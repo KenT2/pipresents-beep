@@ -4,6 +4,7 @@ import ConfigParser
 import remi.gui as gui
 from remi_plus import AdaptableDialog
 from pp_utils import parse_rectangle
+from pp_timeofday import TimeOfDay
 """
 1/12/2016 - warn if foreign files in profile rather than abort
 
@@ -214,12 +215,12 @@ class Validator(AdaptableDialog):
                         self.check_web_window('track','web-window',track['web-window'])
 
                   
-                    # CHECK CROSS REF TRACK TO SHOW
+                    # SHOW TRACK - CHECK CROSS REF TRACK TO SHOW
                     if track['type'] == 'show':
                         if track['sub-show'] == "":
                             self.display('f',"No 'Sub-show to Run'")
                         else:
-                            if track['sub-show'] not in v_show_labels: self.display('f',"Sub-show "+track['sub-show'] + " does not exist")
+                            if track['sub-show'] not in v_show_labels: self.display('f',"Show "+track['sub-show'] + " does not exist")
                             
                 # if anonymous == 0 :self.display('w',"zero anonymous tracks in medialist " + file)
 
@@ -238,8 +239,7 @@ class Validator(AdaptableDialog):
             else:
                 self.display('t',"Checking show '"+show['title'] + "' first pass")
                 if show['show-ref'] == '': self.display('f',"Show Reference is blank")
-                if ' ' in show['show-ref']: self.display('f',"Spaces not allowed in Show Reference: " + show['show-ref'])
-                
+                if ' ' in show['show-ref']: self.display('f',"Spaces not allowed in Show Reference: " + show['show-ref']) 
         if found == 0:self.display('f',"There is no start show")
         if found > 1:self.display('f',"There is more than 1 start show")    
 
@@ -340,6 +340,8 @@ class Validator(AdaptableDialog):
                     if not show['eggtimer-x']!='' and not show['eggtimer-x'].isdigit(): self.display('f',"'Eggtimer x Position' is not a positive integer")
                     if not show['eggtimer-y']!='' and not show['eggtimer-y'].isdigit(): self.display('f',"'Eggtimer y Position' is not a positive integer")
 
+                #check the schedule
+                self.check_schedule_for_show(show,v_show_labels) 
  
                 # Validate simple fields of each show type
                 if show['type'] in ("mediashow",'liveshow'):
@@ -378,6 +380,14 @@ class Validator(AdaptableDialog):
                         if not show['admin-x']!='' and not show['admin-x'].isdigit(): self.display('f',"'Notice Text x Position' is not a positive integer")
                         if not show['admin-y']!='' and not show['admin-y'].isdigit(): self.display('f',"'Notice Text y Position' is not a positive integer")
 
+                if show['type']== 'liveshow':
+                    if  show['repeat']=='repeat':
+                        if show['empty-track-ref']=='':
+                            self.display('f','Empty List Track is blank')
+                        else:
+                            if show['empty-track-ref'] not in v_track_labels:
+                                self.display('f','Empty List Track is not in medialist: '+show['empty-track-ref'])
+                            
 
                 if show['type'] in ("artmediashow",'artliveshow'):
                     
@@ -486,6 +496,9 @@ class Validator(AdaptableDialog):
         if show_count == 0:
             self.display('w',"start show has zero Start Shows")
 
+        #check the schedule
+        self.check_schedule_for_show(show,v_show_labels)      
+
 
 # ***********************************
 # triggers
@@ -530,50 +543,226 @@ class Validator(AdaptableDialog):
             self.display('f','help, do not understaand!: ' + field + ", " + line)
             return        
         
-            
-
 # ***********************************
-# time of day inputs
+# time of day schedule
 # ************************************ 
 
-    def check_times(self,text):
-        lines = text.split("\n")
-        for line in lines:
-            self.check_times_line(line)
-            
-    def check_times_line(self,line):
-        items = line.split()
-        if len(items) == 0: self.display('w','No time values when using time of day trigger: ')
-        for item in items:
-            self.check_times_item(item)
+    def check_schedule_for_show(self,show,v_show_labels):
+        show_type=show['type']
+        show_ref=show['show-ref']
+        print 'check schedule for show ',show_type,show_ref
+        if 'sched-everyday' in show:
+            text=show['sched-everyday']
+            lines=text.splitlines()
+            #chunk text into lines for one day line (day_lines) and leftover (lines)
+            while len(lines) != 0:
+                status,message,day_lines,lines=self.chunk_one_day(lines,show_ref,'everyday')
+                if status == 'error':
+                    return
+                if len(day_lines)!=0:
+                    # check one day line and its times
+                   self.check_day(day_lines,'everyday',show_ref,show_type,v_show_labels)
 
-    def check_times_item(self,item):
-        if item[0] == '+':
-            if not item.lstrip('+').isdigit():
-                self.display('f','Value of relative time is not positive integer: ' + item)
-                return
+
+        if 'sched-weekday' in show:
+            text=show['sched-weekday']
+            lines=text.splitlines()
+            while len(lines) != 0:
+                status,message,day_lines,lines=self.chunk_one_day(lines,show_ref,'weekday')
+                if status == 'error':
+                    return
+                if len(day_lines)!=0:
+                    self.check_day(day_lines,'weekday',show_ref,show_type,v_show_labels)
+
+
+        if 'sched-monthday' in show:
+            text=show['sched-monthday']
+            lines=text.splitlines()
+            while len(lines) != 0:
+                status,message,day_lines,lines=self.chunk_one_day(lines,show_ref,'monthday')
+                # print 'in monthday',day_lines
+                if status == 'error':
+                    return
+                if len(day_lines)!=0:
+                    self.check_day(day_lines,'monthday',show_ref,show_type,v_show_labels)
+            
+
+        if 'sched-specialday' in show:
+            text=show['sched-specialday']
+            lines=text.splitlines()
+            while len(lines) != 0:
+                status,message,day_lines,lines=self.chunk_one_day(lines,show_ref,'specialday')
+                if status == 'error':
+                    return 
+                if len(day_lines)!=0:
+                    self.check_day(day_lines,'specialday',show_ref,show_type,v_show_labels)
+               
+
+
+
+    def chunk_one_day(self,lines,show_ref,section):
+        this_day=[]
+        left_over=[]
+        #print 'get one day',lines
+        # check first line is day and move to output
+        #print lines[0]
+        if not lines[0].startswith('day'):
+            self.display('f','Schedule - first line of section ' + section + ' is not day:  ' + lines[0] )
+            return 'error','',[],[]
+        this_day=[lines[0]]
+        #print ' this day',this_day
+        left_over=lines[1:]
+        # print 'left over',left_over
+        x_left_over=lines[1:]
+        for line in x_left_over:
+            #print 'in loop',line
+            if line.startswith('day'):
+                # print 'one day day',this_day,left_over
+                return 'normal','',this_day,left_over
+            this_day.append(line)
+            left_over=left_over[1:]
+        # print 'one day end',this_day,left_over
+        return 'normal','',this_day,left_over
+                
+    def check_day(self,lines,section,show_ref,show_type,v_show_labels):
+        if section == 'everyday':
+            self.check_everyday(lines[0],show_ref,'everyday')
+        elif section == 'weekday':
+            self.check_weekday(lines[0],show_ref,'weekday')
+        elif section == 'monthday':
+            self.check_monthday(lines[0],show_ref,'monthday')
+        elif section == 'specialday':
+            self.check_specialday(lines[0],show_ref,'specialday')
         else:
-            # hh:mm;ss
-            fields=item.split(':')
-            if len(fields) == 0:
+            self.display('f','Schedule - invalid section name: '+ section)
+            return
+
+        if len(lines) >1:
+            time_lines=lines[1:]
+            self.check_time_lines(time_lines,show_ref,show_type,v_show_labels,section)
+        else:
+            self.display('w','Schedule - In '+ section+ ' there are zero time lines')
+
+ 
+
+    def check_everyday(self,line,show_ref,section):
+        words=line.split()
+        if words[0]!='day':
+            self.display('f', 'error','Schedule - In section '+ section + ' day line does not contain day:  '+ line)
+        if words[1] != 'everyday':
+            self.display('f','Schedule - In section '+ section + ' day line does not contain everyday:  '+ line)
+
+       
+    def check_weekday(self,line,show_ref,section):
+        words=line.split()
+        if words[0]!='day':
+            self.display('f','Schedule - In section '+ section + ' day line does not contain day:  ' + line)
+        days=words[1:]
+        for day in days:
+            if day not in TimeOfDay.DAYS_OF_WEEK:
+                self.display('f','Schedule - In section '+ section + ' day line has invalid day: '+ line)
+
+
+    def check_monthday(self,line,show_ref,section):
+        words=line.split()
+        if words[0]!='day':
+            self.display('f','Schedule - In section '+ section + ' day line does not contain day:  ' + line)
+        days=words[1:]
+        for day in days:
+            if not day.isdigit():
+                self.display('f','Schedule - In section '+ section + ' day line has invalid day: '+ line)
                 return
-            if len(fields) == 1:
-                self.display('f','Too few fields in time: ' + item)
+            if int(day) <1 or int(day)>31:
+                self.display('f','Schedule - In section '+ section + ' day line has out of range day: '+ line)
+        return
+
+    def check_specialday(self,line,show_ref,section):
+        words=line.split()
+        if words[0]!='day':
+            self.display('f','Schedule - In section '+ section + ' day line does not contain day:  ' + line)
+        days=words[1:]
+        for day in days:
+            self.check_date(day,show_ref,section)
+
+   
+    def check_time_lines(self,lines,show_ref,show_type,v_show_labels,section):
+        # lines - list of  lines each with text 'command time'
+        # returns list of lists each being [command, time]
+        time_lines=[]
+        for line in lines:
+            # split line into time,command
+            words=line.split()
+            if len(words)<2:
+                self.display('f','Schedule - In section '+ section + ' time line has wrong length: '+ line)
                 return
-            if len(fields)>3:
-                self.display('f','Too many fields in time: ' + item)
-                return
-            if len(fields) != 3:
-                seconds='0'
+            self.check_time(words[0],show_ref,section)
+
+            if show_type=='start':
+                command = ' '.join(words[1:])
+                self.check_show_control_fields(command,v_show_labels)
             else:
-                seconds=fields[2]
-            if not fields[0].isdigit() or not  fields[1].isdigit() or  not seconds.isdigit():
-                self.display('f','Fields of time are not positive integers: ' + item)
-                return        
-            if int(fields[0])>23 or int(fields[1])>59 or int(seconds)>59:
-                self.display('f','Fields of time are out of range: ' + item)
-                return
-             
+                if words[1] not in ('open','close'):
+                    self.display('f','Schedule - In section '+ section+ ' illegal command: '+ line)
+        return
+
+
+
+    def check_time(self,item,show_ref,section):        
+        fields=item.split(':')
+        if len(fields) == 0:
+            self.display('f','Schedule - In section ' + section + ' time field is empty: '+ item)
+            return
+        if len(fields)>3:
+            self.display('f','Schedule - In section ' + section + ' time line has  too many fields: ' + item)
+            return
+        if len(fields) == 1:
+            seconds=fields[0]
+            minutes='0'
+            hours='0'
+        if len(fields) == 2:
+            seconds=fields[1]
+            minutes=fields[0]
+            hours='0'
+        if len(fields) == 3:
+            seconds=fields[2]
+            minutes=fields[1]
+            hours=fields[0]
+        if not seconds.isdigit() or not  minutes.isdigit() or  not hours.isdigit():
+            self.display('f','Schedule - In section ' + section + ' time field is invalid: ' + item)
+            return
+        if int(minutes)>59:
+            self.display('f','Schedule - In section ' + section + ' Minutes of  '+ item + ' is out of range')
+        if int(seconds)>59:
+            self.display('f','Schedule - In section ' + section + '  Seconds of  '+ item + ' is out of range')
+        if int(hours)>23:
+            self.display('f','Schedule - In section ' + section + ' Hours of  '+ item + ' is out of range')         
+        return
+
+
+    def check_date(self,item,show_ref,section):
+        fields=item.split('-')
+        if len(fields) == 0:
+            self.display('f','Schedule - In section ' + section + ' Date field is empty: '+item)
+            return
+        if len(fields)!=3:
+            self.display('f','Schedule - In section ' + section + ' Too many or few fields in date: ' + item)
+            return
+        year=fields[0]
+        month=fields[1]
+        day = fields[2]
+        if not year.isdigit() or not  month.isdigit() or  not day.isdigit():
+            self.display('f','Schedule - In section ' + section + ' Fields of  '+ item + ' are not positive integers ' )
+            return
+        if int(year)<2018:
+            self.display('f','Schedule - In section ' + section + ' Year of  '+ item + ' is out of range ')
+        if int(month)>12:
+            self.display('f','Schedule - In section ' + section + ' Month of  '+ item + ' is out of range ')
+        if int(day)>31:
+            self.display('f','Schedule - In section ' + section + ' Day of  '+ item + ' is out of range ')
+
+   
+
+
     def check_duration(self,field,line):          
         fields=line.split(':')
         if len(fields) == 0:
@@ -666,14 +855,14 @@ class Validator(AdaptableDialog):
              
              
 # *******************   
-# Check plugin
+# Check track plugin
 # ***********************             
              
     def check_plugin(self,plugin_cfg,pp_home,pp_profile):
         if plugin_cfg.strip() != '' and  plugin_cfg[0] == "+":
             plugin_cfg=pp_home+plugin_cfg[1:]
             if not os.path.exists(plugin_cfg):
-                self.display('f','plugin configuration file not found: '+ plugin_cfg)
+                self.display('f','track plugin configuration file not found: '+ plugin_cfg)
         if plugin_cfg.strip() != '' and  plugin_cfg[0] == "@":
             plugin_cfg=pp_profile+plugin_cfg[1:]
             if not os.path.exists(plugin_cfg):
@@ -858,7 +1047,7 @@ class Validator(AdaptableDialog):
                 self.check_osc(line,dest,fields[2:],v_show_labels)
             return
 
-        if fields[0] not in ('exitpipresents','shutdownnow','reboot','open','openexclusive','close','closeall','monitor','event'):
+        if fields[0] not in ('beep','exitpipresents','shutdownnow','reboot','open','openexclusive','close','closeall','monitor','event'):
                 self.display('f','Show control - Unknown command in: ' + line)
                 return
             
@@ -868,7 +1057,7 @@ class Validator(AdaptableDialog):
                 return
             
         if len(fields) == 2:
-            if fields[0] not in ('open','close','monitor','cec','event','openexclusive'):
+            if fields[0] not in ('beep','open','close','monitor','cec','event','openexclusive'):
                 self.display('f','Show Control - Incorrect number of fields: ' + line)
             else:
                 if fields[0] =='monitor' and fields[1] not in ('on','off'):

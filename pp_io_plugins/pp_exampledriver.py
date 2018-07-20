@@ -23,7 +23,7 @@ class pp_exampledriver(object):
 
 
      # executed once from main program   
-    def init(self,filename,filepath,widget,event_callback=None):
+    def init(self,filename,filepath,widget,pp_dir,pp_home,pp_profile,event_callback=None):
         
         # instantiate arguments
         self.widget=widget

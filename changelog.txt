@@ -1,3 +1,16 @@
+CHANGES FOR 1.4.1a 20/7/2018
+============================
+NEW - Version 1.4 created as pipresents-beep in a new github
+repository
+NEW - pipresents-beep-examples github repository
+modified - 'trigger for next' now waits for a trigger between tracks
+ and does not trigger during a track
+enhanced - beep show control command to play a short audio file
+enhanced - 'show control commands on event' one or more show control commands can now be triggered by
+and input event in addtion to the track control response. 
+enhanced - aplay I/O plugin allows short audio files to be played from animation commands
+enhanced - pp_beep_1p4 example demonstrates beeps and show control on event
+
 CHANGES FOR 1.3.5c 7/6/2018
 ============================
 modified - readme.md ready for gapless to become the stable version
@@ -6,6 +19,7 @@ enhanced - web editor, dropdown field values displayed in red if read value is n
 fixed - crash if linked pins are used in gpio.cfg
 fixed - crash if I/O plugin .cfg file has errors
 fixed - crash if track plugin is not found.
+
 
 CHANGES FOR 1.3.5b 31/5/2018
 ============================

@@ -1,3 +1,11 @@
+Version 1.4.1a 20/7/2018
+========================
+Althought in a new repository this version is a minor improvement to Version 1.3.5a
+New fields have been added to the profile. You will need to update all your profiles by using the web editor
+This version adds an I/O plugin that required a change to the I/O Plugin API - 
+All I/O Plugins you have created need to have the following parameters added to
+ the init() method pp_dir,pp_home,pp_profile. See a provided I/O plugin for where to add them.
+
 Version 1.3.5a 1/5/2018
 =======================
 This version integrates editing the time of day schedule with the web editor.

@@ -99,7 +99,7 @@ class pp_i2cdriver(object):
         pass
 
      # executed once from main program   
-    def init(self,filename,filepath,widget,event_callback=None):
+    def init(self,filename,filepath,widget,pp_dir,pp_home,pp_profile,event_callback=None):
         # instantiate arguments
         self.widget=widget
         self.filename=filename

@@ -93,12 +93,17 @@ class GapShow(Show):
         if self.medialist.anon_length()==0 and self.show_params['type'] not in ('liveshow','artliveshow'):
             self.mon.err(self,'No anonymous tracks in medialist ')
             self.end('error','No anonymous tracks in medialist ')
-               
+
+        if self.show_params['trigger-next-type']=='input':
+            self.wait_for_next_trigger=True
+        else:
+            self.wait_for_next_trigger=False
 
         # delete eggtimer started by the parent
         if self.previous_shower is not None:
             self.previous_shower.delete_eggtimer()
-            
+
+        self.playing_track=False
         self.start_show()
 
 
@@ -120,7 +125,12 @@ class GapShow(Show):
         Show.base_handle_input_event(self,symbol)
 
     def handle_input_event_this_show(self,symbol):
+
+        # show control on event
+        self.handle_show_control_event(symbol,self.show_control_controls)
+
         #  check symbol against mediashow triggers
+        # print self.state,self.playing_track
         if self.state == 'waiting' and self.show_params['trigger-start-type'] in ('input','input-persist') and symbol  ==  self.show_params['trigger-start-param']:
             self.mon.stats(self.show_params['type'],self.show_params['show-ref'],self.show_params['title'],'start trigger',
                             '','','')
@@ -134,12 +144,13 @@ class GapShow(Show):
             elif self.current_player is not None:
                 self.current_player.input_pressed('stop')
                 
-        elif self.state == 'playing' and self.show_params['trigger-next-type'] == 'input' and symbol == self.show_params['trigger-next-param']:
+        elif self.state == 'playing' and self.show_params['trigger-next-type'] == 'input' and symbol == self.show_params['trigger-next-param'] and self.playing_track is False:
             self.mon.stats(self.show_params['type'],self.show_params['show-ref'],self.show_params['title'],'next trigger',
                             '','','')
-            self.next()
+            self.trigger_next()
         else:
             # event is not a trigger so must be internal operation
+            
             operation=self.base_lookup_control(symbol,self.controls_list)
             if operation != '':
                 self.do_operation(operation)
@@ -201,6 +212,10 @@ class GapShow(Show):
             if self.current_player is not None:
                 self.current_player.input_pressed(operation)
 
+    def trigger_next(self):
+        self.next_track_signal=True
+        Show.delete_admin_message(self)
+        self.what_next_after_showing()
 
     def next(self):
         # stop track if running and set signal
@@ -324,6 +339,8 @@ class GapShow(Show):
 
         # uncomment the next line to write stats for every track
         # Show.write_stats(self,'play a track',self.show_params,selected_track)
+
+        self.playing_track=True
         
         # shuffle players
         Show.base_shuffle(self)
@@ -405,6 +422,8 @@ class GapShow(Show):
         
 
     def what_next_after_showing(self):
+        #inhibit for trigger next
+        self.playing_track=False
         # print 'WHAT NEXT'
         self.mon.trace(self,self.pretty_what_next_after_showing_state())
                         
@@ -713,8 +732,14 @@ class GapShow(Show):
                 elif self.medialist.at_end() is False:
                     # nothing special just do the next track
                     # print 'nothing special'
-                    self.medialist.next(self.show_params['sequence'])
-                    self.start_load_show_loop(self.medialist.selected_track())
+                    if self.wait_for_next_trigger is False:
+                        self.medialist.next(self.show_params['sequence'])
+                        self.start_load_show_loop(self.medialist.selected_track())
+                    else:
+                        #close the previous track to display admin message
+                        Show.base_shuffle(self)
+                        Show.base_track_ready_callback(self,False)
+                        Show.display_admin_message(self,self.show_params['trigger-wait-text'])
                           
                 else:
                     # unhandled state

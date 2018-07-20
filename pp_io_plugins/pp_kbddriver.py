@@ -13,7 +13,7 @@ class pp_kbddriver(object):
     def __init__(self):
         self.mon=Monitor()
 
-    def init(self,filename,filepath,widget,callback=None):
+    def init(self,filename,filepath,widget,pp_dir,pp_home,pp_profile,callback=None):
 
         # instantiate arguments
         self.widget=widget

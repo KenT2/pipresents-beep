@@ -34,7 +34,7 @@ class PPWebEditor(App):
         # ***************************************
         # INIT
         # ***************************************
-        self.editor_issue="1.3.5"
+        self.editor_issue="1.4.1"
         self.force_update= False
 
         # get directory holding the code
@@ -516,47 +516,47 @@ class PPWebEditor(App):
 
         
     def new_exhibit_profile(self,widget):
-        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_exhibit_1p3'
+        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_exhibit_1p4'
         self.new_profile(profile)
 
     def new_interactive_profile(self,widget):
-        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_interactive_1p3'
+        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_interactive_1p4'
         self.new_profile(profile)
 
     def new_menu_profile(self,widget):
-        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_menu_1p3'
+        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_menu_1p4'
         self.new_profile(profile)
 
     def new_presentation_profile(self,widget):
-        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_presentation_1p3'
+        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_presentation_1p4'
         self.new_profile(profile)
 
     def new_blank_profile(self,widget):
-        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep +"ppt_blank_1p3"
+        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep +"ppt_blank_1p4"
         self.new_profile(profile)
 
     def new_mediashow_profile(self,widget):
-        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_mediashow_1p3'
+        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_mediashow_1p4'
         self.new_profile(profile)
         
     def new_liveshow_profile(self,widget):
-        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_liveshow_1p3'
+        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_liveshow_1p4'
         self.new_profile(profile)
 
     def new_artmediashow_profile(self,widget):
-        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_artmediashow_1p3'
+        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_artmediashow_1p4'
         self.new_profile(profile)
         
     def new_artliveshow_profile(self,widget):
-        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_artliveshow_1p3'
+        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_artliveshow_1p4'
         self.new_profile(profile)
 
     def new_radiobuttonshow_profile(self,widget):
-        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_radiobuttonshow_1p3'
+        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_radiobuttonshow_1p4'
         self.new_profile(profile)
 
     def new_hyperlinkshow_profile(self,widget):
-        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_hyperlinkshow_1p3'
+        profile = self.editor_dir+os.sep+'pp_resources'+os.sep+'pp_templates'+os.sep + 'ppt_hyperlinkshow_1p4'
         self.new_profile(profile)
 
 
@@ -736,8 +736,11 @@ class PPWebEditor(App):
         
 
     def edit_show(self,show_types,field_specs):
+        show_title=self.current_showlist.selected_show()['title']
+        show_ref=self.current_showlist.selected_show()['show-ref']  
         if self.current_showlist is not None and self.current_showlist.show_is_selected():
-            self.edit_show_dialog=WebEditItem("Edit Show",self.current_showlist.selected_show(),show_types,field_specs,self.show_refs(),
+            self.edit_show_dialog=WebEditItem("Edit Show - "+show_title + ' ['+show_ref+']',
+                                              self.current_showlist.selected_show(),show_types,field_specs,self.show_refs(),
                        self.initial_media_dir,self.pp_home_dir,self.pp_profile_dir,'show',self.finished_edit_show)
             self.edit_show_dialog.show(self)
             show_type=self.current_showlist.selected_show()['type']
@@ -966,9 +969,12 @@ class PPWebEditor(App):
     def m_edit_track(self,widget):
         self.edit_track(PPdefinitions.track_types,PPdefinitions.track_field_specs)
 
-    def edit_track(self,track_types,field_specs):      
+    def edit_track(self,track_types,field_specs):
         if self.current_medialist is not None and self.current_medialist.track_is_selected():
-            self.edit_track_dialog=WebEditItem("Edit Track",self.current_medialist.selected_track(),track_types,field_specs,
+            title=self.current_medialist.selected_track()['title']
+            track_ref=self.current_medialist.selected_track()['track-ref']
+            self.edit_track_dialog=WebEditItem("Edit Track - " + title + ' [' + track_ref +']',
+                                               self.current_medialist.selected_track(),track_types,field_specs,
                        self.show_refs(),self.initial_media_dir,self.pp_home_dir,self.pp_profile_dir,'track',self.finished_edit_track)
             self.edit_track_dialog.show(self)
             self.edit_track_dialog.show_tab('track')

@@ -77,7 +77,7 @@ class pp_gpiodriver(object):
 
 
      # executed once from main program   
-    def init(self,filename,filepath,widget,button_callback=None):
+    def init(self,filename,filepath,widget,pp_dir,pp_home,pp_profile,button_callback=None):
         
         # instantiate arguments
         self.widget=widget

@@ -97,7 +97,7 @@ class TimeOfDay(object):
             # nothing required for start show, all previous events are just ignored.
             for show_ref in TimeOfDay.events:
                  if show_ref != 'start':
-                    # print '\n*****',show_ref
+                    # print 'Catch-up',show_ref
                     times = TimeOfDay.events[show_ref]
                     # go through the event list for a show rembering show state until the first future event is found.
                     # then if last command was to start the show send it

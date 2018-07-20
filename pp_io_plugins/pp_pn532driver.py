@@ -32,7 +32,7 @@ class pp_pn532driver(object):
 
 
     # executed once from main program   
-    def init(self,filename,filepath,widget,button_callback=None):
+    def init(self,filename,filepath,widget,pp_dir,pp_home,pp_profile,button_callback=None):
         self.widget=widget
         self.button_callback=button_callback
         self.filename=filename

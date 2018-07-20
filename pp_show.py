@@ -1,6 +1,7 @@
 #2/1/2016 add write_stats  function
 
 import os
+import copy
 from Tkinter import NW
 from PIL import Image
 from PIL import ImageTk
@@ -67,8 +68,7 @@ class Show(object):
         
         # create an  instance of showmanager so we can init child/subshows
         self.show_manager=ShowManager(self.show_id,self.showlist,self.show_params,self.root,self.show_canvas,self.pp_dir,self.pp_profile,self.pp_home)
-
-
+     
         # init variables
         self.current_player=None
         self.previous_player=None
@@ -120,6 +120,17 @@ class Show(object):
             self.mon.err(self,"Medialist file not found: "+ self.medialst_file)
             self.end('error',"Medialist file not found: "+ self.medialst_file)
 
+        # parse show control events
+        if self.show_params['disable-show-control-events'] != 'yes':
+            status,message,sc_controls=self.parse_show_control_controls(self.show_params['show-control-events'])
+            if status == 'error':
+                self.mon.err(self,message + " in: "+ self.show_params['title'])
+                self.end('error',message + " in: "+ self.show_params['title'])
+            self.show_control_controls=sc_controls
+        else:
+            self.show_control_controls=[]
+        # print 'parse', self.show_control_controls
+                                                                                                   
         # read the medialist for the show
         if self.medialist.open_list(self.medialst_file,self.showlist.profile_version()) is False:
             self.mon.err(self,"Version of medialist different to Pi Presents")
@@ -594,7 +605,6 @@ class Show(object):
   # respond to input events
     def base_handle_input_event(self,symbol):
         self.mon.log(self, self.show_params['show-ref']+ ' Show Id: '+ str(self.show_id)+": received input event: " + symbol)
-
         if self.shower is not None:
             self.shower.handle_input_event(symbol)
         else:
@@ -691,15 +701,45 @@ class Show(object):
                             track_type,ref,title,loc)
             
 
+    def parse_show_control_controls(self,text):
+        sc_controls=[]
+        lines = text.split('\n')
+        for line in lines:
+            if line.strip() == '':
+                continue
+            error_text,sc_control=self.parse_show_control_control(line.strip())
+            if error_text != '':
+                return 'error',error_text,sc_controls
+            sc_controls.append(copy.deepcopy(sc_control))
+        return 'normal','',sc_controls
 
- # Control shows so pass the show control commands back to PiPresents via the command callback
+    # parse the event>command association
+    def parse_show_control_control(self,line):
+        fields = line.split(" ",1)
+        if len(fields) < 2:
+            return "incorrect number of fields in show control event control "+line,['','']
+        symbol=fields[0]
+        show_control_command=' '.join(fields[1:])
+        return '',[symbol,show_control_command]
+
+
+    # match input event against list of controls, do all matches
+    def handle_show_control_event(self,symbolic_name,sc_controls):
+        print 'test',symbolic_name,sc_controls
+        for control in sc_controls:
+            if symbolic_name== control[0]:
+                self.show_control_command(control[1])
+     
+
+    # Control shows at begin or end so pass the show control commands back to PiPresents via the command callback
     def show_control(self,show_control_text):
         lines = show_control_text.split('\n')
         for line in lines:
             if line.strip() != "":
                 # print 'show control command: ',line
                 self.show_control_command(line)
-
+                
+    # do the show control command
     def show_control_command(self,line):
         fields= line.split()
         show_command=fields[0]

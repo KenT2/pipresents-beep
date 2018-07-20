@@ -99,6 +99,10 @@ class ArtShow(Show):
 
 
     def handle_input_event_this_show(self,symbol):
+
+        # show control events
+        self.handle_show_control_event(symbol,self.show_control_controls)
+        
         operation=self.base_lookup_control(symbol,self.controls_list)
         self.do_operation(operation)
 

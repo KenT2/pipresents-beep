@@ -144,6 +144,9 @@ class RadioButtonShow(Show):
         # find the first entry in links that matches the symbol and execute its operation
         self.mon.log(self, self.show_params['show-ref']+ ' Show Id: '+ str(self.show_id)+": received input event: " + symbol)
 
+        # show control events
+        self.handle_show_control_event(symbol,self.show_control_controls)
+
         # print 'radiobuttonshow ',symbol
         found,link_op,link_arg=self.path.find_link(symbol,self.links)
         # print 'input event',symbol,link_op

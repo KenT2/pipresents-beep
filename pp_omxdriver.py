@@ -318,7 +318,8 @@ class OMXDriver(object):
             return False
 
 
-    def send_unpause(self):  
+    def send_unpause(self):
+        # print 'unpause'
         if self.is_running():
             try:
                 self.__iface_player.Action(16)
@@ -371,6 +372,7 @@ class OMXDriver(object):
 
     def toggle_pause(self,reason):
         self.mon.log(self,'toggle pause received '+ reason)
+        # print 'toggle pause'
         if self.is_running():
             try:
                 self.__iface_player.Action(16)
@@ -398,6 +400,7 @@ class OMXDriver(object):
             self.__iface_player.Unmute()
 
     def set_volume(self,millibels):
+        # print millibels
         volume = pow(10, millibels / 2000.0);
         self.__iface_props.Volume(volume)
         

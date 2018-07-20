@@ -12,9 +12,10 @@ class IOPluginManager(object):
 
 
 
-    def init(self,pp_dir,pp_profile,widget,callback):
+    def init(self,pp_dir,pp_profile,widget,callback,pp_home):
         self.pp_dir=pp_dir
         self.pp_profile=pp_profile
+        self.pp_home=pp_home
         IOPluginManager.plugins=[]
 
         if os.path.exists(self.pp_profile+os.sep+'pp_io_config'):
@@ -60,7 +61,7 @@ class IOPluginManager(object):
                 return 'error',driver_name + ' Driver not found in ' + driver_path
             
             instance = self._load_plugin_file(driver_name,self.pp_dir+os.sep+'pp_io_plugins')
-            reason,message=instance.init(cfgfile,cfgfilepath,widget,callback)
+            reason,message=instance.init(cfgfile,cfgfilepath,widget,self.pp_dir,self.pp_home,self.pp_profile,callback)
             if reason=='warn':
                 self.mon.warn(self,message)
                 return 'error',message

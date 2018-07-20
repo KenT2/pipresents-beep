@@ -296,7 +296,6 @@ class VideoPlayer(Player):
             self.omx.pause_on()
             if self.omx.paused is True and self.pause_timeout>0:
                 # kick off the pause teimeout timer
-                print "!!pause on"
                 self.pause_timer=self.canvas.after(self.pause_timeout*1000,self.pause_timeout_callback)
             return True
         else:
@@ -309,7 +308,6 @@ class VideoPlayer(Player):
         if self.play_state  == 'showing' and self.frozen_at_end is False and self.omx.paused_at_start == 'done':
             self.omx.pause_off()
             if self.omx.paused is False:
-                print "!!pause off"
                 # cancel the pause timer
                 if self.pause_timer != None:
                     self.canvas.after_cancel(self.pause_timer)

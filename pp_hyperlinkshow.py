@@ -184,6 +184,10 @@ class HyperlinkShow(Show):
 
 
     def handle_input_event_this_show(self,symbol):
+
+        # show control events
+        self.handle_show_control_event(symbol,self.show_control_controls)
+
         # does the symbol match a link, if so execute it
         # some link commands do a subset of the internal operations
         # find the first entry in links that matches the symbol and execute its operation
