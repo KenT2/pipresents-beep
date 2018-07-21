@@ -119,6 +119,7 @@ class pp_aplaydriver(object):
                     return 'normal','beep played from: '+location+ ' on device: '+ device
                 else:
                     return 'error','beep file not found: '+ location
+        return 'normal','no match for ' + name + ' ' + param_type
 
     def complete_path(self,track_file):
         #  complete path of the filename of the selected entry
@@ -139,7 +140,7 @@ class pp_aplaydriver(object):
 
         fields = location.split('.')
         if fields[1] == 'mp3':
-            os.system("mpg123 " + location)
+            os.system("mpg123 -q " + location)
         else:
             os.system("aplay -q " + location)
 

@@ -57,11 +57,11 @@ class BeepsManager(object):
         return track_file 
 
     def do_beep(self,path):
-        print 'Beep '+path
+        # print 'Beep '+path
         self.mon.log(self,'Do Beep: '+ path)
         fields = path.split('.')
         if fields[1] == 'mp3':
-            os.system("mpg123 " + path)
+            os.system("mpg123 -q " + path)
         else:
             os.system("aplay -q " + path)
 

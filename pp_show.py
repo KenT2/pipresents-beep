@@ -725,7 +725,7 @@ class Show(object):
 
     # match input event against list of controls, do all matches
     def handle_show_control_event(self,symbolic_name,sc_controls):
-        print 'test',symbolic_name,sc_controls
+        # print 'test',symbolic_name,sc_controls
         for control in sc_controls:
             if symbolic_name== control[0]:
                 self.show_control_command(control[1])
