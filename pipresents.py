@@ -6,7 +6,7 @@ It is aimed at primarily at  musems, exhibitions and galleries
 but has many other applications including digital signage
 
 Version 1.4 [pipresents-beep]
-Copyright 2012/2013/2014/2015/2016/2017/2018, Ken Thompson
+Copyright 2012/2013/2014/2015/2016/2017/2018/2019, Ken Thompson
 See github for licence conditions
 See readme.md and manual.pdf for instructions.
 """
@@ -51,8 +51,8 @@ class PiPresents(object):
     def __init__(self):
         # gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_INSTANCES|gc.DEBUG_OBJECTS|gc.DEBUG_SAVEALL)
         gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_SAVEALL)
-        self.pipresents_issue="1.4.1"
-        self.pipresents_minorissue = '1.4.1a'
+        self.pipresents_issue="1.4.2"
+        self.pipresents_minorissue = '1.4.2a'
         # position and size of window without -f command line option
         self.nonfull_window_width = 0.45 # proportion of width
         self.nonfull_window_height= 0.7 # proportion of height
@@ -669,7 +669,7 @@ class PiPresents(object):
             self.show_manager.exit_all_shows() 
 
 
-    def handle_sigterm(self,signum):
+    def handle_sigterm(self,signum,fframe):
         self.mon.log(self,'SIGTERM received - '+ str(signum))
         self.terminate()
 

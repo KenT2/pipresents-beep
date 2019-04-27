@@ -931,7 +931,7 @@ class Validator(AdaptableDialog):
             self.display('f',"incorrect number of fields in Control: " + line)
             return
         operation=fields[1]
-        if operation in ('up','down','play','stop','exit','pause','no-command','null','pause-on','pause-off','mute','unmute','go') or operation[0:6] == 'mplay-' or operation[0:4] == 'omx-' or operation[0:5] == 'uzbl-':
+        if operation in ('repeat','up','down','play','stop','exit','pause','no-command','null','pause-on','pause-off','mute','unmute','go') or operation[0:6] == 'mplay-' or operation[0:4] == 'omx-' or operation[0:5] == 'uzbl-':
             return
         else:
             self.display('f',"unknown Command in Control: " + line)

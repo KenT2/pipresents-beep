@@ -55,6 +55,7 @@ class GapShow(Show):
         self.end_trigger_signal=False
         self.next_track_signal=False
         self.previous_track_signal=False
+        self.repeat_track_signal=False
         self.play_child_signal = False
         self.error_signal=False
         self.show_timeout_signal=False
@@ -182,6 +183,9 @@ class GapShow(Show):
             
         elif operation == 'down' and self.state == 'playing':
             self.next()
+            
+        elif operation == 'repeat' and self.state == 'playing':
+            self.repeat()
 
         elif operation == 'play':
             # use 'play' to start child if state=playing or to trigger the show if waiting for trigger
@@ -226,6 +230,14 @@ class GapShow(Show):
             if self.current_player is not None:
                 self.current_player.input_pressed('stop')
 
+    def repeat(self):
+        # stop track if running and set signal
+        self.repeat_track_signal=True
+        if self.shower is not None:
+            self.shower.do_operation('stop')
+        else:
+            if self.current_player is not None:
+                self.current_player.input_pressed('stop')
 
     def previous(self):
         self.previous_track_signal=True
@@ -616,7 +628,9 @@ class GapShow(Show):
                         self.ending_reason='error'
                         Show.base_close_or_unload(self)
 
-
+                elif self.repeat_track_signal is True:
+                    self.repeat_track_signal=False
+                    self.start_load_show_loop(self.medialist.selected_track())
 
                 # skip to next track on user input or after subshow
                 elif self.next_track_signal is True:

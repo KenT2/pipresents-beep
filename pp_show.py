@@ -478,8 +478,10 @@ class Show(object):
         self.base_withdraw_show_background()
         self.base_delete_show_background()
 
-        # Control concurrent shows at end
-        self.show_control(self.show_params['show-control-end'])
+        # only do show control at end once
+        if self.exit_signal==False:
+            # Control concurrent shows at end
+            self.show_control(self.show_params['show-control-end'])
         
         self.mon.trace(self,' at level ' + str(self.level) + '\n - Current is ' + self.mon.pretty_inst(self.current_player) + '\n - Previous is ' + self.mon.pretty_inst(self.previous_player) + '\n with reason' + reason + '\n\n')
         self.mon.log(self,self.show_params['show-ref']+ ' Show Id: '+ str(self.show_id)+ ": Ending Show")
@@ -725,7 +727,6 @@ class Show(object):
 
     # match input event against list of controls, do all matches
     def handle_show_control_event(self,symbolic_name,sc_controls):
-        # print 'test',symbolic_name,sc_controls
         for control in sc_controls:
             if symbolic_name== control[0]:
                 self.show_control_command(control[1])

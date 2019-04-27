@@ -1,5 +1,5 @@
 {
- "issue": "1.4.1", 
+ "issue": "1.4.2", 
  "shows": [
   {
    "background-colour": "#000000", 
@@ -42,6 +42,7 @@
    "eggtimer-x": "100", 
    "eggtimer-y": "100", 
    "empty-track-ref": "", 
+   "enable-catchup": "yes", 
    "escape-track-ref": "", 
    "freeze-at-end": "yes", 
    "freeze-at-start": "no", 

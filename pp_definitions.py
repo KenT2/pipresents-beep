@@ -1,5 +1,5 @@
 class PPdefinitions(object):
-    DEFINITIONS_VERSION_STRING='1.4.1'
+    DEFINITIONS_VERSION_STRING='1.4.2'
     IMAGE_FILES=('Image files', '.gif','.jpg','.jpeg','.bmp','.png','.tif')
     VIDEO_FILES= ('Video Files','.asf','.avi','.mpg','.mp4','.mpeg','.m2v','.m1v','.vob','.divx','.xvid','.mov','.m4v','.m2p','.mkv','.m2ts','.ts','.mts','.wmv','.webm')
     AUDIO_FILES=('Audio files','.mp3','.wav','.ogg','.ogm','.wma','.asf','.mp2')
@@ -32,7 +32,7 @@ class PPdefinitions(object):
             'tab-show-control','sep',
                 'show-control-begin','show-control-end','sep','disable-show-control-events','sep','show-control-events',
             'tab-sched','sep',
-                'sched-everyday','sched-weekday','sched-monthday','sched-specialday',
+                'sched-everyday','sched-weekday','sched-monthday','sched-specialday','enable-catchup',
 
             ],
 
@@ -55,7 +55,7 @@ class PPdefinitions(object):
             'tab-show-control','sep',
                 'show-control-begin','show-control-end','sep','disable-show-control-events','sep','show-control-events',
             'tab-sched','sep',
-                'sched-everyday','sched-weekday','sched-monthday','sched-specialday',
+                'sched-everyday','sched-weekday','sched-monthday','sched-specialday','enable-catchup',
             ],
     
         'mediashow':[
@@ -82,7 +82,7 @@ class PPdefinitions(object):
             'tab-show-control','sep',
                 'show-control-begin','show-control-end','sep','disable-show-control-events','sep','show-control-events',
             'tab-sched','sep',
-                'sched-everyday','sched-weekday','sched-monthday','sched-specialday',
+                'sched-everyday','sched-weekday','sched-monthday','sched-specialday','enable-catchup',
             ],
                  
         'menu':[
@@ -103,7 +103,7 @@ class PPdefinitions(object):
             'tab-show-control','sep',
                 'show-control-begin','show-control-end','sep','disable-show-control-events','sep','show-control-events',
             'tab-sched','sep',
-                'sched-everyday','sched-weekday','sched-monthday','sched-specialday',
+                'sched-everyday','sched-weekday','sched-monthday','sched-specialday','enable-catchup',
             ],
 
         
@@ -131,7 +131,7 @@ class PPdefinitions(object):
             'tab-show-control','sep',
                 'show-control-begin','show-control-end','show-control-empty','show-control-not-empty','disable-show-control-events','sep','show-control-events',
             'tab-sched','sep',
-                'sched-everyday','sched-weekday','sched-monthday','sched-specialday',
+                'sched-everyday','sched-weekday','sched-monthday','sched-specialday','enable-catchup',
             ],
 
 
@@ -154,7 +154,7 @@ class PPdefinitions(object):
             'tab-show-control','sep',
                 'show-control-begin','show-control-end','sep','disable-show-control-events','sep','show-control-events',
             'tab-sched','sep',
-                'sched-everyday','sched-weekday','sched-monthday','sched-specialday',
+                'sched-everyday','sched-weekday','sched-monthday','sched-specialday','enable-catchup',
             ],
         
 
@@ -176,7 +176,7 @@ class PPdefinitions(object):
             'tab-show-control','sep',
                 'show-control-begin','show-control-end','sep','disable-show-control-events','sep','show-control-events',
             'tab-sched','sep',
-                'sched-everyday','sched-weekday','sched-monthday','sched-specialday',
+                'sched-everyday','sched-weekday','sched-monthday','sched-specialday','enable-catchup',
                     ],
               
             'start':[
@@ -206,7 +206,7 @@ class PPdefinitions(object):
                             'live-tracks-dir1':'','live-tracks-dir2':'',
                                'controls':'pp-down down\npp-stop stop\npp-pause pause\n',
                                'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no',
-                               'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':''},
+                               'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'},
 
                 'artmediashow':{'title': 'New ArtMediashow','show-ref':'','show-canvas':'',  'type': 'artmediashow', 'disable-controls':'no','sequence': 'ordered','repeat':'repeat','medialist': '',
                         'show-text':'','show-text-font':'Helvetica 20 bold','show-text-colour':'white','show-text-x':'0','show-text-y':'0','show-text-justify':'left','background-image':'','background-colour':'',
@@ -217,7 +217,7 @@ class PPdefinitions(object):
                                 'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                             'controls':'pp-down down\npp-stop stop\npp-pause pause\n',
                                 'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no',
-                                'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':''},
+                                'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'},
 
                'hyperlinkshow':{ 'type':'hyperlinkshow','title':'New Hyperlink Show','show-ref':'', 'show-canvas':'', 'medialist':'','debug-path':'no',
                     'links':'','first-track-ref':'','home-track-ref':'','timeout-track-ref':'','disable-controls':'no','show-timeout': '0','track-timeout': '0',
@@ -228,7 +228,7 @@ class PPdefinitions(object):
                                  'omx-audio': 'hdmi','omx-volume':'0','omx-window':'warp 300 300 655 500','omx-other-options': '','web-window':'warp 300 300 700 700','freeze-at-start':'no','freeze-at-end':'yes',
                                  'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                                  'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no',
-                                 'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':''
+                                 'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'
                             },
 
     
@@ -241,7 +241,7 @@ class PPdefinitions(object):
                                    'omx-audio': 'hdmi','omx-volume':'0','omx-window':'warp 300 300 655 500','omx-other-options': '','web-window':'warp 300 300 700 700','freeze-at-start':'no','freeze-at-end':'yes',
                                    'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                                    'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no','controls-in-subshows':'no',
-                                   'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':''
+                                   'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'
                                    },
     
                 'mediashow':{'title': 'New Mediashow','show-ref':'', 'show-canvas':'', 'type': 'mediashow','medialist': '','show-timeout': '0','interval':'0','track-count-limit':'0',
@@ -255,7 +255,7 @@ class PPdefinitions(object):
                              'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                              'controls':'pp-down down\npp-up up\npp-play play\npp-stop stop\npp-pause pause\n',
                              'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no',
-                             'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':''},
+                             'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'},
                                      
                 'liveshow':{'title': 'New Liveshow','show-ref':'','show-canvas':'', 'type': 'liveshow','show-timeout': '0','interval':'0','track-count-limit':'0',
                             'disable-controls':'no','trigger-start-type':'start','trigger-start-param':'','trigger-next-type': 'continue','trigger-next-param':'','sequence': 'ordered','repeat': 'repeat','trigger-end-type':            'none', 'trigger-end-param':'','medialist': '',
@@ -269,7 +269,7 @@ class PPdefinitions(object):
                             'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                             'controls':'pp-down down\npp-up up\npp-play play\npp-stop stop\npp-pause pause\n',
                             'show-control-begin':'','show-control-end':'','show-control-empty':'','show-control-not-empty':'','show-control-events':'','disable-show-control-events':'no',
-                            'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':''},
+                            'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'},
                 
        
               'menu':{'show-ref': '', 'title': 'New Menu','type': 'menu','medialist': '','show-canvas':'',
@@ -281,7 +281,7 @@ class PPdefinitions(object):
                       'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                         'disable-controls':'no','controls':'pp-down down\npp-up up\npp-play play\npp-stop stop\npp-pause pause\n',
                       'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no',
-                      'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':''},    
+                      'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'},    
             
                 'start':{'title': 'Start','start-show-ref':'start', 'type': 'start','background-colour':'#000000','start-show':'','show-ref':'start',
                          'sched-enable':'no','simulate-time':'no','sim-year':'','sim-month':'','sim-day':'','sim-hour':'','sim-minute':'','sim-second':'',
@@ -321,6 +321,7 @@ class PPdefinitions(object):
                                     'values':['left','center','right']},
                     'empty-text':{'shape':'text','text':'List Empty Text','must':'no','read-only':'no'},
                     'empty-track-ref':{'shape':'entry','text':'Empty List Track','must':'no','read-only':'no'},
+                    'enable-catchup':{'shape':'option-menu','text':'Enable Catchup','must':'no','read-only':'no','values':['yes','no']},
                     'escape-track-ref':{'shape':'entry','text':'Escape Track','must':'no','read-only':'no'},
                     'first-track-ref':{'shape':'entry','text':'First Track','must':'no','read-only':'no'},
                     'has-background':{'shape':'option-menu','text':'Has Background Image','must':'no','read-only':'no','values':['yes','no']},

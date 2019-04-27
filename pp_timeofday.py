@@ -96,8 +96,9 @@ class TimeOfDay(object):
             # do the catchup for each real show in turn
             # nothing required for start show, all previous events are just ignored.
             for show_ref in TimeOfDay.events:
-                 if show_ref != 'start':
-                    # print 'Catch-up',show_ref
+                 if show_ref != 'start' and self.enable_catchup[show_ref] == 'yes':
+                    if self.testing:
+                        print 'Catch Up',show_ref
                     times = TimeOfDay.events[show_ref]
                     # go through the event list for a show rembering show state until the first future event is found.
                     # then if last command was to start the show send it
@@ -196,8 +197,8 @@ class TimeOfDay(object):
     def do_event(self,show_ref,time_element):
         self.mon.log (self,'Event : '  + time_element[0] +  ' ' +  show_ref + ' required at: ' + time_element[1].isoformat())
         self.mon.sched (self,TimeOfDay.now,' ToD Scheduler : '  + time_element[0] +  ' ' +  show_ref + ' required at: ' + time_element[1].isoformat())
-        # if self.testing:
-            # print 'Event : ' +  time_element[0] + ' ' + show_ref + ' required at: '+ time_element[1].isoformat()
+        if self.testing:
+            print 'Event : ' +  time_element[0] + ' ' + show_ref + ' required at: '+ time_element[1].isoformat()
         if show_ref != 'start':
             self.callback(time_element[0]  + ' ' + show_ref)
         else:
@@ -266,7 +267,7 @@ class TimeOfDay(object):
             self.sim_year=starter_show['sim-year']
             if not self.sim_year.isdigit():
                 return 'error','Simulate time - year is not a positive integer '+self.sim_year,False
-            if int(self.sim_year)<2018:
+            if int(self.sim_year)<2019:
                 return 'error','Simulate time -  year is out of range '+self.sim_year,False     
         else:
             self.simulate_time=False
@@ -288,11 +289,14 @@ class TimeOfDay(object):
         1 - time hour:min[:sec]
 
         """
+        self.enable_catchup={}
         self.todays_schedule={}
         for index in range(self.showlist.length()):
             show= self.showlist.show(index)
             show_type=show['type']
             show_ref=show['show-ref']
+            if show['type'] != 'start':
+                self.enable_catchup[show_ref]=show['enable-catchup']
             # print 'looping build ',show_type,show_ref,self.showlist.length()
             if 'sched-everyday' in show:
                 text=show['sched-everyday']
@@ -368,6 +372,7 @@ class TimeOfDay(object):
 
                 #print '\nafter specialday'
                 #self.print_todays_schedule()
+        # print self.enable_catchup
         return 'normal',''
 
     def get_one_day(self,lines,show_ref):
@@ -399,7 +404,6 @@ class TimeOfDay(object):
         # open 1:42
         # close 1:45
         # returns status,message,list of days,list of time lines
-        print 'lines ',len(lines), section
         if section == 'everyday':
             status,message,days_list=self.parse_everyday(lines[0],show_ref)
         elif section == 'weekday':

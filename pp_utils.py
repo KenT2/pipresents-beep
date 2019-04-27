@@ -9,6 +9,7 @@ import os
 import gc
 import tkMessageBox
 from Tkinter import NW,N,W,CENTER,LEFT,RIGHT
+from pp_statsrecorder import Statsrecorder
 # from pympler.tracker import SummaryTracker
 # from pympler import summary, muppy
 # import types
@@ -177,12 +178,14 @@ class Monitor(object):
     log_level=0              
     log_path=""            # set in pipresents
     ofile=None
-    stats_file=None
+
     start_time= time.time()
     tracker=None
     show_count=0
     track_count=0
 
+    stats_file=None
+    sr=None          # 
 
 # called at start by pipresents
     def init(self):
@@ -195,13 +198,9 @@ class Monitor(object):
         Monitor.classes  = []
         Monitor.enable_in_code = False  # enables use of self.mon.set_log_level(nn) in classes
         
-        # statistics file, open for appending so its not deleted
-        if Monitor.stats_file is None:
-            Monitor.stats_file=open(Monitor.log_path+ os.sep+'pp_logs' + os.sep + 'pp_stats.txt','a',bufsize)
-            sep='"'+Monitor.delimiter+'"'
-            if Monitor.stats_file.tell()==0:
-                Monitor.stats_file.write('"'+'Date'+sep+'Time'+sep+'Show Type'+sep+'Show Ref'+ sep +'Show Title'+sep
-                                     +'Command'+sep+'Track Type'+sep+'Track Ref'+sep+'Track Title'+sep+'Location"\n')
+        Monitor.sr=Statsrecorder()
+        Monitor.sr.init(Monitor.log_path)
+        
 
     def leak_diff(self):
         Monitor.tracker.print_diff()
@@ -283,17 +282,13 @@ class Monitor(object):
             Monitor.ofile.write (str(time.time()-Monitor.start_time) + " " + self.pretty_inst(caller)+": " + text+"\n")
 
     def start_stats(self,profile):
+            Monitor.profile = profile        
             self.stats((""),(""),(""),("start"),(""),(""),(""),(profile))
-            
+
     def stats(self,*args):
         if (Monitor.m_stats & Monitor.log_level) != 0:
-            # this ref, this name, action, type, ref, name, location
-            arg_string=''
-            for arg in args:
-                arg_string+= Monitor.delimiter+'"'+arg + '"'
-            current_datetime = datetime.datetime.now()
-            Monitor.stats_file.write ('"'+current_datetime.strftime('%Y-%m-%d')+ '"'+Monitor.delimiter+'"'+ current_datetime.strftime('%H:%M:%S') + '"'+ arg_string+"\n")  
-
+            Monitor.sr.write_stats(datetime.datetime.now(),Monitor.profile,*args)
+     
             
     def trace(self,caller,text):
         r_class=caller.__class__.__name__
@@ -332,7 +327,7 @@ class Monitor(object):
   
     def finish(self):
         Monitor.ofile.close()
-        Monitor.stats_file.close()
+        Monitor.sr.close()
 
 ##    def id(self,caller):
 ##        return self.pretty_inst(caller)

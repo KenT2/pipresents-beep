@@ -1,5 +1,5 @@
 {
- "issue": "1.4.1", 
+ "issue": "1.4.2", 
  "shows": [
   {
    "background-colour": "#000000", 
@@ -35,6 +35,7 @@
    "eggtimer-text": "Loading....", 
    "eggtimer-x": "100", 
    "eggtimer-y": "100", 
+   "enable-catchup": "yes", 
    "freeze-at-end": "yes", 
    "freeze-at-start": "no", 
    "image-rotate": "0", 

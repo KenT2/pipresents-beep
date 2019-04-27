@@ -1,3 +1,15 @@
+CHANGES FOR 1.4.2a 27/4/2019
+============================
+enhanced - time of day scheduler, disable catch up per show
+enhanced - statistice recording device driver seperated out to allow alternative recording device
+enhanced - mediashow and liveshow have repeat command to repeat the current track
+fixed - trailing comments delimited by ; not # in keys.cfg, also in example profiles
+fixed - crash when terminating Pi Presents from the Manager
+fixed - crash when exitpipresents is a Show Command in a show.
+fixed - errors in and improvements to the manual
+fixed - filenames in examples.sh
+
+
 CHANGES FOR 1.4.1a 20/7/2018
 ============================
 NEW - Version 1.4 created as pipresents-beep in a new github
