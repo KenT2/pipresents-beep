@@ -189,7 +189,11 @@ class AudioPlayer(Player):
 
 
     def input_pressed(self,symbol):
-        if symbol[0:6] == 'mplay-':
+        if symbol == 'inc-volume':
+            self.control('0')
+        elif symbol== 'dec-volume':
+            self.control('9')
+        elif symbol[0:6] == 'mplay-':
             self.control(symbol[6])
         elif symbol  == 'unmute':
             self.unmute()
@@ -228,7 +232,7 @@ class AudioPlayer(Player):
             self.mplayer.pause_on()
             if self.mplayer.paused is True and self.pause_timeout>0:
                 # kick off the pause teimeout timer
-                print "!!pause on"
+                print("!!pause on")
                 self.pause_timer=self.canvas.after(self.pause_timeout*1000,self.pause_timeout_callback)
             return True
         else:
@@ -240,7 +244,7 @@ class AudioPlayer(Player):
         if self.play_state == 'showing' and self.track != '':
             self.mplayer.pause_off()
             if self.mplayer.paused is False:
-                print "!!pause off"
+                print("!!pause off")
                 # cancel the pause timer
                 if self.pause_timer != None:
                     self.canvas.after_cancel(self.pause_timer)
@@ -257,12 +261,12 @@ class AudioPlayer(Player):
             self.mplayer.pause()
             if self.mplayer.paused is True and self.pause_timeout>0:
                 # kick off the pause teimeout timer
-                print "!!toggle pause on"
+                print("!!toggle pause on")
                 self.pause_timer=self.canvas.after(self.pause_timeout*1000,self.pause_timeout_callback)
             else:
                 # cancel the pause timer
                 if self.pause_timer != None:
-                    print "!!toggle pause off"
+                    print("!!toggle pause off")
                     self.canvas.after_cancel(self.pause_timer)
                     self.pause_timer=None
             return True
@@ -271,7 +275,7 @@ class AudioPlayer(Player):
             return False
 
     def pause_timeout_callback(self):
-        print "!!callback pause off"
+        print("!!callback pause off")
         self.pause_off()
         self.pause_timer=None
 

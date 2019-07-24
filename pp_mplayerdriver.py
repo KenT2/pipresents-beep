@@ -1,6 +1,6 @@
 import pexpect
-import re
 import os
+import sys
 
 from threading import Thread
 from time import sleep
@@ -41,9 +41,7 @@ Signals
 
 class MplayerDriver(object):
 
-    _STATUS_REXP = re.compile(r"V :\s*([\d.]+).*") 
-    _DONE_REXP = re.compile(r"Exiting*")
-
+    _DONE_REXP = b"Exiting*"
     _LAUNCH_CMD = 'mplayer  -quiet '
 
     def __init__(self,widget,pp_dir):
@@ -116,7 +114,7 @@ class MplayerDriver(object):
     # kill the subprocess (mplayer). Used for tidy up on exit.
     def terminate(self,reason):
         self.terminate_reason=reason
-        if self._process<>None:
+        if self._process!=None:
             self._process.send('q')
         else:
             self.end_play_signal=True
@@ -144,15 +142,20 @@ class MplayerDriver(object):
         self._process = pexpect.spawn(cmd)
         
         # uncomment to monitor output to and input from mplayer (read pexpect manual)
-        fout= file(self.pp_dir + os.sep + 'pp_logs'  + os.sep + 'mplayerlogfile.txt','w')  #uncomment and change sys.stdout to fout to log to a file
-        # self._process.logfile_send = sys.stdout  # send just commands to stdout
-        self._process.logfile=fout  # send all communications to log file
+        
+        # send logging to terminal
+        # self._process.logfile = sys.stdout.buffer
+        
+        # send all communications to log file        
+        # self._process.logfile = open(self.pp_dir + os.sep + 'pp_logs'  + os.sep + 'mplayerlogfile.txt','wb')
+
 
         if pause_before_play:
             self._process.send('p')
             self.paused = True
             
-        # start the thread that is going to monitor sys.stdout. Presumably needs a thread because of blocking
+        # start the thread that is going to monitor sys.stdout.
+        # Needs a thread because _process.expect is blocking
 
         self._position_thread = Thread(target=self._get_position)
         self._position_thread.start()
@@ -166,20 +169,26 @@ class MplayerDriver(object):
         self.audio_position=0.0
         
         while True:
+            #expect blocks until a match or timeout hence thread is required
             index = self._process.expect([MplayerDriver._DONE_REXP,
                                           pexpect.TIMEOUT,
-                                          pexpect.EOF,
-                                          MplayerDriver._STATUS_REXP],
-                                         timeout=10)
-            # mplayer does not produce regular status messages just 'exit' at end 
+                                          pexpect.EOF],
+                                         timeout=None)
+            # mplayer does not produce regular status messages just 'Exiting....' at end 
             if index == 0:   # nice day
-                # print 'nice day'
+                #print ('nice day')
                 self.end_play_signal=True
-                break        
+                break
+            elif index== 1: # timeout goes every 10 seconds unless timeout = None
+                pass
+                # print ('timeout')
+            elif index == 2: #eof
+                pass
+                #print ('eof')
             else:
-                # matches _STATUS_REXP so audio position
-                self.audio_position = 0.0
+                pass
+                #print ('error')
+            sleep(0.01)    #probably not needed
 
-                sleep(0.05)
 
 

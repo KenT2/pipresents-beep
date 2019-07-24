@@ -7,14 +7,14 @@ https://trac.v2.nl/wiki/pyOSC
 example by www.ixi-audio.net based on pyOSC documentation
 """
 
-from Tkinter import Tk, StringVar, Menu,Frame,Label,Button,Scrollbar,Listbox,Entry,Text
-from Tkinter import Y,END,TOP,BOTH,LEFT,RIGHT,VERTICAL,SINGLE,NONE,W
-import tkFileDialog
-import tkMessageBox
-import tkSimpleDialog
+from tkinter import Tk, StringVar, Menu,Frame,Label,Button,Scrollbar,Listbox,Entry,Text
+from tkinter import Y,END,TOP,BOTH,LEFT,RIGHT,VERTICAL,SINGLE,NONE,W
+import tkinter.filedialog
+import tkinter.messagebox
+import tkinter.simpledialog
 import os
 import sys
-import ConfigParser
+import configparser
 import shutil
 import json
 import copy
@@ -44,7 +44,7 @@ class OSCMonitor(object):
         self.pp_dir=sys.path[0]
             
         if not os.path.exists(self.pp_dir+os.sep+"pipresents.py"):
-            tkMessageBox.showwarning("Pi Presents","Bad Application Directory")
+            tkinter.messagebox.showwarning("Pi Presents","Bad Application Directory")
             exit()
             
           
@@ -234,11 +234,11 @@ class OSCMonitor(object):
 
 
     def show_help (self):
-        tkMessageBox.showinfo("Help","Read 'manual.pdf'")
+        tkinter.messagebox.showinfo("Help","Read 'manual.pdf'")
   
 
     def about (self):
-        tkMessageBox.showinfo("About","Simple Remote Monitor for Pi Presents\n"
+        tkinter.messagebox.showinfo("About","Simple Remote Monitor for Pi Presents\n"
                               +"Author: Ken Thompson"
                               +"\nWebsite: http://pipresents.wordpress.com/")
 

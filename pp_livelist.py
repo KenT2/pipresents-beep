@@ -2,7 +2,7 @@ import os
 import json
 import copy
 import random
-import ConfigParser
+import configparser
 import time
 
 from pp_definitions import PPdefinitions
@@ -31,7 +31,7 @@ class LiveList(object):
         medialists are stored as json arrays.
         for liveshow medialist should contain only tracks with a track reference e.g. child track and empty track
         """
-        ifile  = open(filename, 'rb')
+        ifile  = open(filename, 'r')
         mdict = json.load(ifile)
         ifile.close()
         self.medialist_tracks = mdict['tracks']
@@ -279,10 +279,10 @@ class LiveList(object):
 
 
     def print_livelist(self):
-        print 'LIVELIST'
+        print('LIVELIST')
         for it in self.new_livelist:
-            print 'type: ', it['type'], 'loc: ',it['location'],'\nplugin cfg: ', it['plugin']
-        print ''
+            print('type: ', it['type'], 'loc: ',it['location'],'\nplugin cfg: ', it['plugin'])
+        print('')
 
 
         
@@ -303,7 +303,7 @@ class LiveList(object):
 
     def livelist_new_plugin(self,plugin_cfg,title):
         # read the file which is a plugin cfg file into a dictionary
-        self.plugin_config = ConfigParser.ConfigParser()
+        self.plugin_config = configparser.ConfigParser(inline_comment_prefixes = (';',))
         self.plugin_config.read(plugin_cfg)
         self.plugin_params =  dict(self.plugin_config.items('plugin'))
         # create a new livelist entry of a type specified in the config file with plugin

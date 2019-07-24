@@ -140,7 +140,7 @@ class WebEditItem(AdaptableDialog):
             # print 'content', field, self.field_content[field]
             # is it in the field content dictionary
             if not field in self.field_content:
-                print "Value for field not found in opened file: " + field
+                print("Value for field not found in opened file: " + field)
                 return None,None
             else:
 
@@ -161,7 +161,7 @@ class WebEditItem(AdaptableDialog):
                     self.col_row+=5
 
                 elif field_spec['shape']=='spinbox':
-                    print 'spinbox not implemented'
+                    print('spinbox not implemented')
                     return None,None
 
                     
@@ -179,7 +179,7 @@ class WebEditItem(AdaptableDialog):
 
 
                 else:
-                    print"Uknown shape for: " + field
+                    print("Uknown shape for: " + field)
                     return None,None
                 
                 # create buttons where required
@@ -187,6 +187,7 @@ class WebEditItem(AdaptableDialog):
                     button=self.browse_button(20,20,'','browse_button',self.field_index,field_spec['text'])
                     
                 elif field_spec['shape']=='colour':
+                    # print ('colour',self.field_content[field])
                     if ColourMap().exists(self.field_content[field]) is True:
                         colour=ColourMap().lookup(self.field_content[field])
                     else:
@@ -279,7 +280,7 @@ class WebEditItem(AdaptableDialog):
 
     def color_picker_changed(self,widget,result):
         self.update_colour_fields()
-        # print 'colour picked',result
+        # print ('colour picked',result)
 
 
     def update_colour_fields(self):
@@ -474,7 +475,7 @@ class ColourMap(object):
         return ColourMap.colour_map[colour_name.lower()]
 
     def exists(self,colour_name):
-        return ColourMap.colour_map.has_key(colour_name)
+        return colour_name in ColourMap.colour_map
 
 # ****************************************************
 # one off conversion of COLOURS to dictionary source - used offline
@@ -764,7 +765,7 @@ class ColourMap(object):
         def twodigithex( number ):
             return '%02x' % number
 
-        with open('C:\Users\Ken\Documents\Develop\colors.txt', 'wb') as colour:
+        with open('C:\\Users\Ken\Documents\Develop\colors.txt', 'wb') as colour:
             colour.write('dict(')
             
             # convert colours
@@ -775,14 +776,14 @@ class ColourMap(object):
                 green  =  ord ( colorString[1] ) <<8/256
                 blue   =  ord ( colorString[2] ) <<8/256
                 colour_name  =  colorString[3:].lower()
-                print red,green,blue, type(red)
+                print(red,green,blue, type(red))
                 
                 code='#'+twodigithex(red)+twodigithex(green)+twodigithex(blue)
                 colour.write(colour_name)
                 colour.write("='")
                 colour.write(code)
                 colour.write("',")
-                print red,green,blue,colour_name,code
+                print(red,green,blue,colour_name,code)
                 count+=1
                 if count==4:
                     count=0

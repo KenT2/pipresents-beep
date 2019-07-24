@@ -3,7 +3,7 @@
 import time
 import copy
 import os
-import ConfigParser
+import configparser
 from pp_utils import Monitor
 
 
@@ -292,7 +292,7 @@ class pp_gpiodriver(object):
             
         # print 'pin P1-'+ str(pin)+ ' set  '+ str(state) + ' required: ' + str(req_time)+ ' actual: ' + str(long(time.time()))
         self.GPIO.output(pin,state)
-        return 'normal',pp_gpiodriver.title + ' pin P1-'+ str(pin)+ ' set  '+ str(state) + ' required at: ' + str(req_time)+ ' sent at: ' + str(long(time.time()))
+        return 'normal',pp_gpiodriver.title + ' pin P1-'+ str(pin)+ ' set  '+ str(state) + ' required at: ' + str(req_time)+ ' sent at: ' + str(int(time.time()))
 
 
     def _reset_outputs(self):
@@ -328,7 +328,7 @@ class pp_gpiodriver(object):
 
     def _read(self,filename,filepath):
         if os.path.exists(filepath):
-            self.config = ConfigParser.ConfigParser()
+            self.config = configparser.ConfigParser(inline_comment_prefixes = (';',))
             self.config.read(filepath)
             return 'normal',filename+' read'
         else:
@@ -336,10 +336,10 @@ class pp_gpiodriver(object):
 
 
 if __name__ == '__main__':
-    from Tkinter import *
+    from tkinter import *
 
     def button_callback(symbol,source):
-        print 'callback',symbol,source
+        print('callback',symbol,source)
         if symbol=='pp-stop':
             idd.terminate()
             exit()
@@ -352,7 +352,7 @@ if __name__ == '__main__':
 
     idd=pp_gpiodriver()
     reason,message=idd.init('gpio.cfg','/home/pi/pipresents/pp_resources/pp_templates/gpio.cfg',root,button_callback)
-    print reason,message
+    print(reason,message)
     idd.start()
     root.mainloop()
 

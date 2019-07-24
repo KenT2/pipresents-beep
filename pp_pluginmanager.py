@@ -1,6 +1,6 @@
 import os
 import imp
-import ConfigParser
+import configparser
 from pp_utils import Monitor
 
 class PluginManager(object):
@@ -122,7 +122,7 @@ class PluginManager(object):
 # ***********************************
 
     def read(self,plugin_cfg_file):
-        self.plugin_config = ConfigParser.ConfigParser()
+        self.plugin_config = configparser.ConfigParser(inline_comment_prefixes = (';',))
         self.plugin_config.read(plugin_cfg_file)
         return dict(self.plugin_config.items('plugin'))
         

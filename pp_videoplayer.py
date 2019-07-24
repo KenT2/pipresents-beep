@@ -50,13 +50,26 @@ class VideoPlayer(Player):
             self.omx_audio= self.show_params['omx-audio']
         if self.omx_audio != "": self.omx_audio= "-o "+ self.omx_audio
         
+
+        self.omx_max_volume_text=self.track_params['omx-max-volume']
+        if self.omx_max_volume_text != "":
+            self.omx_max_volume= int(self.omx_max_volume_text)
+        else:
+            self.omx_max_volume=0
+        
         if self.track_params['omx-volume'] != "":
             self.omx_volume= self.track_params['omx-volume']
         else:
             self.omx_volume= self.show_params['omx-volume']
+            
         if self.omx_volume != "":
-            self.omx_volume= int(self.omx_volume)*100
-
+            self.omx_volume= int(self.omx_volume)
+        else:
+            self.omx_volume=0
+            
+        self.omx_volume=min(self.omx_volume,self.omx_max_volume)
+            
+                  
         if self.track_params['omx-window'] != '':
             self.omx_window= self.track_params['omx-window']
         else:
@@ -201,7 +214,17 @@ class VideoPlayer(Player):
 
     def input_pressed(self,symbol):
         if symbol[0:4] == 'omx-':
-            self.control(symbol[4])
+            if symbol[0:5] in ('omx-+','omx--','omx-='):
+                if symbol[4] in ('+','='):
+                    self.inc_volume()
+                else:
+                    self.dec_volume()
+            else:
+                self.control(symbol[4])
+        elif symbol == 'inc-volume':
+            self.inc_volume()
+        elif symbol == 'dec-volume':
+            self.dec_volume()            
         elif symbol  == 'pause':
             self.pause()
         elif symbol  == 'go':
@@ -246,6 +269,25 @@ class VideoPlayer(Player):
             else:
                 self.mon.log(self,"!<stop rejected")                
 
+    def inc_volume(self):
+        self.mon.log(self,">inc-volume received from show Id: "+ str(self.show_id))
+        if self.play_state  == 'showing' and self.frozen_at_end is False and self.omx.paused_at_start == 'done':
+            self.omx.inc_volume()
+            return True
+        else:
+            self.mon.log(self,"!<inc-volume rejected " + self.play_state)
+            return False
+
+    def dec_volume(self):
+        self.mon.log(self,">dec-volume received from show Id: "+ str(self.show_id))
+        if self.play_state  == 'showing' and self.frozen_at_end is False and self.omx.paused_at_start == 'done':
+            self.omx.dec_volume()
+            return True
+        else:
+            self.mon.log(self,"!<dec-volume rejected " + self.play_state)
+            return False
+
+
     def mute(self):
         self.mon.log(self,">mute received from show Id: "+ str(self.show_id))
         if self.play_state  == 'showing' and self.frozen_at_end is False and self.omx.paused_at_start == 'done':
@@ -271,12 +313,10 @@ class VideoPlayer(Player):
             self.omx.toggle_pause('user')
             if self.omx.paused is True and self.pause_timeout>0:
                 # kick off the pause teimeout timer
-                print "!!toggle pause on"
                 self.pause_timer=self.canvas.after(self.pause_timeout*1000,self.pause_timeout_callback)
             else:
                 # cancel the pause timer
                 if self.pause_timer != None:
-                    print "!!toggle pause off"
                     self.canvas.after_cancel(self.pause_timer)
                     self.pause_timer=None
             return True
@@ -285,7 +325,6 @@ class VideoPlayer(Player):
             return False
 
     def pause_timeout_callback(self):
-        print "!!callback pause off"
         self.pause_off()
         self.pause_timer=None
 
@@ -396,15 +435,17 @@ class VideoPlayer(Player):
         self.play_state='loading'
         
         # load the selected track
+        # options= '  ' + self.omx_audio+ ' --vol -6000 ' + self.omx_window_processed + ' ' + self.seamless_loop + ' ' + self.omx_other_options +" "
+
         options= ' --no-osd ' + self.omx_audio+ ' --vol -6000 ' + self.omx_window_processed + ' ' + self.seamless_loop + ' ' + self.omx_other_options +" "
-        self.omx.load(track,self.freeze_at_start,options,self.mon.pretty_inst(self))
+        self.omx.load(track,self.freeze_at_start,options,self.mon.pretty_inst(self),self.omx_volume,self.omx_max_volume)
         # self.mon.log (self,'Send load command track '+ self.track + 'with options ' + options + 'from show Id: '+ str(self.show_id))
         # print 'omx.load started ',self.track
         # and start polling for state changes
         self.tick_timer=self.canvas.after(50, self.load_state_machine)
 
     def start_state_machine_unload(self):
-        # print 'videoplayer - starting unload',self.play_state
+        # print ('videoplayer - starting unload',self.play_state)
         if self.play_state in('closed','initialised','unloaded'):
             # omxplayer already closed
             self.play_state='unloaded'
@@ -431,12 +472,15 @@ class VideoPlayer(Player):
             self.freeze_signal=False     # signal that user has pressed stop
             self.must_quit_signal=False
             # show the track and content
-            self.omx.show(self.freeze_at_end_required,self.omx_volume)
+            self.omx.show(self.freeze_at_end_required)
             self.mon.log (self,'>showing track from show Id: '+ str(self.show_id))
 
             # and start polling for state changes
             # print 'start show state machine show'
             self.tick_timer=self.canvas.after(0, self.show_state_machine)
+        # race condition don't start state machine as unload in progress
+        elif self.play_state == 'start_unload':
+            pass
         else:
             self.mon.fatal(self,'illegal state in show method ' + self.play_state)
             self.play_state='show-failed'
@@ -474,7 +518,7 @@ class VideoPlayer(Player):
                     self.mon.log(self,'Got video duration from track, frezing at: '+ str(self.omx.duration)+ ' microsecs.')
                     
                     if self.unload_signal is True:
-                        # print'unload sig=true state= start_unload'
+                        # print('unload sig=true state= start_unload')
                         # need to unload, kick off state machine in 'start_unload' state
                         self.play_state='start_unload'
                         self.unloading_count=0

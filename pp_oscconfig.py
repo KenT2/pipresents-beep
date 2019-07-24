@@ -1,11 +1,11 @@
 #! /usr/bin/env python
 
-from Tkinter import Tk, StringVar,Frame,Label,Button,Scrollbar,Listbox,Entry,Text,OptionMenu
-from Tkinter import Y,END,BOTH,LEFT,RIGHT,VERTICAL,SINGLE,NONE,W
-import tkMessageBox
-import tkSimpleDialog
+from tkinter import Tk, StringVar,Frame,Label,Button,Scrollbar,Listbox,Entry,Text,OptionMenu
+from tkinter import Y,END,BOTH,LEFT,RIGHT,VERTICAL,SINGLE,NONE,W
+import tkinter.messagebox
+import tkinter.simpledialog
 import os
-import ConfigParser
+import configparser
 
 # ***************************************
 #  OSC CONFIG CLASS
@@ -24,20 +24,20 @@ class OSCConfig(object):
         
         if os.path.exists(self.options_file) is True:
             """reads options from options file"""
-            config=ConfigParser.ConfigParser()
+            config=configparser.ConfigParser(inline_comment_prefixes = (';',))
             config.read(self.options_file)
 
             # this unit
-            self.this_unit_name = config.get('this-unit','name',0)
-            self.this_unit_ip = config.get('this-unit','ip',0)
+            self.this_unit_name = config.get('this-unit','name')
+            self.this_unit_ip = config.get('this-unit','ip')
 
-            self.slave_enabled= config.get('slave','enabled',0)
-            self.listen_port =  config.get('slave','listen-port',0)  #listen on this port for messages
+            self.slave_enabled= config.get('slave','enabled')
+            self.listen_port =  config.get('slave','listen-port')  #listen on this port for messages
 
-            self.master_enabled= config.get('master','enabled',0)                                  
-            self.reply_listen_port = config.get('master','reply-listen-port',0)           
-            self.slave_units_name = config.get('master','slave-units-name',0)
-            self.slave_units_ip = config.get('master','slave-units-ip',0)
+            self.master_enabled= config.get('master','enabled')                                  
+            self.reply_listen_port = config.get('master','reply-listen-port')           
+            self.slave_units_name = config.get('master','slave-units-name')
+            self.slave_units_ip = config.get('master','slave-units-ip')
             return True
         else:
             return False
@@ -47,7 +47,7 @@ class OSCConfig(object):
     def create(self,options_file,mode):
         self.options_file=options_file
         if not os.path.exists(self.options_file):
-            config=ConfigParser.ConfigParser()
+            config=configparser.ConfigParser(inline_comment_prefixes = (';',))
             
             config.add_section('this-unit')
             config.set('this-unit','ip','')
@@ -77,7 +77,7 @@ class OSCConfig(object):
                 config.set('master','slave-units-name','')
                 config.set('master','slave-units-ip','')               
          
-            with open(self.options_file, 'wb') as config_file:
+            with open(self.options_file, 'w') as config_file:
                 config.write(config_file)
 
 
@@ -86,71 +86,71 @@ class OSCConfig(object):
 # OCS EDITOR CLASS
 # ************************************
 
-class OSCEditor(tkSimpleDialog.Dialog):
+class OSCEditor(tkinter.simpledialog.Dialog):
 
     def __init__(self, parent, options_file, req_unit_type, title=None, ):
         self.options_file=options_file
         self.req_unit_type=req_unit_type
 
         # init the super class
-        tkSimpleDialog.Dialog.__init__(self, parent, title)
+        tkinter.simpledialog.Dialog.__init__(self, parent, title)
 
 
     def body(self, master):
         self.result=False
-        config=ConfigParser.ConfigParser()
+        config=configparser.ConfigParser(inline_comment_prefixes = (';',))
         config.read(self.options_file)
 
         Label(master, text="").grid(row=30, sticky=W)
         Label(master, text="OSC Name of This Unit:").grid(row=31, sticky=W)
         self.e_this_unit_name = Entry(master,width=80)
         self.e_this_unit_name.grid(row=32)
-        self.e_this_unit_name.insert(0,config.get('this-unit','name',0))
+        self.e_this_unit_name.insert(0,config.get('this-unit','name'))
         
 
         Label(master, text="").grid(row=40, sticky=W)
         Label(master, text="IP of This Unit:").grid(row=41, sticky=W)
         self.e_this_unit_ip = Entry(master,width=80)
         self.e_this_unit_ip.grid(row=42)
-        self.e_this_unit_ip.insert(0,config.get('this-unit','ip',0))
+        self.e_this_unit_ip.insert(0,config.get('this-unit','ip'))
 
         Label(master, text="").grid(row=45, sticky=W)
         Label(master, text="OSC Slave Enabled (yes/no):").grid(row=46, sticky=W)
         self.e_slave_enabled = Entry(master,width=80)
         self.e_slave_enabled.grid(row=47)
-        self.e_slave_enabled.insert(0,config.get('slave','enabled',0))
+        self.e_slave_enabled.insert(0,config.get('slave','enabled'))
 
         Label(master, text="").grid(row=50, sticky=W)
         Label(master, text="Port for listening to commands for this Unit:").grid(row=51, sticky=W)
         self.e_listen_port = Entry(master,width=80)
         self.e_listen_port.grid(row=52)
-        self.e_listen_port.insert(0,config.get('slave','listen-port',0))
+        self.e_listen_port.insert(0,config.get('slave','listen-port'))
         
         Label(master, text="").grid(row=55, sticky=W)
         Label(master, text="OSC Master Enabled (yes/no):").grid(row=56, sticky=W)
         self.e_master_enabled = Entry(master,width=80)
         self.e_master_enabled.grid(row=57)
-        self.e_master_enabled.insert(0,config.get('master','enabled',0))
+        self.e_master_enabled.insert(0,config.get('master','enabled'))
         
 
         Label(master, text="").grid(row=70, sticky=W)
         Label(master, text="Listen to replies from Slave Unit on Port:").grid(row=71, sticky=W)
         self.e_reply_listen_port = Entry(master,width=80)
         self.e_reply_listen_port.grid(row=72)
-        self.e_reply_listen_port.insert(0,config.get('master','reply-listen-port',0))
+        self.e_reply_listen_port.insert(0,config.get('master','reply-listen-port'))
 
 
         Label(master, text="").grid(row=80, sticky=W)
         Label(master, text="Slave Unit OSC Name (1 only):").grid(row=81, sticky=W)
         self.e_slave_units_name = Entry(master,width=80)
         self.e_slave_units_name.grid(row=82)
-        self.e_slave_units_name.insert(0,config.get('master','slave-units-name',0))
+        self.e_slave_units_name.insert(0,config.get('master','slave-units-name'))
 
         Label(master, text="").grid(row=90, sticky=W)
         Label(master, text="Slave Unit IP (1 only):").grid(row=91, sticky=W)
         self.e_slave_units_ip = Entry(master,width=80)
         self.e_slave_units_ip.grid(row=92)
-        self.e_slave_units_ip.insert(0,config.get('master','slave-units-ip',0))
+        self.e_slave_units_ip.insert(0,config.get('master','slave-units-ip'))
 
         return None    # no initial focus
     
@@ -164,7 +164,7 @@ class OSCEditor(tkSimpleDialog.Dialog):
 
     def save_options(self):
         """ save the output of the options edit dialog to file"""
-        config=ConfigParser.ConfigParser()
+        config=configparser.ConfigParser(inline_comment_prefixes = (';',))
 
 
         config.add_section('this-unit')
@@ -181,7 +181,7 @@ class OSCEditor(tkSimpleDialog.Dialog):
         config.set('master','reply-listen-port',self.e_reply_listen_port.get())
         config.set('master','slave-units-name',self.e_slave_units_name.get())
         config.set('master','slave-units-ip',self.e_slave_units_ip.get())
-        with open(self.options_file, 'wb') as optionsfile:
+        with open(self.options_file, 'w') as optionsfile:
             config.write(optionsfile)
     
 

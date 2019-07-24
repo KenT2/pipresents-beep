@@ -12,7 +12,7 @@ from pp_iopluginmanager import IOPluginManager
 from pp_i2cdriver import pp_i2cdriver
 
 import time
-from Tkinter import NW
+from tkinter import NW
 
 class krt_i2cinputs(object):
 

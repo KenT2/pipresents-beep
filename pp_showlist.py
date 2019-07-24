@@ -23,7 +23,7 @@ class ShowList(object):
         self._selected_show_index=-1 # index of currently selected show
         
     def print_list(self):
-        print self._shows
+        print(self._shows)
 
     def length(self):
         return self._num_shows
@@ -84,7 +84,7 @@ class ShowList(object):
     def first(self):
         self.select(0)
 
-    def next(self):
+    def __next__(self):
         if self.length()>0:
             if self._selected_show_index== self.length()-1:
                 index=0
@@ -132,7 +132,7 @@ class ShowList(object):
         shows are stored internally as a list of dictionaries in self._shows
         """
         if filename != '' and os.path.exists(filename):
-            ifile  = open(filename, 'rb')
+            ifile  = open(filename, 'r')
             sdict= json.load(ifile)
             ifile.close()
             self._rawshows=sdict['shows']
@@ -162,11 +162,11 @@ class ShowList(object):
         if filename=="":
             return False
         if os.name=='nt':
-            filename = string.replace(filename,'/','\\')
+            filename = str.replace(filename,'/','\\')
         else:
-            filename = string.replace(filename,'\\','/')
+            filename = str.replace(filename,'\\','/')
         dic={'issue':self.profile_version_string,'shows':self._shows}
-        ofile  = open(filename, "wb")
+        ofile  = open(filename, "w")
         json.dump(dic,ofile,sort_keys=True,indent=1)
         ofile.close()
         return

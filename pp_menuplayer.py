@@ -1,5 +1,5 @@
 import os
-from Tkinter import N, CENTER, LEFT, NW, W
+from tkinter import N, CENTER, LEFT, NW, W
 from PIL import Image
 from PIL import ImageTk
 from pp_player import Player
@@ -337,24 +337,24 @@ class MenuPlayer(Player):
 
 
     def print_geometry(self,total_width,total_height):
-        print 'list length',self.list_length
-        print 'menu width: ', self.menu_width
-        print 'columns', self.menu_columns
-        print 'icon width: ', self.icon_width
-        print 'horizontal padding: ', self.menu_horizontal_padding
-        print 'text width: ', self.text_width
-        print 'entry width: ', self.entry_width
-        print 'total width: ', total_width
-        print 'x separation: ', self.x_separation
-        print ''
-        print 'menu height', self.menu_height
-        print 'rows: ', self.menu_rows
-        print 'icon height', self.icon_height
-        print 'vertical padding: ', self.menu_vertical_padding        
-        print 'text height', self.text_height
-        print 'entry height', self.entry_height
-        print 'total height', total_height
-        print 'y separation', self.y_separation
+        print('list length',self.list_length)
+        print('menu width: ', self.menu_width)
+        print('columns', self.menu_columns)
+        print('icon width: ', self.icon_width)
+        print('horizontal padding: ', self.menu_horizontal_padding)
+        print('text width: ', self.text_width)
+        print('entry width: ', self.entry_width)
+        print('total width: ', total_width)
+        print('x separation: ', self.x_separation)
+        print('')
+        print('menu height', self.menu_height)
+        print('rows: ', self.menu_rows)
+        print('icon height', self.icon_height)
+        print('vertical padding: ', self.menu_vertical_padding)        
+        print('text height', self.text_height)
+        print('entry height', self.entry_height)
+        print('total height', total_height)
+        print('y separation', self.y_separation)
 
         
     # ------------------------------------------------------------------

@@ -22,7 +22,7 @@ class Statsrecorder(object):
     def init(self,log_path):
         # called once when Pi Presents starts      
         # statistics file, open for appending so its not deleted
-        bufsize=0
+        bufsize=-1
         if Statsrecorder.stats_file is None:
             Statsrecorder.stats_file=open(log_path+ os.sep+'pp_logs' + os.sep + 'pp_stats.txt','a',bufsize)
             sep='"'+Statsrecorder.delimiter+'"'

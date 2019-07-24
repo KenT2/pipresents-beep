@@ -1,6 +1,6 @@
 import os
 import imp
-import ConfigParser
+import configparser
 from pp_utils import Monitor
 
 class IOPluginManager(object):
@@ -122,7 +122,7 @@ class IOPluginManager(object):
 
     def _read(self,filename,filepath):
         if os.path.exists(filepath):
-            config = ConfigParser.ConfigParser()
+            config = configparser.ConfigParser(inline_comment_prefixes = (';',))
             config.read(filepath)
             self.mon.log(self,filename+" read from "+ filepath)
             return 'normal',filename+' read',config

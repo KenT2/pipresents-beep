@@ -1,3 +1,21 @@
+Version 1.4.3a 24/7/2019
+========================
+Pi Presents is now Python 3. It will not run under Python 2.
+The last Python 2 release 1.4.2 a has been tagged as a Github Release if you want it.
+
+To upgrade to this version install the Python 3 version of some packages:
+
+      sudo apt-get install python3-pil.imagetk
+      sudo apt-get install python3-pexpect
+      sudo pip3 install evdev
+
+The Python 2 versions of these packages can be left installed.
+
+The command to run Pi presents is python3 instead of python
+
+Your profiles will require update for new features
+
+
 Version 1.4.2a 27/4/2019
 ========================
 This version adds a new field to shows to disable catch up. Profile will require update.

@@ -40,7 +40,7 @@ class Animate(object):
         self.event_callback=event_callback
 
         # Initialise time used by sequencer
-        Animate.sequencer_time=long(time.time())
+        Animate.sequencer_time=int(time.time())
         
         # init timer
         self.sequencer_tick_timer=None
@@ -58,7 +58,7 @@ class Animate(object):
 
     # called by main program only         
     def poll(self):
-        poll_time=long(time.time())
+        poll_time=int(time.time())
         # is current time greater than last time the scheduler was run (previous second or more)
         # run in a loop to catch up because root.after can get behind when images are being rendered etc.
         while Animate.sequencer_time<=poll_time:
@@ -107,7 +107,7 @@ class Animate(object):
 
 
     def add_event(self,name,param_type,param_values,delay,tag):
-        poll_time=long(time.time())
+        poll_time=int(time.time())
         # prepare the event
         event=Animate.event_template
         event[Animate.name]=name
@@ -151,9 +151,9 @@ class Animate(object):
 
 
     def print_events(self):
-        print 'events list'
+        print('events list')
         for event in Animate.events:
-            print 'EVENT: ',event
+            print('EVENT: ',event)
 
     
 

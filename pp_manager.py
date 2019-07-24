@@ -7,7 +7,7 @@ from remi_plus import OKDialog, OKCancelDialog, AdaptableDialog, append_with_lab
 import time
 import subprocess
 import sys, os, shutil
-import ConfigParser
+import configparser
 import zipfile
 from threading import Timer
 from time import sleep
@@ -47,16 +47,16 @@ class PPManager(App):
 
         
         # get directory holding the code
-        self.manager_dir=sys.path[0]
+        self.pp_dir=sys.path[0]
             
-        if not os.path.exists(self.manager_dir + os.sep + 'pp_manager.py'):
-            print >> sys.stderr, 'Manager: Bad Application Directory'
+        if not os.path.exists(self.pp_dir + os.sep + 'pp_manager.py'):
+            print('Manager: Bad Application Directory', file=sys.stderr)
             exit()
 
         # object if there is no options file
-        self.options_file_path=self.manager_dir+os.sep+'pp_config'+os.sep+'pp_web.cfg'
+        self.options_file_path=self.pp_dir+os.sep+'pp_config'+os.sep+'pp_web.cfg'
         if not os.path.exists(self.options_file_path):
-            print >> sys.stderr, 'Manager: Cannot find web options file'
+            print('Manager: Cannot find web options file', file=sys.stderr)
             exit()
 
         # read the options
@@ -65,22 +65,22 @@ class PPManager(App):
         # get interface and IP
         network=Network()
         self.interface, self.ip = network.get_ip()
-        print 'Manager: Network Details '+ self.interface, self.ip
+        print('Manager: Network Details '+ self.interface, self.ip)
 
         # create a mailer instance and read mail options
-        self.email_options_file_path=self.manager_dir+os.sep+'pp_config'+os.sep+'pp_email.cfg'
+        self.email_options_file_path=self.pp_dir+os.sep+'pp_config'+os.sep+'pp_email.cfg'
         if not os.path.exists(self.email_options_file_path):
-            print >> sys.stderr, 'Manager: Cannot find email options file'
+            print('Manager: Cannot find email options file', file=sys.stderr)
             exit()
         self.mailer=Mailer()
         self.mailer.read_config(self.email_options_file_path)
-        print >> sys.stderr,'Manager: read email options from '+self.email_options_file_path
+        print('Manager: read email options from '+self.email_options_file_path, file=sys.stderr)
 
         if not os.path.exists(self.pp_profiles_dir):
-            print >> sys.stderr, 'Manager: Profiles directory does not exist: ' + self.pp_profiles_dir
+            print('Manager: Profiles directory does not exist: ' + self.pp_profiles_dir, file=sys.stderr)
             exit()
 
-        print >> sys.stderr, 'Manager: Web server started by pp_manager'
+        print('Manager: Web server started by pp_manager', file=sys.stderr)
 
         #init variables
         self.profile_objects=[]
@@ -89,7 +89,7 @@ class PPManager(App):
         # Initialise an instance of the Pi Presents and Web Editor driver classes
         self.pp=PiPresents()
         self.ed = WebEditor()
-        self.ed.init(self.manager_dir)
+        self.ed.init(self.pp_dir)
 
 
         mww=550
@@ -761,7 +761,7 @@ class PPManager(App):
         
     # download
     def on_logs_download_clicked(self,log_file,name):
-        self.logs_dir=self.manager_dir+os.sep+'pp_logs'
+        self.logs_dir=self.pp_dir+os.sep+'pp_logs'
         self.logs_download_dialog=AdaptableDialog(width=500,height=200,title='<b>Download ' + name+ '</b>',
                                                        message='',confirm_name='Done')
         self.logs_download_button = gui.FileDownloader('<br>Click Link to Start Download',self.logs_dir+os.sep+log_file, width=200, height=80)
@@ -804,7 +804,7 @@ class PPManager(App):
             OKDialog('Run Pi Presents','Failed, server on Windows').show(self)
             return
         if self.current_profile != '':
-            command = self.manager_dir+'/pipresents.py'
+            command = self.pp_dir+'/pipresents.py'
             success=self.pp.run_pp(command,self.pp_home_dir,self.current_profile,self.pp_options)
             if success is False:
                 OKDialog('Run Pi Presents','Error: Pi Presents already Running').show(self)
@@ -846,7 +846,7 @@ class PPManager(App):
         if os.name== 'nt':
             OKDialog('Run Pi Presents','Failed, server on Windows').show(self)
             return
-        command = self.manager_dir+'/pp_web_editor.py'
+        command = self.pp_dir+'/pp_web_editor.py'
         self.ed_options=''
         # run editor if it is not already running
         self.ed.run_ed(command,self.ed_options)
@@ -1036,21 +1036,21 @@ class Options(object):
             Options.options_file=options_file
             
         """reads options from options file """
-        Options.config=ConfigParser.ConfigParser()
+        Options.config=configparser.ConfigParser(inline_comment_prefixes = (';',))
         Options.config.read(Options.options_file)
         
         self.config=Options.config
-        self.pp_profiles_offset =self.config.get('manager-editable','profiles_offset',0)
-        self.media_offset =self.config.get('manager-editable','media_offset',0)
-        self.livetracks_offset =self.config.get('manager-editable','livetracks_offset',0)
-        self.pp_options = self.config.get('manager-editable','options',0)
+        self.pp_profiles_offset =self.config.get('manager-editable','profiles_offset')
+        self.media_offset =self.config.get('manager-editable','media_offset')
+        self.livetracks_offset =self.config.get('manager-editable','livetracks_offset')
+        self.pp_options = self.config.get('manager-editable','options')
 
-        self.pp_home_dir =self.config.get('manager','home',0)
-        self.top_dir = self.config.get('manager','import_top',0)
+        self.pp_home_dir =self.config.get('manager','home')
+        self.top_dir = self.config.get('manager','import_top')
         self.unit=self.config.get('network','unit')
 
         self.autostart_path=self.config.get('manager-editable','autostart_path')
-        self.autostart_options = self.config.get('manager-editable','autostart_options',0)
+        self.autostart_options = self.config.get('manager-editable','autostart_options')
 
         self.pp_profiles_dir=self.pp_home_dir+os.sep+'pp_profiles'+self.pp_profiles_offset
         self.media_dir=self.pp_home_dir+self.media_offset
@@ -1061,11 +1061,11 @@ class Options(object):
 
 
     def print_paths(self):
-        print 'home',self.pp_home_dir
-        print 'profiles',self.pp_profiles_offset, self.pp_profiles_dir
-        print 'media', self.media_offset, self.media_dir
-        print 'livetracks', self.livetracks_offset, self.livetracks_dir
-        print 'top',self.top_dir
+        print('home',self.pp_home_dir)
+        print('profiles',self.pp_profiles_offset, self.pp_profiles_dir)
+        print('media', self.media_offset, self.media_dir)
+        print('livetracks', self.livetracks_offset, self.livetracks_dir)
+        print('top',self.top_dir)
 
 
     def save_options(self):
@@ -1079,7 +1079,7 @@ class Options(object):
         self.config.set('manager-editable','autostart_path',self.autostart_path)        
         self.config.set('manager-editable','autostart_options',self.autostart_options)
         
-        with open(Options.options_file, 'wb') as config_file:
+        with open(Options.options_file, 'w') as config_file:
             self.config.write(config_file)
     
     # ******************
@@ -1306,16 +1306,16 @@ class ManagerOptionsDialog(AdaptableDialog,Options):
       
 class WebEditor(object):
     my_ed=None
-    manager_dir=None
+    pp_dir=None
 
     # run when every instance is started
     def __init__(self):
         pass
 
     # run once when Manager is started
-    def init(self,manager_dir):
+    def init(self,pp_dir):
         WebEditor.my_ed=None
-        WebEditor.manager_dir=manager_dir
+        WebEditor.pp_dir=pp_dir
         pass
 
     def run_ed(self,command,options):
@@ -1324,7 +1324,7 @@ class WebEditor(object):
         # print pid,user,running_profile
         if pid ==-1:
             options_list= options.split(' ')
-            command = ['python',command, '-r']
+            command = ['python3',command, '-r']
             if options_list[0] != '':
                 command = command + options_list
             # print 'COMMAND',command
@@ -1359,17 +1359,17 @@ class WebEditor(object):
     def exit_ed(self):
         pid,user=self.is_ed_running()
         if pid !=-1:
-            subprocess.call(['pkill', '-f', '/pipresents/pp_web_editor.py'])
+            subprocess.call(['pkill', '-f', self.pp_dir+'/pp_web_editor.py'])
             self.my_ed=None
             return True
         else:
             return False
  
     def is_ed_running(self):
-        p = subprocess.Popen(['ps', '-A', '-o', 'pid,user,cmd'], stdout=subprocess.PIPE)
+        p = subprocess.Popen(['ps', '-A', '-o', 'pid,user,cmd'], universal_newlines=True, stdout=subprocess.PIPE)
         out, err = p.communicate()
         for line in out.splitlines():
-            if '/pipresents/pp_web_editor.py' in line:
+            if self.pp_dir+'/pp_web_editor.py' in line:
                 # print 'LINE',line
                 split=line.split()
                 pid=int(split[0])
@@ -1388,16 +1388,16 @@ class WebEditor(object):
       
 class PiPresents(object):
     my_pp=None
-    manager_dir=None
+    pp_dir=None
 
     # run when every instance is started
     def __init__(self):
         pass
 
     # run once when Manager is started
-    def init(self,manager_dir):
+    def init(self,pp_dir):
         PiPresents.my_pp=None
-        PiPresents.manager_dir=manager_dir
+        PiPresents.pp_dir=pp_dir
         pass
 
     def run_pp(self,command,pp_home,current_profile,pp_options):
@@ -1407,10 +1407,10 @@ class PiPresents(object):
         # print pid,user,running_profile
         if pid ==-1:
             options_list= pp_options.split(' ')
-            command = ['python',command,'-o',pp_home,'-p',current_profile,'--manager']
+            command = ['python3',command,'-o',pp_home,'-p',current_profile,'--manager']
             if options_list[0] != '':
                 command = command + options_list
-            print 'COMMAND',command
+            print('COMMAND',command)
             PiPresents.my_pp=subprocess.Popen(command)
             return True
         else:
@@ -1443,7 +1443,7 @@ class PiPresents(object):
         pid,user,running_profile=self.is_pp_running()
 
         if pid !=-1:
-            subprocess.call(['pkill' ,'-f' ,'/pipresents/pipresents.py'])
+            subprocess.call(['pkill' ,'-f' ,self.pp_dir+'/pipresents.py'])
             self.my_pp=None
             return True
         else:
@@ -1451,10 +1451,10 @@ class PiPresents(object):
 
  
     def is_pp_running(self):
-        p = subprocess.Popen(['ps', '-A', '-o', 'pid,user,cmd'], stdout=subprocess.PIPE)
+        p = subprocess.Popen(['ps', '-A', '-o', 'pid,user,cmd'], universal_newlines=True, stdout=subprocess.PIPE)
         out, err = p.communicate()
         for line in out.splitlines():
-            if '/pipresents/pipresents.py' in line:
+            if self.pp_dir+'/pipresents.py' in line:
                 # print 'LINE',line
                 split=line.split()
                 pid=int(split[0])
@@ -1475,15 +1475,15 @@ class Autostart(Options,object):
 
     def autostart(self):
         # get directory holding the code
-        self.manager_dir=sys.path[0]
+        self.pp_dir=sys.path[0]
             
-        if not os.path.exists(self.manager_dir + os.sep + 'pp_manager.py'):
-            print >> sys.stderr, 'Manager: Bad Application Directory'
+        if not os.path.exists(self.pp_dir + os.sep + 'pp_manager.py'):
+            print('Manager: Bad Application Directory', file=sys.stderr)
             exit()
 
-        self.options_file_path=self.manager_dir+os.sep+'pp_config'+os.sep+'pp_web.cfg'
+        self.options_file_path=self.pp_dir+os.sep+'pp_config'+os.sep+'pp_web.cfg'
         if not os.path.exists(self.options_file_path):
-            print >> sys.stderr, 'Manager: web options file not found'
+            print('Manager: web options file not found', file=sys.stderr)
             exit()
 
         # read the options
@@ -1496,22 +1496,22 @@ class Autostart(Options,object):
         #start the Pi Presents Driver
         pp_auto=PiPresents()
         # and initialise its class variables
-        pp_auto.init(self.manager_dir)
+        pp_auto.init(self.pp_dir)
 
 
         if self.autostart_path != '' and os.name !='nt':
             autostart_profile_path= self.pp_home_dir+os.sep+'pp_profiles'+ self.autostart_path
             if False:
             #if not os.path.exists(autostart_profile_path):
-                print >> sys.stderr, 'Manager: Autostart Profile does not exist: ' + autostart_profile_path
+                print('Manager: Autostart Profile does not exist: ' + autostart_profile_path, file=sys.stderr)
             else:
-                command =self.manager_dir+'/pipresents.py'
+                command =self.pp_dir+'/pipresents.py'
                 success=pp_auto.run_pp(command,self.pp_home_dir,self.autostart_path,self.autostart_options)
                 if success is True:
-                    print >> sys.stderr, 'Manager: Auto-Started profile ',autostart_profile_path
+                    print('Manager: Auto-Started profile ',autostart_profile_path, file=sys.stderr)
                     return self.autostart_path
                 else:
-                    print >> sys.stderr, 'Manager: FAILED, Pi Presents AUTO Not Started'
+                    print('Manager: FAILED, Pi Presents AUTO Not Started', file=sys.stderr)
                     return ''
         else:
             return ''
@@ -1533,10 +1533,10 @@ if __name__  ==  "__main__":
             if success is True:
                 return True
             else:
-                print >> sys.stderr,'Manager: Failed to connect to email SMTP server ' + str(tries) +  '\n ' +str(error)
+                print('Manager: Failed to connect to email SMTP server ' + str(tries) +  '\n ' +str(error), file=sys.stderr)
                 tries +=1
                 if tries >5:
-                    print >> sys.stderr,'Manager: Failed to connect to email SMTP server after ' + str(tries)
+                    print('Manager: Failed to connect to email SMTP server after ' + str(tries), file=sys.stderr)
                     return False
 
     def send_email(mailer,reason,subject,message):
@@ -1545,28 +1545,28 @@ if __name__  ==  "__main__":
         else:
             success,error = mailer.send(subject,message)
             if success is False:
-                print >> sys.stderr, 'Manager: Failed to send email: ' + str(error)
+                print('Manager: Failed to send email: ' + str(error), file=sys.stderr)
                 success,error=mailer.disconnect()
                 if success is False:
-                    print >> sys.stderr,'Manager: Failed disconnect after send:' + str(error)
+                    print('Manager: Failed disconnect after send:' + str(error), file=sys.stderr)
                 return False
             else:
-                print >> sys.stderr,'Manager: Sent email for ' + reason
+                print('Manager: Sent email for ' + reason, file=sys.stderr)
                 success,error=mailer.disconnect()
                 if success is False:
-                    print >> sys.stderr,'Manager: Failed disconnect ' + str(error)
+                    print('Manager: Failed disconnect ' + str(error), file=sys.stderr)
                 return True
 
 
-    print >> sys.stderr, '\n *** Pi Presents Manager Started ***'
+    print('\n *** Pi Presents Manager Started ***', file=sys.stderr)
 
     # wait for environment variables to stabilize. Required for Jessie autostart
     tries=0
     success=False
     while tries < 40:
         # get directory holding the code
-        manager_dir=sys.path[0]
-        manager_path=manager_dir+os.sep+'pp_manager.py'
+        pp_dir=sys.path[0]
+        manager_path=pp_dir+os.sep+'pp_manager.py'
         if os.path.exists(manager_path):
             success =True
             break
@@ -1574,11 +1574,11 @@ if __name__  ==  "__main__":
         sleep (0.5)
         
     if success is False:
-        print >> sys.stderr, "Manager: Bad application directory: " + manager_dir
-        # tkMessageBox.showwarning("pp_manager.py","Bad application directory: "+ manager_dir)
+        print("Manager: Bad application directory: " + pp_dir, file=sys.stderr)
+        # tkMessageBox.showwarning("pp_manager.py","Bad application directory: "+ pp_dir)
         exit()
 
-    print >> sys.stderr, 'Manager: Found pp_manager.py in ', manager_dir
+    print('Manager: Found pp_manager.py in ', pp_dir, file=sys.stderr)
 
 
     #create upload and download directories if necessary
@@ -1596,37 +1596,37 @@ if __name__  ==  "__main__":
 
     # wait for network to be available
     network=Network()
-    print >> sys.stderr, 'Manager: Waiting for Network'
+    print('Manager: Waiting for Network', file=sys.stderr)
     network_connected=network.wait_for_network(10)
     if network_connected is False:
-        print >> sys.stderr, 'Manager: Failed to connect to network after 10 seconds'
+        print('Manager: Failed to connect to network after 10 seconds', file=sys.stderr)
         # tkMessageBox.showwarning("Pi Presents Manager","Failed to connect to network after 10 seconds")       
         # exit()   
 
     # Read network config  -  pp_web.cfg
-    manager_options_file_path=manager_dir+os.sep+'pp_config'+os.sep+'pp_web.cfg'
+    manager_options_file_path=pp_dir+os.sep+'pp_config'+os.sep+'pp_web.cfg'
     if not os.path.exists(manager_options_file_path):
-        print >> sys.stderr,'Manager: pp_web.cfg not found at ' + manager_options_file_path
+        print('Manager: pp_web.cfg not found at ' + manager_options_file_path, file=sys.stderr)
         # tkMessageBox.showwarning("Pi Presents Manager",'pp_web.cfg not found at ' + manager_options_file_path)
         exit()
     network.read_config(manager_options_file_path)
-    print >> sys.stderr, 'Manager: Found pp_web.cfg in ', manager_options_file_path
+    print('Manager: Found pp_web.cfg in ', manager_options_file_path, file=sys.stderr)
 
 
     # get interface and IP details of preferred interface
     if network_connected is True:
         interface,ip = network.get_preferred_ip()
-        print >> sys.stderr, 'Manager: Network details ' + network.unit + ' ' + interface + ' ' + ip
+        print('Manager: Network details ' + network.unit + ' ' + interface + ' ' + ip, file=sys.stderr)
         network.set_ip(interface,ip)
 
 
         # start the mailer
-        email_file_path = manager_dir+os.sep+'pp_config'+os.sep+'pp_email.cfg'
+        email_file_path = pp_dir+os.sep+'pp_config'+os.sep+'pp_email.cfg'
         if not os.path.exists(email_file_path):
-            print >> sys.stderr,'Manager: pp_email.cfg not found at ' + email_file_path
+            print('Manager: pp_email.cfg not found at ' + email_file_path, file=sys.stderr)
             # tkMessageBox.showwarning("Pi Presents Manager",'pp_email.cfg not found at ' + email_file_path)
             exit()
-        print >> sys.stderr,'Manager: Found pp_email.cfg at ' + email_file_path
+        print('Manager: Found pp_email.cfg at ' + email_file_path, file=sys.stderr)
         
         mailer=Mailer()
         email_enabled=False
@@ -1634,7 +1634,7 @@ if __name__  ==  "__main__":
         # all Ok so can enable email if config file allows it.
         if mailer.email_allowed is True:
             email_enabled=True
-            print >> sys.stderr,'Manager: Email Enabled'
+            print('Manager: Email Enabled', file=sys.stderr)
         
         # send an email with IP address of the server.
         if email_enabled is True and mailer.email_with_ip is True:

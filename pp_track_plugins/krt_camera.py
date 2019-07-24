@@ -8,7 +8,7 @@ Pi Presents to display its output.
 """
 from picamera import PiCamera
 import time
-from Tkinter import NW
+from tkinter import NW
 
 class krt_camera(object):
 

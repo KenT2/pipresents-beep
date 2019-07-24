@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import os
-import ConfigParser
+import configparser
 
 
 import remi.gui as gui
@@ -23,20 +23,20 @@ class OSCConfig(object):
         # print 'in read',OSCConfig.options_file
         if os.path.exists(OSCConfig.options_file) is True:
             # reads options from options file
-            config=ConfigParser.ConfigParser()
+            config=configparser.ConfigParser(inline_comment_prefixes = (';',))
             config.read(OSCConfig.options_file)
 
             # this unit
-            self.this_unit_name = config.get('this-unit','name',0)
-            self.this_unit_ip = config.get('this-unit','ip',0)
+            self.this_unit_name = config.get('this-unit','name')
+            self.this_unit_ip = config.get('this-unit','ip')
 
-            self.slave_enabled= config.get('slave','enabled',0)
-            self.listen_port =  config.get('slave','listen-port',0)  #listen on this port for messages
+            self.slave_enabled= config.get('slave','enabled')
+            self.listen_port =  config.get('slave','listen-port')  #listen on this port for messages
 
-            self.master_enabled= config.get('master','enabled',0)                                  
-            self.reply_listen_port = config.get('master','reply-listen-port',0)           
-            self.slave_units_name = config.get('master','slave-units-name',0)
-            self.slave_units_ip = config.get('master','slave-units-ip',0)
+            self.master_enabled= config.get('master','enabled')                                  
+            self.reply_listen_port = config.get('master','reply-listen-port')           
+            self.slave_units_name = config.get('master','slave-units-name')
+            self.slave_units_ip = config.get('master','slave-units-ip')
             return True
         else:
             return False
@@ -46,7 +46,7 @@ class OSCConfig(object):
         #print 'create'
         if not os.path.exists(OSCConfig.options_file):
             #print'not exist'
-            config=ConfigParser.ConfigParser()
+            config=configparser.ConfigParser(inline_comment_prefixes = (';',))
             
             config.add_section('this-unit')
             config.set('this-unit','ip','')
@@ -63,7 +63,7 @@ class OSCConfig(object):
             config.set('master','slave-units-name','')
             config.set('master','slave-units-ip','')                   
            
-            with open(self.options_file, 'wb') as config_file:
+            with open(self.options_file, 'w') as config_file:
                 config.write(config_file)
        
     
@@ -118,23 +118,23 @@ class OSCWebEditor(AdaptableDialog):
     def edit(self):
 
         # print 'edit_options in class'
-        config=ConfigParser.ConfigParser()
+        config=configparser.ConfigParser(inline_comment_prefixes = (';',))
         config.read(OSCConfig.options_file)
 
 
-        self.get_field('e_this_unit_name').set_value(config.get('this-unit','name',0))
-        self.get_field('e_this_unit_ip').set_value(config.get('this-unit','ip',0))
+        self.get_field('e_this_unit_name').set_value(config.get('this-unit','name'))
+        self.get_field('e_this_unit_ip').set_value(config.get('this-unit','ip'))
         
-        self.get_field('e_slave_enabled').set_value(config.get('slave','enabled',0))
-        self.get_field('e_listen_port').set_value(config.get('slave','listen-port',0))
+        self.get_field('e_slave_enabled').set_value(config.get('slave','enabled'))
+        self.get_field('e_listen_port').set_value(config.get('slave','listen-port'))
 
 
-        self.get_field('e_master_enabled').set_value(config.get('master','enabled',0))
-        self.get_field('e_reply_listen_port').set_value(config.get('master','reply-listen-port',0))
+        self.get_field('e_master_enabled').set_value(config.get('master','enabled'))
+        self.get_field('e_reply_listen_port').set_value(config.get('master','reply-listen-port'))
 
 
-        self.get_field('e_slave_units_name').set_value(config.get('master','slave-units-name',0))
-        self.get_field('e_slave_units_ip').set_value(config.get('master','slave-units-ip',0))
+        self.get_field('e_slave_units_name').set_value(config.get('master','slave-units-name'))
+        self.get_field('e_slave_units_ip').set_value(config.get('master','slave-units-ip'))
 
 
 
@@ -182,7 +182,7 @@ class OSCWebEditor(AdaptableDialog):
     def save(self):
 
         # save the output of the options edit dialog to file
-        config=ConfigParser.ConfigParser()
+        config=configparser.ConfigParser(inline_comment_prefixes = (';',))
 
         config.add_section('this-unit')
         config.set('this-unit','name',self.get_field('e_this_unit_name').get_value())
@@ -199,7 +199,7 @@ class OSCWebEditor(AdaptableDialog):
         config.set('master','slave-units-name',self.get_field('e_slave_units_name').get_value())
         config.set('master','slave-units-ip',self.get_field('e_slave_units_ip').get_value())
             
-        with open(OSCConfig.options_file, 'wb') as optionsfile:
+        with open(OSCConfig.options_file, 'w') as optionsfile:
             config.write(optionsfile)
 
 

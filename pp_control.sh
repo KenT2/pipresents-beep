@@ -13,8 +13,8 @@ case "$1" in
 
    run)
        echo "run"
-       echo "python /home/pi/pipresents/pipresents.py " "$2"
-       python /home/pi/pipresents/pipresents.py $2 > /dev/null &
+       echo "python3 /home/pi/pipresents/pipresents.py " "$2"
+       python3 /home/pi/pipresents/pipresents.py $2 > /dev/null &
        echo $!
        ;;
 

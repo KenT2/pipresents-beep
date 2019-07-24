@@ -21,7 +21,7 @@ import time
 import logging
 import ctypes
 import string
-import nfc
+from . import nfc
 
 def hex_dump(string):
     """Dumps data as hexstrings"""
@@ -56,22 +56,22 @@ class NFCReader(object):
                 try:
                     _ = nfc.nfc_initiator_init(self.__device)
                     self.uid = ''
-                    print 'start poll'
+                    print('start poll')
                     while True:
                         self._poll()
                 finally:
                     nfc.nfc_close(self.__device)
             else:
-                print "NFC Waiting for device."
+                print("NFC Waiting for device.")
                 time.sleep(5)
         except (KeyboardInterrupt, SystemExit):
             loop = False
-        except IOError, e:
-            print "Exception: " + str(e)
+        except IOError as e:
+            print("Exception: " + str(e))
             loop = True
         finally:
             nfc.nfc_exit(self.__context)
-            print "NFC Clean shutdown called"
+            print("NFC Clean shutdown called")
         return loop
 
 
@@ -80,15 +80,15 @@ class NFCReader(object):
         nt = nfc.nfc_target()
         res = nfc.nfc_initiator_poll_target(self.__device, self.__modulations, len(self.__modulations), 1, 2,
                                             ctypes.byref(nt))
-        print "RES", res
+        print("RES", res)
         if res < 0:
-            print 'card absent'
+            print('card absent')
         elif res >= 1:
-            print 'length ',nt.nti.nai.szUidLen
+            print('length ',nt.nti.nai.szUidLen)
             self.uid = "".join([chr(nt.nti.nai.abtUid[i]) for i in range(nt.nti.nai.szUidLen)])
-            print self.uid.encode("hex")
+            print(self.uid.encode("hex"))
         else:
-            print 'fault'
+            print('fault')
 
 
 if __name__ == '__main__':

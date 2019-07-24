@@ -17,11 +17,11 @@ import logging
 try:
     from http.server import HTTPServer, BaseHTTPRequestHandler
 except:
-    from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+    from http.server import HTTPServer, BaseHTTPRequestHandler
 try:
     import socketserver
 except:
-    import SocketServer as socketserver
+    import socketserver as socketserver
 import mimetypes
 import webbrowser
 import struct
@@ -36,10 +36,10 @@ import os
 import re
 from threading import Timer
 try:
-    from urllib import unquote
-    from urllib import quote
-    from urlparse import urlparse
-    from urlparse import parse_qs
+    from urllib.parse import unquote
+    from urllib.parse import quote
+    from urllib.parse import urlparse
+    from urllib.parse import parse_qs
 except ImportError:
     from urllib.parse import unquote
     from urllib.parse import quote
@@ -173,11 +173,11 @@ class WebSocketsHandler(socketserver.StreamRequestHandler):
                 decoded += chr(self.bytetonum(char) ^ masks[len(decoded) % 4])
             self.on_message(from_websocket(decoded))
         except socket.timeout as e:
-            print 'socket timed out'
+            print('socket timed out')
             self.log.debug('socket timed out: %s' % e)
             return False
         except Exception:
-            print 'websocket error'
+            print('websocket error')
             self.log.error("error parsing websocket", exc_info=True)
             return False
         return True
@@ -289,7 +289,7 @@ def parse_parametrs(p):
 def gui_updater(client, node):
     changed_widgets = {} #key = widget instance, value = html representation
     node.repr(client, changed_widgets)
-    for widget in changed_widgets.keys():
+    for widget in list(changed_widgets.keys()):
         html = changed_widgets[widget]
         __id = str(widget.identifier)
         for ws in client.websockets:
@@ -317,7 +317,7 @@ class _UpdateThread(threading.Thread):
                 # noinspection PyBroadException
                 try:
 
-                    for client in clients.values():
+                    for client in list(clients.values()):
                         if not hasattr(client, 'root'):
                             continue
 
@@ -727,7 +727,7 @@ function uploadFile(widgetID, eventSuccess, eventFail, eventData, file){
                                     environ={'REQUEST_METHOD': 'POST',
                                              'CONTENT_TYPE': self.headers['Content-Type']})
             # Echo back information about what was posted in the form
-            for field in form.keys():
+            for field in list(form.keys()):
                 field_item = form[field]
                 if field_item.filename:
                     # The field contains an uploaded file

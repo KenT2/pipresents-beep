@@ -21,7 +21,7 @@ import time
 import logging
 import ctypes
 import string
-import nfc
+from . import nfc
 
 def hex_dump(string):
     """Dumps data as hexstrings"""
@@ -74,7 +74,7 @@ class NFCReader(object):
                 time.sleep(5)
         except (KeyboardInterrupt, SystemExit):
             loop = False
-        except IOError, e:
+        except IOError as e:
             self.log("Exception: " + str(e))
             loop = True  # not str(e).startswith("NFC Error whilst polling")
         # except Exception, e:
@@ -218,13 +218,13 @@ class NFCReader(object):
     def read_card(self, uid):
         """Takes a uid, reads the card and return data for use in writing the card"""
         key = "\xff\xff\xff\xff\xff\xff"
-        print "Reading card", uid.encode("hex")
+        print("Reading card", uid.encode("hex"))
         self._card_uid = self.select_card()
         self._authenticate(0x00, uid, key)
         block = 0
         for block in range(64):
             data = self.auth_and_read(block, uid, key)
-            print block, data.encode("hex"), "".join([ x if x in string.printable else "." for x in data])
+            print(block, data.encode("hex"), "".join([ x if x in string.printable else "." for x in data]))
 
     def write_card(self, uid, data):
         """Accepts data of the recently read card with UID uid, and writes any changes necessary to it"""

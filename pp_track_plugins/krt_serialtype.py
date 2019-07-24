@@ -1,5 +1,5 @@
 """
-This example writes values of the automation HAT analog input 1 to the screen directly using Tkinter.
+This example writes values from serial port or keyboard to the screen directly using Tkinter.
 
 The values are written direct to the Tkinter canvas that is used by
 Pi Presents to display its output.
@@ -12,7 +12,7 @@ from pp_iopluginmanager import IOPluginManager
 
 
 import time
-from Tkinter import NW
+from tkinter import NW
 
 class krt_serialtype(object):
 
@@ -73,7 +73,7 @@ class krt_serialtype(object):
         else:
             char = 'Not available'            
 
-        my_text= 'Type some text follewed by Enter      '+ value
+        my_text= 'Type some text followed by Enter      '+ value
         plugin_obj1=self.canvas.create_text(100,200,
                                         anchor=NW,
                                       text=my_text,

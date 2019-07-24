@@ -50,7 +50,7 @@ while [ $RET -eq 0 ]; do
      else
        if [ "$GAME" != "" ]; then
           cd /home/pi/pipresents
-          python /home/pi/pipresents/pipresents.py -o /home/pi -p $GAME -bf
+          python3 /home/pi/pipresents/pipresents.py -o /home/pi -p $GAME -bf
        fi
      fi
   fi

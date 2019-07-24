@@ -3,7 +3,7 @@
 import time
 import copy
 import os
-import ConfigParser
+import configparser
 
 
 
@@ -108,13 +108,13 @@ class pp_exampledriver(object):
         if param_values == []:
             return 'error',pp_exampledriver.title + ', no parameter values for type ' + param_type
 
-        print 'Output from ' + pp_exampledriver.title + ':' + pp_exampledriver.message_name
+        print('Output from ' + pp_exampledriver.title + ':' + pp_exampledriver.message_name)
         for value in param_values:
-            print '     ',value
+            print('     ',value)
         
          
         # return a debugging string
-        return 'normal',pp_exampledriver.title + ':'+pp_exampledriver.message_name+ ' output required at: ' + str(req_time)+ ' sent at: ' + str(long(time.time()))
+        return 'normal',pp_exampledriver.title + ':'+pp_exampledriver.message_name+ ' output required at: ' + str(req_time)+ ' sent at: ' + str(int(time.time()))
 
 
     # allow querying of driver state
@@ -128,7 +128,7 @@ class pp_exampledriver(object):
 
     def _read(self,filename,filepath):
         if os.path.exists(filepath):
-            self.config = ConfigParser.ConfigParser()
+            self.config = configparser.ConfigParser(inline_comment_prefixes = (';',))
             self.config.read(filepath)
             return 'normal',filename+' read'
         else:
@@ -139,13 +139,13 @@ class pp_exampledriver(object):
 # test harness
 # ************************************
 if __name__ == '__main__':
-    from Tkinter import *
+    from tkinter import *
 
     def main_event_callback(symbol,source):
-        print '\nTick generated with symbolic name '+symbol+' from '+source
+        print('\nTick generated with symbolic name '+symbol+' from '+source)
         # short circuit going into a PP show and out throught animate command
-        status,log_message=idd.handle_output_event('send-message','message',['parameter 1','parameter 2'],str(long(time.time())))
-        print 'debug: ',status,log_message
+        status,log_message=idd.handle_output_event('send-message','message',['parameter 1','parameter 2'],str(int(time.time())))
+        print('debug: ',status,log_message)
 
 
 
@@ -156,7 +156,7 @@ if __name__ == '__main__':
 
     idd=pp_exampledriver()
     reason,message=idd.init('exampledriver.cfg','/home/pi/pipresents/pp_resources/pp_templates/exampledriver.cfg',root,main_event_callback)
-    print reason,message
+    print(reason,message)
     idd.start()
     # start tkinter's event loop
     root.mainloop()

@@ -1,3 +1,26 @@
+CHANGES FOR 1.4.3a 24/7/2019
+============================
+modified - upgraded code to Python 3. SEE RELEASE NOTES FOR UPGRADE PROCEDURE
+
+modified - web track, reduce the delay to load the image behind the browser to 1 second
+enhanced - added 'open show' record to statistics recording- param required
+enhanced - the maximum volume of video sound can now be set
+enhanced - inc-volume and dec-volume commands for video and audio tracks omx-+/- and mplay-0/9 are deprecated
+
+fixed - video volume now works (changed from pseudo keyboard commands to dbus commands)
+fixed - crash if video track controls text invalid
+fixed - Pi Presents code can now be in any directory
+fixed - allow simulated years <2018
+fixed - show control, if OSC is not enabled then ignore OSC commands instead of reporting error.
+fixed - crash in serialdriver I/O plugin
+
+enhanced - pp_counter_1p4 example
+enhanced - new pp_html_1p4 example
+fixed - error in some examples due to absence of empty track in a liveshow
+fixed and improved  - pp_beep_1p4 example 
+
+
+
 CHANGES FOR 1.4.2a 27/4/2019
 ============================
 enhanced - time of day scheduler, disable catch up per show

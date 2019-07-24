@@ -1,9 +1,10 @@
 import time
 import copy
 import os
-import ConfigParser
+import configparser
 import ctypes
 import pynfc.src.nfc as nfc
+import binascii
 
 
 class pp_pn532driver(object):
@@ -94,7 +95,7 @@ class pp_pn532driver(object):
             self.__device = nfc.nfc_open(self.__context, conn_strings[0])
             try:
                 _ = nfc.nfc_initiator_init(self.__device)
-            except IOError, e:
+            except IOError as e:
                 return 'error',pp_pn532driver.title + 'Exception initiating tag reader' + str(e)
             
         # init timer
@@ -170,17 +171,16 @@ class pp_pn532driver(object):
             return 'normal','',''
         elif res >= 1:
             uid_length=nt.nti.nai.szUidLen
-            # print 'length ',uid_length
-            uid = "".join([chr(nt.nti.nai.abtUid[i]) for i in range(uid_length)])
-            uid_hex=uid.encode("hex")
-            # print uid_hex
+            uid = bytearray([nt.nti.nai.abtUid[i] for i in range(uid_length)])
+            uid_hex=binascii.hexlify(uid).decode('UTF-8')
             return 'normal','',uid_hex
         else:
-            print 'tag reader error: reader returns zero result'
+            print('tag reader error: reader returns zero result')
             return 'error','reader returns zero result',''
 
     def find_event_entry(self,tag_code):
         for entry in pp_pn532driver.tag_codes:
+            # print (entry[pp_pn532driver.TAG_CODE],tag_code)
             if entry[pp_pn532driver.TAG_CODE]==tag_code:
                 # print entry
                 return entry
@@ -224,7 +224,7 @@ class pp_pn532driver(object):
     def _read(self,filename,filepath):
         # try inside profile
         if os.path.exists(filepath):
-            self.config = ConfigParser.ConfigParser()
+            self.config = configparser.ConfigParser(inline_comment_prefixes = (';',))
             self.config.read(filepath)
             return 'normal',filename+' read'
         else:
@@ -237,10 +237,10 @@ class pp_pn532driver(object):
 
 
 if __name__ == '__main__':
-    from Tkinter import *
+    from tkinter import *
 
     def button_callback(symbol,source):
-        print 'callback',symbol,source
+        print('callback',symbol,source)
         if symbol=='pp-stop':
             pn.terminate()
             exit()
@@ -253,7 +253,7 @@ if __name__ == '__main__':
 
     pn=pp_pn532driver()
     reason,message=pn.init('pn532.cfg','/home/pi/pipresents/pp_resources/pp_templates/pn532.cfg',root,button_callback)
-    print reason,message
+    print(reason,message)
     pn.start()
     root.mainloop()
 

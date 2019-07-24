@@ -1,7 +1,7 @@
 #enhanced keyboard driver
 import copy
 import os
-import ConfigParser
+import configparser
 
 
 class pp_kbddriver_plus(object):
@@ -210,7 +210,7 @@ class pp_kbddriver_plus(object):
 
     def _read(self,filename,filepath):
         if os.path.exists(filepath):
-            self.config = ConfigParser.ConfigParser()
+            self.config = configparser.ConfigParser(inline_comment_prefixes = (';',))
             self.config.read(filepath)
             return 'normal',filename+' read'
         else:
@@ -220,10 +220,10 @@ class pp_kbddriver_plus(object):
 
 
 if __name__ == '__main__':
-    from Tkinter import *
+    from tkinter import *
 
     def key_callback(symbol,source):
-        print 'callback',symbol,source,'\n'
+        print('callback',symbol,source,'\n')
         if symbol=='pp-stop':
             idd.terminate()
             exit()
@@ -237,7 +237,7 @@ if __name__ == '__main__':
     idd=pp_kbddriver_plus()
     
     reason,message=idd.init('pp_kbddriver_plus.cfg','/home/pi/pipresents/pp_io_config/keys_plus.cfg',root,key_callback)
-    print reason,message
+    print(reason,message)
     if reason != 'error':
         idd.start()
         root.mainloop()

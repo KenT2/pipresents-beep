@@ -287,7 +287,7 @@ class MyApp(App):
         
 
     def on_input_dialog_confirm(self, widget, value):
-        print 'Ok pressed input_dialog_confirm',value
+        print('Ok pressed input_dialog_confirm',value)
         self.lbl.set_text('Hello ' + value)
 
     def open_fileselection_dialog(self, widget):

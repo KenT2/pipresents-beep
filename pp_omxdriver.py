@@ -37,14 +37,11 @@ Signals
 
 class OMXDriver(object):
 
-    # adjust this to determine freeze after the first frame
-    after_first_frame_position =-50000 # microseconds
-   
     _LAUNCH_CMD = '/usr/bin/omxplayer --no-keys '  # needs changing if user has installed his own version of omxplayer elsewhere
 
     # add more keys here, see popcornmix/omxplayer github files readme.md and  KeyConfig.h
     KEY_MAP =   {'<':3,'>':4,'z':5,'j':6,'k':7,'i':8,'o':9,'n':10,'m':11,'s':12,
-                 '-': 17, '+': 18, '=':18,'x':30,'w':31}
+                 'x':30,'w':31}
 
 
     def __init__(self,widget,pp_dir):
@@ -80,7 +77,9 @@ class OMXDriver(object):
         self.__iface_player = None
 
 
-    def load(self, track, freeze_at_start,options,caller):
+    def load(self, track, freeze_at_start,options,caller,omx_volume,omx_max_volume):
+        self.omx_volume=omx_volume
+        self.omx_max_volume=omx_max_volume
         self.pause_before_play_required=freeze_at_start
         self.caller=caller
         track= "'"+ track.replace("'","'\\''") + "'"
@@ -100,7 +99,7 @@ class OMXDriver(object):
         # print self.omxplayer_cmd
         self.mon.log(self, "Send command to omxplayer: "+ self.omxplayer_cmd)
         # self._process=subprocess.Popen(self.omxplayer_cmd,shell=True,stdout=file('/home/pi/pipresents/pp_logs/stdout.txt','a'),stderr=file('/home/pi/pipresents/pp_logs/stderr.txt','a'))
-        self._process=subprocess.Popen(self.omxplayer_cmd,shell=True,stdout=file('/dev/null','a'),stderr=file('/dev/null','a'))
+        self._process=subprocess.Popen(self.omxplayer_cmd,shell=True,stdout=open('/dev/null','a'),stderr=open('/dev/null','a'))
         self.pid=self._process.pid
 
         # wait for omxplayer to start then start monitoring thread
@@ -138,7 +137,7 @@ class OMXDriver(object):
         self.end_play_reason='nothing'
         self.paused_at_end=False
         self.paused_at_start='False'
-        self.delay = 50
+        self.delay = 5
         self.widget.after(0,self._status_loop)
 
 
@@ -146,10 +145,12 @@ class OMXDriver(object):
     """
     freeze at start
     'no' - unpause in show - test !=0
-    'before_first_frame' - don't unpause in show, test !=0
-    'after_first_frame' - don't unpause in show, test > -100000
+    'before_first_frame' - don't unpause in show, test >-xx just large enough negative to stop first frame showing
+    'after_first_frame' - don't unpause in show, test > -yy large enough so that first frame always shows
     """
-        
+    after_first_frame_position = -50000 #microseconds
+    before_first_frame_position = -70000 #microseconds
+    
     def _status_loop(self):
             if self.is_running() is False:
                 # process is not running because quit or natural end - seems not to happen
@@ -159,7 +160,7 @@ class OMXDriver(object):
                 return
             else:
                 success, video_position = self.get_position()
-                # if video_position <= 0: print 'read position',video_position
+                # print ('read',success,video_position)
                 if success is False:
                     # print 'send nice day - exception when reading video position'
                     self.end_play_signal=True
@@ -178,16 +179,19 @@ class OMXDriver(object):
                             self.end_play_reason='pause_at_end'
                             return
                         else:
-                            print 'pause at end failed, probably because of delay after detection, just run on'
+                            print('pause at end failed, probably because of delay after detection, just run on')
                             self.widget.after(self.delay,self._status_loop)
                     else:
                         # need to do the pausing for preload after first timestamp is received 0 is default value before start
                         # print self.pause_before_play_required,self.paused_at_start,self.video_position,OMXDriver.after_first_frame_position
-                        if (self.pause_before_play_required == 'after-first-frame' and self.paused_at_start == 'False' and self.video_position >OMXDriver.after_first_frame_position)\
-                        or(self.pause_before_play_required != 'after-first-frame' and self.paused_at_start == 'False' and self.video_position !=0):
+                        if (self.pause_before_play_required == 'after-first-frame' and self.paused_at_start == 'False'\
+                         and self.video_position >OMXDriver.after_first_frame_position\
+                          and self.video_position !=0)\
+                        or(self.pause_before_play_required != 'after-first-frame' and self.paused_at_start == 'False'\
+                         and self.video_position > OMXDriver.before_first_frame_position\
+                         and self.video_position !=0):
                             pause_after_load_success=self.pause('after load')
                             if pause_after_load_success is True:
-                                # print self.id,' pause after load success',self.video_position
                                 self.start_play_signal = True
                                 self.paused_at_start='True'
                             else:
@@ -200,8 +204,7 @@ class OMXDriver(object):
 
 
     
-    def show(self,freeze_at_end_required,initial_volume):
-        self.initial_volume=initial_volume
+    def show(self,freeze_at_end_required):
         self.pause_at_end_required=freeze_at_end_required
         # unpause to start playing
         if self.pause_before_play_required =='no':
@@ -218,7 +221,7 @@ class OMXDriver(object):
     def control(self,char):
 
         val = OMXDriver.KEY_MAP[char]
-        self.mon.log(self,'>control received and sent to omxplayer ' + str(self.pid))
+        self.mon.log(self,'>control received and sent to omxplayer ' + str(self.pid) + ' ' + str(val))
         if self.is_running():
             try:
                 self.__iface_player.Action(dbus.Int32(val))
@@ -274,7 +277,7 @@ class OMXDriver(object):
                 if status == 'Playing':
                     self.paused = False
                     self.paused_at_start='done'
-                    self.set_volume(self.initial_volume)
+                    self.set_volume()
                     return True
 
                 if status == 'Failed':
@@ -399,13 +402,19 @@ class OMXDriver(object):
     def unmute(self):
             self.__iface_player.Unmute()
 
-    def set_volume(self,millibels):
-        # print millibels
-        volume = pow(10, millibels / 2000.0);
-        self.__iface_props.Volume(volume)
-        
+    def set_volume(self):
+        millibels=self.omx_volume*100
+        out = pow(10, millibels / 2000.0)
+        self.__iface_props.Volume(out)
+    
+    def inc_volume(self):
+        self.omx_volume+=3
+        self.omx_volume=min(self.omx_volume,self.omx_max_volume)
+        self.set_volume()
 
-
+    def dec_volume(self):
+        self.omx_volume-=3
+        self.set_volume() 
 
     def stop(self):
         self.mon.log(self,'>stop received and quit sent to omxplayer ' + str(self.pid))
@@ -456,6 +465,7 @@ class OMXDriver(object):
         # don't test process as is done just before
         try:
             micros = self.__iface_props.Position()
+            # print ('micros',micros)
             return True,micros
         except dbus.exceptions.DBusException as ex:
             # print 'Failed get_position - dbus exception: {}'.format(ex.get_dbus_message())
@@ -472,7 +482,7 @@ class OMXDriver(object):
                 self.mon.warn(self, 'repeat get duration ' + str(tries))
                 tries +=1
                 if tries >5:                      
-                    return False,sys.maxint*100
+                    return False,sys.maxsize*100
 
 
     def _try_duration(self):

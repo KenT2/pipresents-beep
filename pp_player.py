@@ -1,11 +1,12 @@
 import os
-from Tkinter import NW
+from tkinter import NW,FLAT,RIDGE
 from PIL import Image
 from PIL import ImageTk
 
 from pp_pluginmanager import PluginManager
 from pp_animate import Animate
 from pp_utils import Monitor,calculate_text_position
+from tk_html_widgets import HTMLText
 
 class Player(object):
 
@@ -76,8 +77,10 @@ class Player(object):
 
         # initialise state and signals
         self.background_obj=None
+        self.html_show_text_obj = None
         self.show_text_obj=None
         self.track_text_obj=None
+        self.html_track_text_obj = None
         self.hint_obj=None
         self.background=None
         self.freeze_at_end_required='no' # overriden by videoplayer
@@ -249,6 +252,7 @@ class Player(object):
         self.show_text_obj=None
         self.hint_obj=None
         self.track_obj=None
+        text_type='html'
 
         
         # background image
@@ -283,19 +287,54 @@ class Player(object):
         status,message=self.load_track_content()
         if status == 'error':
             return 'error',message
+
+        self.show_html_background_colour= self.show_params['show-html-background-colour']
+        if self.show_params['show-html-width'] == '':
+            self.show_html_width=self.show_canvas_x2-self.show_canvas_x1
+        else:
+            self.show_html_width=self.show_params['show-html-width']
+            
+        if self.show_params['show-html-height'] == '':
+            self.show_html_height=self.show_canvas_y2-self.show_canvas_y1
+        else:
+            self.show_html_height=self.show_params['show-html-height']
+            
+        self.show_text_type=self.show_params['show-text-type']
+        
+        if self.show_params['show-text-location'] != '':
+            text_path=self.complete_path(self.show_params['show-text-location'])
+            if not os.path.exists(text_path):
+                return 'error',"Show Text file not found "+ text_path
+            with open(text_path) as f:
+                show_text=f.read()
+        else:
+            show_text= self.show_params['show-text']
+                        
+
                           
         # load show text if enabled
-        if self.show_params['show-text'] !=  '' and self.track_params['display-show-text'] == 'yes':
+        if show_text !=  '' and self.track_params['display-show-text'] == 'yes':
 
             x,y,anchor,justify=calculate_text_position(self.show_params['show-text-x'],self.show_params['show-text-y'],
                                      self.show_canvas_x1,self.show_canvas_y1,
                                      self.show_canvas_centre_x,self.show_canvas_centre_y,
                                      self.show_canvas_x2,self.show_canvas_y2,self.show_params['show-text-justify'])
+            if self.show_text_type=='html':
+                self.html_show_text_obj = HTMLText(self.canvas,background=self.show_html_background_colour,
+                relief=FLAT)
+
+                self.html_show_text_obj.set_html(show_text,self.pp_home,self.pp_profile)
+
+                self.show_text_obj=self.canvas.create_window(x,y,window=self.html_show_text_obj,
+                       anchor=anchor,width=self.show_html_width,
+                       height=self.show_html_height)
  
-            self.show_text_obj=self.canvas.create_text(x,y,
+                
+            else:
+                self.show_text_obj=self.canvas.create_text(x,y,
                                                        anchor=anchor,
                                                        justify=justify,
-                                                       text=self.show_params['show-text'],
+                                                       text= show_text,
                                                        fill=self.show_params['show-text-colour'],
                                                        font=self.show_params['show-text-font'])
 
@@ -329,22 +368,52 @@ class Player(object):
         else:
             track_text_colour= self.track_params['track-text-colour']
             
+        self.track_html_background_colour= self.track_params['track-html-background-colour']
+        
+        if self.track_params['track-html-width'] == '':
+            self.track_html_width=self.show_canvas_x2-self.show_canvas_x1
+        else:
+            self.track_html_width=self.track_params['track-html-width']
             
-        if self.track_params['track-text'] !=  '':
+        if self.track_params['track-html-height'] == '':
+            self.track_html_height=self.show_canvas_y2-self.show_canvas_y1
+        else:
+            self.track_html_height=self.track_params['track-html-height']
+            
+        self.track_text_type=self.track_params['track-text-type']
+        
+        if self.track_params['track-text-location'] != '':
+            text_path=self.complete_path(self.track_params['track-text-location'])
+            if not os.path.exists(text_path):
+                return 'error',"Track Text file not found "+ text_path
+            with open(text_path) as f:
+                track_text=f.read()
+        else:
+            track_text= self.track_params['track-text']
+                        
+        if  track_text !=  '':
 
             x,y,anchor,justify=calculate_text_position(track_text_x,track_text_y,
                                      self.show_canvas_x1,self.show_canvas_y1,
                                      self.show_canvas_centre_x,self.show_canvas_centre_y,
                                      self.show_canvas_x2,self.show_canvas_y2,track_text_justify)
  
-            
-            self.track_text_obj=self.canvas.create_text(x,y,
+            if self.track_text_type=='html':
+                self.html_track_text_obj = HTMLText(self.canvas,background=self.track_html_background_colour,
+                    relief=FLAT)
+                # self.html_text.pack(fill="both", expand=True)
+                self.html_track_text_obj.set_html(track_text,self.pp_home,self.pp_profile)
+                # self.html_text.fit_height()
+                self.track_text_obj=self.canvas.create_window(x,y,window=self.html_track_text_obj,
+                       anchor=anchor,width=self.track_html_width,
+                       height=self.track_html_height)
+            else:
+                self.track_text_obj=self.canvas.create_text(x,y,
                                                         anchor=anchor,
                                                         justify=justify,
-                                                        text=self.track_params['track-text'],
+                                                        text=track_text,
                                                         fill=track_text_colour,
                                                         font=track_text_font)
-
         # load instructions if enabled
         if enable_menu is  True:
 
@@ -428,10 +497,18 @@ class Player(object):
         self.canvas.itemconfig(self.hint_obj,state='hidden')
         # self.canvas.update_idletasks( )
         
+        # need to delete html parser to stop garbage
+        if self.html_show_text_obj != None:
+            self.html_show_text_obj.delete_parser()
+        if self.html_track_text_obj != None:            
+            self.html_track_text_obj.delete_parser()
+        
         self.canvas.delete(self.background_obj)
         self.canvas.delete(self.show_text_obj)
         self.canvas.delete(self.track_text_obj)
         self.canvas.delete(self.hint_obj)
+        
+        
         self.background=None
         # self.canvas.update_idletasks( )
 

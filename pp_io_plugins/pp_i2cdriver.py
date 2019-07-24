@@ -23,7 +23,7 @@ To use pp_i2cdriver.py I2C must be enabled in Preferences>Raspberry Pi Configura
 """
 import copy
 import os
-import ConfigParser
+import configparser
 import smbus
 import threading
 import time
@@ -229,8 +229,8 @@ class pp_i2cdriver(object):
 
     # callable by track plugins to print analog input values
     def print_inputs(self):
-        print 'Automation phat analog inputs, percentage of 3.3 volts:',pp_i2cdriver.inputs['analog1-percentage'], pp_i2cdriver.inputs['analog2-percentage'], pp_i2cdriver.inputs['analog3-percentage']
-        print 'Automation phat analog inputs, voltage:',round(pp_i2cdriver.inputs['analog1-volts'],2), round(pp_i2cdriver.inputs['analog2-volts'],2), round(pp_i2cdriver.inputs['analog3-volts'],2)
+        print('Automation phat analog inputs, percentage of 3.3 volts:',pp_i2cdriver.inputs['analog1-percentage'], pp_i2cdriver.inputs['analog2-percentage'], pp_i2cdriver.inputs['analog3-percentage'])
+        print('Automation phat analog inputs, voltage:',round(pp_i2cdriver.inputs['analog1-volts'],2), round(pp_i2cdriver.inputs['analog2-volts'],2), round(pp_i2cdriver.inputs['analog3-volts'],2))
        
     # allow querying of driver state
     def is_active(self):
@@ -495,7 +495,7 @@ class pp_i2cdriver(object):
     def _read(self,filename,filepath):
         # try inside profile
         if os.path.exists(filepath):
-            self.config = ConfigParser.ConfigParser()
+            self.config = configparser.ConfigParser(inline_comment_prefixes = (';',))
             self.config.read(filepath)
             # self.mon.log(self,filename + " read from "+ filepath)
             return 'normal',filename+' read'
@@ -676,10 +676,10 @@ class ScrollhdThread(StoppableThread):
 
 
 if __name__ == '__main__':
-    from Tkinter import *
+    from tkinter import *
 
     def button_callback(symbol,source):
-        print 'callback',symbol,source
+        print('callback',symbol,source)
         if symbol=='pp-stop':
             idd.terminate()
             exit()

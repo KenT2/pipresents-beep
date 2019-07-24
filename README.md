@@ -1,7 +1,9 @@
-PI PRESENTS  - Version 1.4.1
+PI PRESENTS  - Version 1.4.3
 ============================
 
 This repository contains the latest and greatest version Pi Presents. Use if you are happy with bleeding edge software that is under development.
+
+VERSION 1.4.3 IS PYTHON 3
 
 
 TO INSTALL PIPRESENTS-BEEP
@@ -50,9 +52,10 @@ The full manual in English is here https://github.com/KenT2/pipresents-beep/blob
 Requirements
 -------------
 
-	* must use the latest version of Raspbian Stretch with Desktop (not the Lite version)
+	* must use the latest version of Raspbian Stretch or Buster with Desktop (not the Lite version)
 	* must be run from the PIXEL desktop.
 	* must be installed and run from user Pi
+        * must have Python 3 installed (which Raspbian does)
 
 
 Set the GPU Memory size to 256MB
@@ -69,16 +72,15 @@ Pi Presents MUST have the latest version of omxplayer and of Raspbian, get this 
 
 Install required packages 
 -----------------------------
-         sudo apt-get install python-imaging
-         sudo apt-get install python-imaging-tk
+         sudo apt-get install python3-pil.imagetk
          sudo apt-get install unclutter
          sudo apt-get install mplayer
          sudo apt-get install uzbl
-         sudo apt-get install python-pexpect
+         sudo apt-get install python3-pexpect
 		 
 Install optional packages
 ------------------------------
-         sudo pip install evdev  (if you are using the input device I/O plugin)
+         sudo pip3 install evdev  (if you are using the input device I/O plugin)
          sudo apt-get install mpg123 (for .mp3 beeps)
 
 	   
@@ -93,7 +95,7 @@ There should now be a directory 'KenT2-pipresents-beep-xxxx' in your /home/pi di
 
 Run Pi Presents to check the installation is successful. From a terminal window opened in the home directory type:
 
-         python /home/pi/pipresents/pipresents.py
+         python3 /home/pi/pipresents/pipresents.py
 
 You will see a window with an error message which is because you have no profiles.Click OK to exit Pi Presents.
 
@@ -111,13 +113,13 @@ There should now be a directory 'KenT2-pipresents-beep-examples-xxxx' in the /ho
 
 From the terminal window type:
 
-         python /home/pi/pipresents/pipresents.py -p pp_mediashow_1p4
+         python3 /home/pi/pipresents/pipresents.py -p pp_mediashow_1p4
 		 
 to see a repeating multimedia show
 
 Exit this with CTRL-BREAK or closing the window, then:
 
-          python /home/pi/pipresents/pipresents.py -p pp_mediashow_1p4 -f -b
+          python3 /home/pi/pipresents/pipresents.py -p pp_mediashow_1p4 -f -b
 		  
 to display full screen and to disable screen blanking
 
@@ -127,6 +129,14 @@ Now read the manual to try other examples.
 
 Updating Pi Presents from earlier Versions of Pi Presents Beep or Pi Presents Gapless
 ======================================================================================
+
+Install Python 3 version of some packages:
+
+      sudo apt-get install python3-pil.imagetk
+      sudo apt-get install python3-pexpect
+      sudo pip3 install evdev
+
+The Python 2 versions of these packages can be left installed
 
 Open a terminal window in the /home/pi and type:
 

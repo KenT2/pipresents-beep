@@ -2,7 +2,7 @@
 
 import os
 import sys
-import ConfigParser
+import configparser
 import shutil
 import copy
 import string
@@ -34,7 +34,7 @@ class PPWebEditor(App):
         # ***************************************
         # INIT
         # ***************************************
-        self.editor_issue="1.4.2"
+        self.editor_issue="1.4.3"
         self.force_update= False
 
         # get directory holding the code
@@ -800,7 +800,7 @@ class PPWebEditor(App):
         if os.path.exists(path) is  True:
             OKDialog("Add Medialist","Medialist file exists<br>" + path).show(self)
             return ''
-        nfile = open(path,'wb')
+        nfile = open(path,'w')
         nfile.write("{")
         nfile.write("\"issue\":  \""+PPdefinitions.DEFINITIONS_VERSION_STRING+"\",\n")
         nfile.write("\"tracks\": [")
@@ -1147,12 +1147,12 @@ class PPWebEditor(App):
 
 
     def show_versions(self,widget):
-        print 'editor', self.editor_version()
-        print 'definitions', self.definitions_version()
+        print('editor', self.editor_version())
+        print('definitions', self.definitions_version())
         if self.current_showlist is not None:
-            print 'profile', self.current_showlist.profile_version()
+            print('profile', self.current_showlist.profile_version())
         else:
-            print 'not open'
+            print('not open')
 
 
     def m_update_all(self,widget):
@@ -1234,7 +1234,7 @@ class PPWebEditor(App):
     def update_shows(self):
         # open showlist into a list of dictionaries
         # self.mon.log (self,"Updating show ")
-        ifile  = open(self.pp_profile_dir + os.sep + "pp_showlist.json", 'rb')
+        ifile  = open(self.pp_profile_dir + os.sep + "pp_showlist.json", 'r')
         sdict = json.load(ifile)
         ifile.close()
         shows = sdict['shows']
@@ -1275,7 +1275,7 @@ class PPWebEditor(App):
                 del show['controls']
                 
                 # open the  medialist and add the menu track then populate some of its fields from the show
-                ifile  = open(self.pp_profile_dir + os.sep + to_file, 'rb')
+                ifile  = open(self.pp_profile_dir + os.sep + to_file, 'r')
                 tracks = json.load(ifile)['tracks']
                 ifile.close()
                 
@@ -1293,14 +1293,14 @@ class PPWebEditor(App):
                                           
                 # and save the medialist
                 dic={'issue':self.editor_issue,'tracks':tracks}
-                ofile  = open(self.pp_profile_dir + os.sep + to_file, "wb")
+                ofile  = open(self.pp_profile_dir + os.sep + to_file, 'w')
                 json.dump(dic,ofile,sort_keys=True,indent=1)
                 # end for show in shows
 
         #update the fields in  all shows
         replacement_shows=self.update_shows_in_showlist(shows)
         dic={'issue':PPdefinitions.DEFINITIONS_VERSION_STRING,'shows':replacement_shows}
-        ofile  = open(self.pp_profile_dir + os.sep + "pp_showlist.json", "wb")
+        ofile  = open(self.pp_profile_dir + os.sep + "pp_showlist.json", 'w')
         json.dump(dic,ofile,sort_keys=True,indent=1)
         return True
 
@@ -1330,12 +1330,12 @@ class PPWebEditor(App):
             if this_file.endswith(".json") and this_file not in  ('pp_showlist.json','schedule.json'):
                 # self.mon.log (self,"Updating medialist " + this_file)
                 # open a medialist and update its tracks
-                ifile  = open(self.pp_profile_dir + os.sep + this_file, 'rb')
+                ifile  = open(self.pp_profile_dir + os.sep + this_file, 'r')
                 tracks = json.load(ifile)['tracks']
                 ifile.close()
                 replacement_tracks=self.update_tracks(tracks)
                 dic={'issue':PPdefinitions.DEFINITIONS_VERSION_STRING,'tracks':replacement_tracks}
-                ofile  = open(self.pp_profile_dir + os.sep + this_file, "wb")
+                ofile  = open(self.pp_profile_dir + os.sep + this_file, 'w')
                 json.dump(dic,ofile,sort_keys=True,indent=1)       
 
 
@@ -1351,7 +1351,7 @@ class PPWebEditor(App):
                 spec_fields=PPdefinitions.new_tracks[track_type]
                 left_overs=dict()
                 # go through track and delete fields not in spec
-                for key in old_track.keys():
+                for key in list(old_track.keys()):
                     if key in spec_fields:
                         left_overs[key]=old_track[key]
                 # print '\n leftovers',left_overs
@@ -1372,7 +1372,7 @@ class PPWebEditor(App):
             spec_fields=PPdefinitions.new_shows[show_type]
             left_overs=dict()
             # go through track and delete fields not in spec
-            for key in old_show.keys():
+            for key in list(old_show.keys()):
                 if key in spec_fields:
                     left_overs[key]=old_show[key]
             # print '\n leftovers',left_overs
@@ -1417,7 +1417,7 @@ class Options(AdaptableDialog):
 
 
     def create_options(self):
-        config=ConfigParser.ConfigParser()
+        config=configparser.ConfigParser(inline_comment_prefixes = (';',))
         config.add_section('config')
         if os.name == 'nt':
             config.set('config','home',os.path.expanduser('~')+'\pp_home')
@@ -1427,19 +1427,19 @@ class Options(AdaptableDialog):
             config.set('config','home',os.path.expanduser('~')+'/pp_home')
             config.set('config','media',os.path.expanduser('~'))
             config.set('config','offset','')
-        with open(self.options_file, 'wb') as config_file:
+        with open(self.options_file, 'w') as config_file:
             config.write(config_file)
 
 
     def read_options(self):
         # print 'read options'
         """reads options from options file to interface"""
-        config=ConfigParser.ConfigParser()
+        config=configparser.ConfigParser(inline_comment_prefixes = (';',))
         config.read(self.options_file)
         
-        self.pp_home_dir =config.get('config','home',0)
-        self.pp_profiles_offset =config.get('config','offset',0)
-        self.initial_media_dir =config.get('config','media',0)
+        self.pp_home_dir =config.get('config','home')
+        self.pp_profiles_offset =config.get('config','offset')
+        self.initial_media_dir =config.get('config','media')
 
 
     def edit(self,callback):
@@ -1482,12 +1482,12 @@ class Options(AdaptableDialog):
         # print 'options hide'
         self.hide()
         
-        config=ConfigParser.ConfigParser()
+        config=configparser.ConfigParser(inline_comment_prefixes = (';',))
         config.add_section('config')
         config.set('config','home',home_dir)
         config.set('config','media',media_dir)
         config.set('config','offset',offset)
-        with open(self.options_file, 'wb') as optionsfile:
+        with open(self.options_file, 'w') as optionsfile:
             config.write(optionsfile)
         self.callback()
     
@@ -1517,32 +1517,32 @@ if __name__  ==  "__main__":
     editor_dir=sys.path[0]
     # print editor_dir
     if not os.path.exists(editor_dir+os.sep+"pp_web_editor.py"):
-        print "Bad Application Directory"
+        print("Bad Application Directory")
         exit()
     network=Network()
     if mode == 'remote':
         # wait for network to be available
-        print 'Waiting for Network'
+        print('Waiting for Network')
         success=network.wait_for_network(10)
         if success is False:
-            print 'Failed to connect to network after 10 seconds'     
+            print('Failed to connect to network after 10 seconds')     
             exit()   
 
 
     # check pp_web.cfg
     editor_options_file_path=editor_dir+os.sep+'pp_config'+os.sep+'pp_web.cfg'
     if not os.path.exists(editor_options_file_path):
-        print 'pp_web.cfg not found at ' + editor_options_file_path
+        print('pp_web.cfg not found at ' + editor_options_file_path)
         # tkMessageBox.showwarning("Pi Presents Web Editor",'pp_web.cfg not found at ' + editor_options_file_path)
         exit()
 
-    print 'Found pp_web.cfg in ', editor_options_file_path
+    print('Found pp_web.cfg in ', editor_options_file_path)
 
     network.read_config(editor_options_file_path)
     if mode == 'remote':
         # get interface and IP details of preferred interface
         interface,ip = network.get_preferred_ip()
-        print 'Network details ' + network.unit + ' ' + interface + ' ' + ip
+        print('Network details ' + network.unit + ' ' + interface + ' ' + ip)
 
 
     start_browser=False

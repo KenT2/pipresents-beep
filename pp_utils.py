@@ -1,14 +1,13 @@
 # dec 2015 - hide terminal output if --manager option.
 # 28/1/2016  - additional filter and log output for statistics
 
-import string
 import time
 import datetime
 import sys
 import os
 import gc
-import tkMessageBox
-from Tkinter import NW,N,W,CENTER,LEFT,RIGHT
+import tkinter.messagebox
+from tkinter import NW,N,W,CENTER,LEFT,RIGHT
 from pp_statsrecorder import Statsrecorder
 # from pympler.tracker import SummaryTracker
 # from pympler import summary, muppy
@@ -88,6 +87,8 @@ def parse_rectangle(text):
             # error
             return 'error','illegal rectangle: '+ text,0,0,0,0
 
+
+# used for web_editor only
 def calculate_relative_path(file_path,pp_home_dir,pp_profile_dir):
         # is media in the profile
         # print 'pp_profile dir ',pp_profile_dir
@@ -103,7 +104,7 @@ def calculate_relative_path(file_path,pp_home_dir,pp_profile_dir):
             # print "@ common ",common
             if common == pp_profile_dir:
                 location = "@" + os.sep + relpath
-                location = string.replace(location,'\\','/')
+                location = str.replace(location,'\\','/')
                 # print '@location ',location
                 # print
                 return location
@@ -118,7 +119,7 @@ def calculate_relative_path(file_path,pp_home_dir,pp_profile_dir):
             # print "+ common ",common
             if common == pp_home_dir:
                 location = "+" + os.sep + relpath
-                location = string.replace(location,'\\','/')
+                location = str.replace(location,'\\','/')
                 # print '+location ', location
                 # print
                 return location
@@ -149,13 +150,13 @@ class StopWatch(object):
     def split(self,text):
         if StopWatch.global_enable and self.enable:
             self.end=time.clock()
-            print text + " " + str(self.end-self.sstart) + " secs"
+            print(text + " " + str(self.end-self.sstart) + " secs")
             self.sstart=time.clock()
         
     def stop(self,text):
         if StopWatch.global_enable and self.enable:
             self.end=time.clock()
-            print text + " " + str(self.end-self.sstart) + " secs"
+            print(text + " " + str(self.end-self.sstart) + " secs")
 
 
 
@@ -191,7 +192,7 @@ class Monitor(object):
     def init(self):
         # Monitor.tracker = SummaryTracker()
         if Monitor.ofile is None:
-            bufsize=0
+            bufsize=-1
             Monitor.ofile=open(Monitor.log_path+ os.sep+'pp_logs' + os.sep + 'pp_log.txt','w',bufsize)
         Monitor.log_level=0     # set in pipresents
         Monitor.manager=False  #set in pipresents
@@ -214,9 +215,9 @@ class Monitor(object):
     def leak_anal(self):
         all_objects = muppy.get_objects()
         my_types = muppy.filter(all_objects, Type=ImagePlayer)
-        print len(my_types)                                    
+        print(len(my_types))                                    
         for t in my_types:
-            print t,sys.getrefcount(t)
+            print(t,sys.getrefcount(t))
             # ,gc.get_referrers(t) 
 
     # CONTROL
@@ -235,30 +236,30 @@ class Monitor(object):
         if Monitor.manager is False:
             if Monitor.log_level & ~ (Monitor.m_warn|Monitor.m_err|Monitor.m_fatal|Monitor.m_sched) != 0:
                 for i in range(0,num):
-                    print
+                    print()
 
     def fatal(self,caller,text):
         r_class=caller.__class__.__name__
         r_func = sys._getframe(1).f_code.co_name
         r_line =  str(sys._getframe(1).f_lineno)
         if self.enabled(r_class,Monitor.m_fatal) is True: 
-            print "%.2f" % (time.time()-Monitor.start_time), " System Error: ",r_class+"/"+ r_func + "/"+ r_line + ": ", text
+            print("%.2f" % (time.time()-Monitor.start_time), " System Error: ",r_class+"/"+ r_func + "/"+ r_line + ": ", text)
             Monitor.ofile.write (" SYSTEM ERROR: " + r_class +"/"+ r_func + "/"+ r_line + ": " + text + "\n")
         if Monitor.manager is False:
-            tkMessageBox.showwarning(r_class ,'System Error:\n'+text)
+            tkinter.messagebox.showwarning(r_class ,'System Error:\n'+text)
 
     def err(self,caller,text):
         r_class=caller.__class__.__name__
         if self.enabled(r_class,Monitor.m_err) is True:        
-            print "%.2f" % (time.time()-Monitor.start_time), " Profile Error: ",r_class+": ", text
+            print("%.2f" % (time.time()-Monitor.start_time), " Profile Error: ",r_class+": ", text)
             Monitor.ofile.write (" ERROR: " + self.pretty_inst(caller)+ ":  " + text + "\n")
         if Monitor.manager is False:
-            tkMessageBox.showwarning(r_class ,'Profile Error:\n'+text)
+            tkinter.messagebox.showwarning(r_class ,'Profile Error:\n'+text)
                                         
     def warn(self,caller,text):
         r_class=caller.__class__.__name__
         if self.enabled(r_class,Monitor.m_warn) is True:     
-            print "%.2f" % (time.time()-Monitor.start_time), " Warning: ",self.pretty_inst(caller) +": ", text
+            print("%.2f" % (time.time()-Monitor.start_time), " Warning: ",self.pretty_inst(caller) +": ", text)
             Monitor.ofile.write (" WARNING: " + self.pretty_inst(caller)+ ":  " + text + "\n")
 
     def sched(self,caller,pipresents_time,text):
@@ -268,7 +269,7 @@ class Monitor(object):
                 ptime='       '
             else:
                 ptime=str(pipresents_time)
-            print ptime +" "+r_class+": " + text
+            print(ptime +" "+r_class+": " + text)
             # print "%.2f" % (time.time()-Monitor.start_time) +" "+self.pretty_inst(caller)+": " + text
             Monitor.ofile.write (time.strftime("%Y-%m-%d %H:%M") + " " + self.pretty_inst(caller)+": " + text+"\n")
 
@@ -277,7 +278,7 @@ class Monitor(object):
     def log(self,caller,text):
         r_class=caller.__class__.__name__
         if self.enabled(r_class,Monitor.m_log) is True:
-            print "%.2f" % (time.time()-Monitor.start_time) +" "+r_class+": " + text
+            print("%.2f" % (time.time()-Monitor.start_time) +" "+r_class+": " + text)
             # print "%.2f" % (time.time()-Monitor.start_time) +" "+self.pretty_inst(caller)+": " + text
             Monitor.ofile.write (str(time.time()-Monitor.start_time) + " " + self.pretty_inst(caller)+": " + text+"\n")
 
@@ -299,15 +300,15 @@ class Monitor(object):
         r_longid = caller
         # self.print_info(r_class,Monitor.m_trace)
         if self.enabled(r_class,Monitor.m_trace) is True:
-            print  self.pretty_inst(caller)+'/'+r_func, text
+            print(self.pretty_inst(caller)+'/'+r_func, text)
             Monitor.ofile.write ( self.pretty_inst(caller)+" /" + r_func +" " + text+"\n")
 
     def print_info(self,r_class,mask):
-        print  'called from', r_class
-        print 'Global Log level',Monitor.log_level
-        print 'Global enable in code', Monitor.enable_in_code
-        print 'in code log level',self.this_class_level
-        print 'Trace mask',mask
+        print('called from', r_class)
+        print('Global Log level',Monitor.log_level)
+        print('Global enable in code', Monitor.enable_in_code)
+        print('in code log level',self.this_class_level)
+        print('Trace mask',mask)
              
     def enabled(self,r_class,report):
         enabled_in_code=(report & self.this_class_level) != 0 and Monitor.enable_in_code is True

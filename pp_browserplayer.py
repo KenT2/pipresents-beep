@@ -254,10 +254,10 @@ class BrowserPlayer(Player):
                 # get rid of status bar
                 # self.bplayer.control('set show_status = 0')
                 # and get ready to wait for browser to appear
-                self.wait_count= 50   # 10 seconds at 200mS steps 
+                self.wait_count= 50   # 1 seconds at 20mS steps 
                 self.mon.log(self,"      State machine: uzbl process alive")
                 
-            self.tick_timer=self.canvas.after(200, self.load_state_machine)
+            self.tick_timer=self.canvas.after(20, self.load_state_machine)
 
         elif self.load_state == 'waiting':
             # self.mon.log(self,"      Load state machine: " + self.load_state)
@@ -273,7 +273,7 @@ class BrowserPlayer(Player):
                     self.loaded_callback('normal','browser loaded')
             else:
                 self.wait_count -=1
-                self.tick_timer=self.canvas.after(200, self.load_state_machine)
+                self.tick_timer=self.canvas.after(20, self.load_state_machine)
 
 
     def start_unload_state_machine(self):
@@ -404,14 +404,14 @@ class BrowserPlayer(Player):
             return 'error','incorrect number of fields for '+ command + 'in: ' + line
             
         if command == 'load':
-            if len(fields)<>2:
+            if len(fields)!=2:
                 return 'error','incorrect number of fields for '+ command + 'in: ' + line
             else:
                 arg = fields[1]
 
 
         if command == 'wait':
-            if len(fields)<>2:
+            if len(fields)!=2:
                 return 'error','incorrect number of fields for '+ command + 'in: ' + line
             else:
                 arg = fields[1]
@@ -472,7 +472,7 @@ class BrowserPlayer(Player):
 
         #deal with warp which has 1 or 5  arguments
         # check basic syntax
-        if  fields[0] <>'warp':
+        if  fields[0] !='warp':
             return 'error','not a valid type:'+ fields[0],'',False,0,0,0,0
 
         # deal with window coordinatesor not   
@@ -481,7 +481,7 @@ class BrowserPlayer(Player):
             has_window=False
             return 'normal','',fields[0],has_window,0,0,0,0
         else:
-            print ' '.join(fields[1:])
+            # print(' '.join(fields[1:]))
             status,message,x1,y1,x2,y2 = parse_rectangle(' '.join(fields[1:]))
             if status=='error':
                 return 'error',message,'',False,0,0,0,0

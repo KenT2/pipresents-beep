@@ -32,8 +32,8 @@ class MediaList(object):
         self._selected_track_index=-1 # index of currently selected track
 
     def print_list(self):
-        print '\n'
-        print self._tracks
+        print('\n')
+        print(self._tracks)
 
     def first(self):
         self._selected_track_index=-1
@@ -313,7 +313,7 @@ class MediaList(object):
         opens a saved medialist
         medialists are stored as json arrays.
         """
-        ifile  = open(filename, 'rb')
+        ifile  = open(filename, 'r')
         mdict = json.load(ifile)
         ifile.close()
         self._tracks = mdict['tracks']
@@ -360,12 +360,12 @@ class MediaList(object):
             return False
         dic={'issue':self.medialist_version_string,'tracks':self._tracks}
         filename=str(filename)
-        filename = string.replace(filename,'\\','/')
+        filename = str.replace(filename,'\\','/')
         tries = 1
         while tries<=10:
             # print "save  medialist  ",filename
             try:
-                ofile  = open(filename, "wb")
+                ofile  = open(filename, "w")
                 json.dump(dic,ofile,sort_keys=True,indent=1)
                 ofile.close()
                 self.mon.log(self,"Saved medialist "+ filename)

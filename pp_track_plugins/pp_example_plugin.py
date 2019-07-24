@@ -132,7 +132,7 @@ Usually a plugin will be written for a single track type. krt_time.py and krt_im
 
 import os
 import time
-from Tkinter import NW
+from tkinter import NW
 from PIL import Image, ImageDraw, ImageFont
 
 # the class must have the same name as the file without .py

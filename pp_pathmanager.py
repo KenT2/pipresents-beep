@@ -17,7 +17,7 @@ class PathManager(object):
     # if stop-at is not found returns ''
 
     def back_to(self,stop_at,):
-        if self.debug: print 'pathmanager command - back_to: ',stop_at
+        if self.debug: print('pathmanager command - back_to: ',stop_at)
         for page in self.path_stack:
             if page[0] ==  stop_at:
                 break
@@ -37,7 +37,7 @@ class PathManager(object):
     # if stop-at is not found and everything is popped the stack is left empty and the first track is returned
 
     def back_by(self,stop_at,back_by_text='1000'):
-        if self.debug:  print 'pathmanager command  -   back by: ',back_by_text,' or stop at: ',stop_at
+        if self.debug:  print('pathmanager command  -   back by: ',back_by_text,' or stop at: ',stop_at)
         back_by=int(back_by_text)
         count=0
         while self.path_stack != []:
@@ -50,11 +50,11 @@ class PathManager(object):
             top=self.path_stack.pop()
         track_to_play = top[0]
         if self.debug: 
-            print '   removed for playing: ',track_to_play
+            print('   removed for playing: ',track_to_play)
         return track_to_play
     
     def append(self,page):
-        if self.debug:  print 'pathmanager command - append: ',page
+        if self.debug:  print('pathmanager command - append: ',page)
         self.path_stack.append([page])
 
 
@@ -64,7 +64,7 @@ class PathManager(object):
 
     # sibling - just pop the media track so sibling is appended and can go back to page track
     def pop_for_sibling(self):
-        if self.debug: print 'pathmanger command - pop for sibling: '
+        if self.debug: print('pathmanger command - pop for sibling: ')
         self.path_stack.pop()
 
 
@@ -73,7 +73,7 @@ class PathManager(object):
         path= '\nPath now is:'
         for page in self.path_stack:
             path  += "\n      " + page[0]
-        print
+        print()
         return path
  
 

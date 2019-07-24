@@ -85,7 +85,7 @@ def from_pix(x):
 
 
 def jsonize(d):
-    return ';'.join(map(lambda k, v: k + ':' + v + '', d.keys(), d.values()))
+    return ';'.join(map(lambda k, v: k + ':' + v + '', list(d.keys()), list(d.values())))
 
 
 class _VersionedDictionary(dict):
@@ -208,7 +208,7 @@ class Tag(object):
             s = self.children[k]
             if isinstance(s, type('')):
                 innerHTML = innerHTML + s
-            elif isinstance(s, type(u'')):
+            elif isinstance(s, type('')):
                 innerHTML = innerHTML + s.encode('utf-8')
             else:
                 try:
@@ -221,7 +221,7 @@ class Tag(object):
             self.attributes['style'] = jsonize(self.style)
             self._backup_repr = '<%s %s>%s</%s>' % (self.type,
                                     ' '.join('%s="%s"' % (k, v) if v is not None else k for k, v in
-                                                self.attributes.items()),
+                                                list(self.attributes.items())),
                                     innerHTML,
                                     self.type)
         if self._ischanged():
@@ -281,8 +281,8 @@ class Tag(object):
         Args:
             child (Tag): The child to be removed.
         """
-        if child in self.children.values() and hasattr(child, 'identifier'):
-            for k in self.children.keys():
+        if child in list(self.children.values()) and hasattr(child, 'identifier'):
+            for k in list(self.children.keys()):
                 if hasattr(self.children[k], 'identifier'):
                     if self.children[k].identifier == child.identifier:
                         if k in self._render_children_list:
@@ -441,7 +441,7 @@ class Widget(Tag):
         self.add_child(key, value)
 
         if self.layout_orientation == Widget.LAYOUT_HORIZONTAL:
-            if 'float' in self.children[key].style.keys():
+            if 'float' in list(self.children[key].style.keys()):
                 if not (self.children[key].style['float'] == 'none'):
                     self.children[key].style['float'] = 'left'
             else:
@@ -835,9 +835,9 @@ class HBox(Widget):
         if not isinstance(value, Widget):
             raise ValueError('value should be a Widget (otherwise use add_child(key,other)')
 
-        if 'left' in value.style.keys():
+        if 'left' in list(value.style.keys()):
             del value.style['left']
-        if 'right' in value.style.keys():
+        if 'right' in list(value.style.keys()):
             del value.style['right']
 
         value.style['position'] = 'static'
@@ -854,7 +854,7 @@ class HBox(Widget):
         self.add_child(key, value)
 
         if self.layout_orientation == Widget.LAYOUT_HORIZONTAL:
-            if 'float' in self.children[key].style.keys():
+            if 'float' in list(self.children[key].style.keys()):
                 if not (self.children[key].style['float'] == 'none'):
                     self.children[key].style['float'] = 'left'
             else:
@@ -913,13 +913,13 @@ class TabBox(Widget):
 
     def _fix_tab_widths(self):
         tab_w = 100.0 / len(self._tabs)
-        for a, li, holder in self._tabs.values():
+        for a, li, holder in list(self._tabs.values()):
             li.style['float'] = "left"
             li.style['width'] = "%.1f%%" % tab_w
 
     def _on_tab_pressed(self, _a, _li, _holder):
         # remove active on all tabs, and hide their contents
-        for a, li, holder in self._tabs.values():
+        for a, li, holder in list(self._tabs.values()):
             a.remove_class('active')
             holder.style['display'] = 'none'
 
@@ -933,14 +933,14 @@ class TabBox(Widget):
 
     def select_by_widget(self, widget):
         """ shows a tab identified by the contained widget """
-        for a, li, holder in self._tabs.values():
+        for a, li, holder in list(self._tabs.values()):
             if holder.children['content'] == widget:
                 self._on_tab_pressed(a, li, holder)
                 return
 
     def select_by_name(self, name):
         """ shows a tab identified by the name """
-        for a, li, holder in self._tabs.values():
+        for a, li, holder in list(self._tabs.values()):
             if a.children['text'] == name:
                 self._on_tab_pressed(a, li, holder)
                 return
@@ -1003,7 +1003,7 @@ class _MixinTextualWidget(object):
         Returns:
             str: The text content of the Widget. You can set the text content with set_text(text).
         """
-        if 'text' not in self.children.keys():
+        if 'text' not in list(self.children.keys()):
             return ''
         return self.get_child('text')
 
@@ -1461,7 +1461,7 @@ class ListView(Widget, _SyncableValuesMixin):
             item (ListItem): the item to add.
             key (str): string key for the item.
         """
-        if isinstance(item, type('')) or isinstance(item, type(u'')):
+        if isinstance(item, type('')) or isinstance(item, type('')):
             item = ListItem(item)
         elif not isinstance(item, ListItem):
             raise ValueError("item must be text or a ListItem instance")
@@ -1529,7 +1529,7 @@ class ListView(Widget, _SyncableValuesMixin):
         """
         self._selected_key = None
         self._selected_item = None
-        for item in self.children.values():
+        for item in list(self.children.values()):
             item.attributes['selected'] = False
 
         if key in self.children:
@@ -1625,7 +1625,7 @@ class DropDown(Widget, _SyncableValuesMixin):
         return obj
 
     def append(self, item, key=''):
-        if isinstance(item, type('')) or isinstance(item, type(u'')):
+        if isinstance(item, type('')) or isinstance(item, type('')):
             item = DropDownItem(item)
         elif not isinstance(item, DropDownItem):
             raise ValueError("item must be text or a DropDownItem instance")
@@ -1642,7 +1642,7 @@ class DropDown(Widget, _SyncableValuesMixin):
         Args:
             key (str): Unique string identifier of the DropDownItem that have to be selected.
         """
-        for item in self.children.values():
+        for item in list(self.children.values()):
             if 'selected' in item.attributes:
                 del item.attributes['selected']
         self.children[key].attributes['selected'] = 'selected'
@@ -1804,7 +1804,7 @@ class Table(Widget):
                 the title.
         """
         title = None
-        if 'title' in self.children.keys():
+        if 'title' in list(self.children.keys()):
             title = self.children['title']
         super(Table, self).empty()
         if keep_title and (title is not None):

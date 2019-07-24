@@ -11,7 +11,7 @@ There is also an example of how to send debugging text to the terminal window.
 from pp_countermanager import CounterManager
 
 import time
-from Tkinter import NW
+from tkinter import NW
 
 class krt_counters(object):
 

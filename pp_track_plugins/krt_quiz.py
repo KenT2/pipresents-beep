@@ -11,7 +11,7 @@ There is also an example of how to send debugging text to the terminal window.
 from pp_countermanager import CounterManager
 
 # import constants from Tkinter
-from Tkinter import NW
+from tkinter import NW
 
 # class name must be the same as the nae in the .cfg file
 class krt_quiz(object):

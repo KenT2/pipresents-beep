@@ -66,7 +66,7 @@ class TimeOfDay(object):
             second= int(self.sim_second)
             TimeOfDay.now = datetime(day = day, month =month, year=year,hour=hour, minute=minute, second=second)
             self.testing=True
-            print '\nInitial SIMULATED time',TimeOfDay.now.ctime()
+            print('\nInitial SIMULATED time',TimeOfDay.now.ctime())
             self.mon.sched(self,TimeOfDay.now,'Testing is ON, Initial SIMULATED time ' + str(TimeOfDay.now.ctime()))
         else:
             #get the current date/time only this once
@@ -98,7 +98,7 @@ class TimeOfDay(object):
             for show_ref in TimeOfDay.events:
                  if show_ref != 'start' and self.enable_catchup[show_ref] == 'yes':
                     if self.testing:
-                        print 'Catch Up',show_ref
+                        print('Catch Up',show_ref)
                     times = TimeOfDay.events[show_ref]
                     # go through the event list for a show rembering show state until the first future event is found.
                     # then if last command was to start the show send it
@@ -139,7 +139,7 @@ class TimeOfDay(object):
         catchup_time=0
         while TimeOfDay.now<=poll_time:
             if  TimeOfDay.now-TimeOfDay.last_now != timedelta(seconds=1):
-                print 'POLL TIME FAILED', TimeOfDay.last_now, TimeOfDay.now
+                print('POLL TIME FAILED', TimeOfDay.last_now, TimeOfDay.now)
             #if catchup_time != 0:
                # print 'scheduler behind by: ',catchup_time, TimeOfDay.now.time(),poll_time.time()
             self.do_scheduler()
@@ -198,7 +198,7 @@ class TimeOfDay(object):
         self.mon.log (self,'Event : '  + time_element[0] +  ' ' +  show_ref + ' required at: ' + time_element[1].isoformat())
         self.mon.sched (self,TimeOfDay.now,' ToD Scheduler : '  + time_element[0] +  ' ' +  show_ref + ' required at: ' + time_element[1].isoformat())
         if self.testing:
-            print 'Event : ' +  time_element[0] + ' ' + show_ref + ' required at: '+ time_element[1].isoformat()
+            print('Event : ' +  time_element[0] + ' ' + show_ref + ' required at: '+ time_element[1].isoformat())
         if show_ref != 'start':
             self.callback(time_element[0]  + ' ' + show_ref)
         else:
@@ -267,7 +267,7 @@ class TimeOfDay(object):
             self.sim_year=starter_show['sim-year']
             if not self.sim_year.isdigit():
                 return 'error','Simulate time - year is not a positive integer '+self.sim_year,False
-            if int(self.sim_year)<2019:
+            if int(self.sim_year)<2000:
                 return 'error','Simulate time -  year is out of range '+self.sim_year,False     
         else:
             self.simulate_time=False
@@ -346,7 +346,7 @@ class TimeOfDay(object):
                     if status == 'error':
                         return 'error',message
                     #print 'monthday ',status,message,days_list,times_list                
-                    if  TimeOfDay.now.day in map(int,days_list):
+                    if  TimeOfDay.now.day in list(map(int,days_list)):
                         self.todays_schedule[show['show-ref']]=copy.deepcopy(times_list)
 
                 #print '\nafter monthday'
@@ -589,20 +589,20 @@ class TimeOfDay(object):
 
                     
     def print_todays_schedule(self):
-        print '\nSchedule For '+ TimeOfDay.now.ctime()
+        print('\nSchedule For '+ TimeOfDay.now.ctime())
         for key in self.todays_schedule:
-            print '  '+key
+            print('  '+key)
             for show in self.todays_schedule[key]:
-                print '    '+show[0]+ ':   '+show[1]
-            print
+                print('    '+show[0]+ ':   '+show[1])
+            print()
 
     def print_events_lists(self):
-        print '\nTask list for today'
+        print('\nTask list for today')
         for key in self.events:
-            print '\n',key
+            print('\n',key)
             for show in self.events[key]:
-                print show[0],show[1].isoformat()
-        print
+                print(show[0],show[1].isoformat())
+        print()
                 
 
             

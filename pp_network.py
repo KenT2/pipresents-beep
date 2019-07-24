@@ -1,7 +1,7 @@
 import subprocess
 import smtplib
 from email.mime.text import MIMEText
-import ConfigParser
+import configparser
 import time
 from time import sleep
 from pp_utils import Monitor
@@ -17,49 +17,49 @@ class Mailer(object):
     def read_config(self,options_file=None):
         if options_file != None:
             Mailer.options_file=options_file
-            Mailer.config=ConfigParser.ConfigParser()
+            Mailer.config=configparser.ConfigParser(inline_comment_prefixes = (';',))
         self.config=Mailer.config
         self.config.read(Mailer.options_file)
-        self.server=self.config.get('email','server',0)
-        self.port=self.config.get('email','port',0)
-        self.username=self.config.get('email','username',0)
-        self.password=self.config.get('email','password',0)
-        self.email_to=self.config.get('email-editable','to',0)
+        self.server=self.config.get('email','server')
+        self.port=self.config.get('email','port')
+        self.username=self.config.get('email','username')
+        self.password=self.config.get('email','password')
+        self.email_to=self.config.get('email-editable','to')
         self.is_to_list= self.email_to.splitlines()
         self.is_to = ', '.join(self.is_to_list)
 
-        email_allowed=self.config.get('email-editable','email_allowed',0)
+        email_allowed=self.config.get('email-editable','email_allowed')
         if email_allowed == 'yes':
             self.email_allowed = True
         else:
             self.email_allowed = False
 
-        email_with_ip=self.config.get('email-editable','email_with_ip',0)            
+        email_with_ip=self.config.get('email-editable','email_with_ip')            
         if email_with_ip == 'yes':
             self.email_with_ip = True
         else:
             self.email_with_ip=False
             
             
-        email_on_error=self.config.get('email-editable','email_on_error',0)
+        email_on_error=self.config.get('email-editable','email_on_error')
         if email_on_error == 'yes':
             self.email_on_error = True
         else:
             self.email_on_error=False
             
-        email_on_terminate=self.config.get('email-editable','email_on_terminate',0)
+        email_on_terminate=self.config.get('email-editable','email_on_terminate')
         if email_on_terminate == 'yes':
             self.email_on_terminate = True
         else:
             self.email_on_terminate=False
             
-        email_at_start=self.config.get('email-editable','email_at_start',0)
+        email_at_start=self.config.get('email-editable','email_at_start')
         if email_at_start == 'yes':
             self.email_at_start = True
         else:
             self.email_at_start=False
             
-        attach_log=self.config.get('email-editable','log_on_error',0)
+        attach_log=self.config.get('email-editable','log_on_error')
         if attach_log == 'yes':
             self.log_on_error = True
         else:
@@ -74,7 +74,7 @@ class Mailer(object):
         self.config.set('email-editable','email_on_error','yes' if self.email_on_error is True else 'no')
         self.config.set('email-editable','email_on_terminate','yes' if self.email_on_terminate is True else 'no')
         self.config.set('email-editable','log_on_error','yes' if self.log_on_error is True else 'no')
-        with open(Mailer.options_file, 'wb') as config_file:
+        with open(Mailer.options_file, 'w') as config_file:
             self.config.write(config_file)
             
 
@@ -156,17 +156,17 @@ class Network(object):
         
     def read_config(self,options_file_path):
         
-        config=ConfigParser.ConfigParser()
+        config=configparser.ConfigParser(inline_comment_prefixes = (';',))
         config.read(options_file_path)
-        self.preferred_interface=config.get('network','preferred_interface',0)
-        self.unit=config.get('network','unit',0)
-        self.force_ip=config.get('network','force_ip',0)
-        self.manager_port=int(config.get('manager','port',0))
-        self.manager_username=config.get('manager','username',0)
-        self.manager_password=config.get('manager','password',0)
-        self.editor_username=config.get('editor','username',0)
-        self.editor_password=config.get('editor','password',0)
-        self.editor_port=int(config.get('editor','port',0))        
+        self.preferred_interface=config.get('network','preferred_interface')
+        self.unit=config.get('network','unit')
+        self.force_ip=config.get('network','force_ip')
+        self.manager_port=int(config.get('manager','port'))
+        self.manager_username=config.get('manager','username')
+        self.manager_password=config.get('manager','password')
+        self.editor_username=config.get('editor','username')
+        self.editor_password=config.get('editor','password')
+        self.editor_port=int(config.get('editor','port'))        
 
     def wait_for_network(self,tries):       
         i=0
@@ -189,11 +189,11 @@ class Network(object):
         
     def get_ips(self):
         arg='ip route list'
-        p=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
+        p=subprocess.Popen(arg,shell=True,universal_newlines=True,stdout=subprocess.PIPE)
         data = p.communicate()
 
         # Split data [0] obtained from stdout into lines
-        # print ' data is',data[0]
+        # print (' data is',data[0],'\n')
         ip_lines = data[0].splitlines()
         if len(ip_lines) == 0:
             # print 'not connected'
@@ -203,7 +203,7 @@ class Network(object):
         result=[]
         for line in ip_lines:
             fields= line.split()
-
+            # print (fields)
             if fields[0] != 'default' and 'src' in fields:
                 interface= fields[fields.index('dev')+1]
                 ip = fields[fields.index('src')+1]
@@ -252,21 +252,21 @@ if __name__ == "__main__":
         else:        
             i+=1
             if i>20:
-                print 'failed to connect after 20 seconds'
+                print('failed to connect after 20 seconds')
                 exit()
             sleep(1)
 
-    print 'network available'
+    print('network available')
 
     preferred_interface=''   
     i_type,ip=network.get_preferred_ip()
-    print i_type,ip
+    print(i_type,ip)
 
     mailer=Mailer()
 
     mailer.read_config('/home/pi/pipresents/pp_config/pp_email.cfg')
     success=mailer.connect()
-    print 'Connected '+ str(success)
+    print('Connected '+ str(success))
 
     mailer.send(
                 'test','hello')

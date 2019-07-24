@@ -17,8 +17,8 @@ import signal
 from subprocess import call, check_output
 import time
 import gc
-from Tkinter import Tk, Canvas
-import tkMessageBox
+from tkinter import Tk, Canvas
+import tkinter.messagebox
 from time import sleep
 # import objgraph
 
@@ -51,8 +51,8 @@ class PiPresents(object):
     def __init__(self):
         # gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_INSTANCES|gc.DEBUG_OBJECTS|gc.DEBUG_SAVEALL)
         gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_SAVEALL)
-        self.pipresents_issue="1.4.2"
-        self.pipresents_minorissue = '1.4.2a'
+        self.pipresents_issue="1.4.3"
+        self.pipresents_minorissue = '1.4.3a'
         # position and size of window without -f command line option
         self.nonfull_window_width = 0.45 # proportion of width
         self.nonfull_window_height= 0.7 # proportion of height
@@ -78,7 +78,7 @@ class PiPresents(object):
         
         if not os.path.exists(pp_dir+"/pipresents.py"):
             if self.options['manager']  is False:
-                tkMessageBox.showwarning("Pi Presents","Bad Application Directory")
+                tkinter.messagebox.showwarning("Pi Presents","Bad Application Directory")
             exit(102)
 
         
@@ -123,18 +123,18 @@ class PiPresents(object):
         with open("/boot/issue.txt") as ifile:
             self.mon.log(self,'\nRaspbian: '+ifile.read())
 
-        self.mon.log(self,'\n'+check_output(["omxplayer", "-v"]))
-        self.mon.log(self,'\nGPU Memory: '+check_output(["vcgencmd", "get_mem", "gpu"]))
+        self.mon.log(self,'\n'+ check_output(["omxplayer", "-v"],universal_newlines=True))
+        self.mon.log(self,'\nGPU Memory: '+ check_output(["vcgencmd", "get_mem", "gpu"],universal_newlines=True))
 
         if os.geteuid() == 0:
-            print 'Do not run Pi Presents with sudo'
+            print('Do not run Pi Presents with sudo')
             self.mon.log(self,'Do not run Pi Presents with sudo')
             self.mon.finish()
             sys.exit(102)
 
         
         if "DESKTOP_SESSION" not in os.environ:
-            print 'Pi Presents must be run from the Desktop'
+            print('Pi Presents must be run from the Desktop')
             self.mon.log(self,'Pi Presents must be run from the Desktop')
             self.mon.finish()
             sys.exit(102)
@@ -155,7 +155,7 @@ class PiPresents(object):
         user=os.getenv('USER')
 
         if user is None:
-            tkMessageBox.showwarning("You must be logged in to run Pi Presents")
+            tkinter.messagebox.showwarning("You must be logged in to run Pi Presents")
             exit(102)
 
         if user !='pi':
@@ -424,8 +424,15 @@ class PiPresents(object):
 
         # init the counter manager
         self.counter_manager=CounterManager()
-        self.counter_manager.init()
-
+        if self.starter_show['counters-store'] == 'yes':
+            store_enable=True
+        else:
+            store_enable=False
+        reason,message=self.counter_manager.init(self.pp_profile + '/counters.cfg',
+             store_enable, self.options['loadcounters'],self.starter_show['counters-initial'])
+        if reason == 'error':
+            self.mon.err(self,message)
+            self.end('error',message)
 
         # warn about start shows and scheduler
 
@@ -556,6 +563,8 @@ class PiPresents(object):
                 if status=='error':
                     self.mon.err(self,message)
                     self.end('error',message)
+                return
+            else:
                 return
         
 
@@ -723,8 +732,8 @@ class PiPresents(object):
                           
             # close logging files
             self.mon.finish()
-            print 'Uncollectable Garbage',gc.collect()
-            # objgraph.show_backrefs(objgraph.by_type('Monitor'))
+            print('Uncollectable Garbage',gc.collect())
+            # objgraph.show_backrefs(objgraph.by_type('Canvas'),filename='backrefs.png')
             sys.exit(101)
                           
         elif reason == 'error':
@@ -737,7 +746,7 @@ class PiPresents(object):
                           
             # close logging files 
             self.mon.finish()
-            print 'uncollectable garbage',gc.collect()
+            print('uncollectable garbage',gc.collect())
             sys.exit(102)
 
         else:           
@@ -752,7 +761,7 @@ class PiPresents(object):
             if self.shutdown_required is True:
                 # print 'SHUTDOWN'
                 call (['sudo','shutdown','now','SHUTTING DOWN'])
-            print 'uncollectable garbage',gc.collect()
+            print('uncollectable garbage',gc.collect())
             sys.exit(100)
 
 
@@ -897,7 +906,7 @@ if __name__ == '__main__':
         sleep (0.5)
         
     if success is False:
-        tkMessageBox.showwarning("pipresents.py","Bad application directory: "+ code_dir)
+        tkinter.messagebox.showwarning("pipresents.py","Bad application directory: "+ code_dir)
         exit()
 
     pp = PiPresents()

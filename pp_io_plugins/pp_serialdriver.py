@@ -1,7 +1,7 @@
 #usb serial port driver
 import copy
 import os
-import ConfigParser
+import configparser
 import serial
 
 class pp_serialdriver(object):
@@ -46,7 +46,7 @@ class pp_serialdriver(object):
         self.filename=filename
         self.filepath=filepath
         self.event_callback=event_callback
-
+        self.tick_timer=None
         pp_serialdriver.ser=None
         pp_serialdriver.driver_active = False
 
@@ -66,14 +66,14 @@ class pp_serialdriver(object):
         pp_serialdriver.byte_size_text = self.config.get('DRIVER','byte-size')
         pp_serialdriver.parity_bit_text = self.config.get('DRIVER','parity-bit')
         pp_serialdriver.stop_bit_text = self.config.get('DRIVER','stop-bits')
-        pp_serialdriver.eol_char = self.config.get('DRIVER','eol-char')
+        pp_serialdriver.eol_char = bytes.fromhex(self.config.get('DRIVER','eol-char'))
         # construct the control list from the config file
         pp_serialdriver.in_names=[]
         pp_serialdriver.out_names=[]
         for section in self.config.sections():
             if section == 'DRIVER':
                 continue
-            if entry[pp_serialdriver.DIRECTION] == 'none':
+            if self.config.get(section,'direction') == 'none':
                 continue
             entry=copy.deepcopy(pp_serialdriver.TEMPLATE)
             entry[pp_serialdriver.NAME]=self.config.get(section,'name')
@@ -142,7 +142,11 @@ class pp_serialdriver(object):
                 return 'error',pp_serialdriver.title + ' invalid byte size ' + pp_serialdriver.byte_size_text
         else:
             return 'error',pp_serialdriver.title + ' byte size is not a positive integer ' + pp_serialdriver.byte_size_text
-        
+
+        pp_serialdriver.inputs['current-character']=bytes()
+        pp_serialdriver.inputs['current-line']=bytes()
+        pp_serialdriver.inputs['previous-line']=bytes()
+
         # all ok so indicate the driver is active
         pp_serialdriver.driver_active=True
 
@@ -153,10 +157,9 @@ class pp_serialdriver(object):
 
     # start method must be defined. If not using inputs just pass 
     def start(self):
-        self.data=''
-        pp_serialdriver.inputs['current-character']=''
-        pp_serialdriver.inputs['current-line']=''
-        pp_serialdriver.inputs['previous-line']=''
+        pp_serialdriver.inputs['current-character']=bytes()
+        pp_serialdriver.inputs['current-line']=bytes()
+        pp_serialdriver.inputs['previous-line']=bytes()
         self.tick_timer=self.widget.after(1,self.tick_loop)
         
 
@@ -165,22 +168,25 @@ class pp_serialdriver(object):
         if pp_serialdriver.driver_active is True and pp_serialdriver.ser.is_open is True:
             chars = pp_serialdriver.ser.read(9999)
             if len(chars)>0:
-                for char in chars:
-                    # print 'received ', hex(ord(char)),char
+                for i in range(len(chars)):
+                    char=chars[i:i+1]
+                    # char is bytes type
+                    # print ('received ',char)
 
                     # if char is eol then match the line and start a new line
-                    if ord(char) == int(pp_serialdriver.eol_char,16):
+                    if char == pp_serialdriver.eol_char:
                         # do match of line
                         # print 'match line',pp_serialdriver.inputs['current-line']
                         self.match_line(pp_serialdriver.inputs['current-line'])
                         # shuffle and empty the buffer
                         pp_serialdriver.inputs['previous-line'] = pp_serialdriver.inputs['current-line']
-                        pp_serialdriver.inputs['current-line']=''
-                        pp_serialdriver.inputs['current-character']=''
+                        pp_serialdriver.inputs['current-line']=bytes()
+                        pp_serialdriver.inputs['current-character']=bytes()
                         
                     else:
                         # do match with character entries
-                        # print 'match char',char
+                        # print ('match char',char,type(char),type(pp_serialdriver.inputs['current-line']))
+                        
                         pp_serialdriver.inputs['current-character']=char
                         pp_serialdriver.inputs['current-line']+=char
                         self.match_char(char)                        
@@ -191,31 +197,32 @@ class pp_serialdriver(object):
     def match_char(self,char):
         for entry in pp_serialdriver.in_names:
             if entry[pp_serialdriver.MODE] == 'any-character':
-                # print 'match any character', char, 'current line is ',pp_serialdriver.inputs['current-line']
+                # print ('match any character', char, 'current line is ',pp_serialdriver.inputs['current-line'])
                 if self.event_callback  is not  None:
                         self.event_callback(entry[pp_serialdriver.NAME],pp_serialdriver.title)
-            if entry[pp_serialdriver.MODE] == 'specific-character' and char == entry[pp_serialdriver.MATCH]:
-                # print 'match specific character', char
+            if entry[pp_serialdriver.MODE] == 'specific-character' and char.decode('utf-8') == entry[pp_serialdriver.MATCH]:
+                # print ('match specific character', char)
                 if self.event_callback  is not  None:
                         self.event_callback(entry[pp_serialdriver.NAME],pp_serialdriver.title)
 
     def match_line(self,line):
         for entry in pp_serialdriver.in_names:
             if entry[pp_serialdriver.MODE] == 'any-line':
-                # print 'match any line',line
+                # print ('match any line',line)
                 if self.event_callback  is not  None:
                         self.event_callback(entry[pp_serialdriver.NAME],pp_serialdriver.title)
 
-            if entry[pp_serialdriver.MODE] == 'specific-line' and line == entry[pp_serialdriver.MATCH]:
-                # print 'match specific line', line
+            if entry[pp_serialdriver.MODE] == 'specific-line' and line.decode('utf-8') == entry[pp_serialdriver.MATCH]:
+                # print ('match specific line', line)
                 if self.event_callback  is not  None:
                         self.event_callback(entry[pp_serialdriver.NAME],pp_serialdriver.title)
 
 
-    # allow track plugins (or anyting else) to access analog input values
+    # allow track plugins (or anything else) to access received text
     def get_input(self,key):
+        # print (pp_serialdriver.inputs['current-character'])
         if key in pp_serialdriver.inputs:
-            return True, pp_serialdriver.inputs[key]
+            return True, pp_serialdriver.inputs[key].decode('utf-8')
         else:
             return False, None
 
@@ -329,7 +336,7 @@ class pp_serialdriver(object):
 
     def _read(self,filename,filepath):
         if os.path.exists(filepath):
-            self.config = ConfigParser.ConfigParser()
+            self.config = configparser.ConfigParser(inline_comment_prefixes = (';',))
             self.config.read(filepath)
             return 'normal',filename+' read'
         else:

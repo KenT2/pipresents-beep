@@ -1,5 +1,5 @@
 import os
-import ConfigParser
+import configparser
 from pp_utils import Monitor
 
 class pp_kbddriver(object):
@@ -86,8 +86,9 @@ class pp_kbddriver(object):
     # read the key bindings from keys.cfg
     def _read(self,filename,filepath):
         if os.path.exists(filepath):
-            self.config = ConfigParser.ConfigParser()
+            self.config = configparser.ConfigParser(inline_comment_prefixes = (';',))
             self.config.optionxform = str
+            
             self.config.read(filepath)
             return 'normal',filename+' read'
         else:

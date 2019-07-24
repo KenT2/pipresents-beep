@@ -9,9 +9,9 @@ from time import sleep
 
 
 def read_pins():
-    print ""
+    print("")
     for pin in pins:
-        print "Pin ",pin,GPIO.input(pin)
+        print("Pin ",pin,GPIO.input(pin))
             
 
 pins=[3,5,7,8,10,11,12,13,15,16,18,19, 21, 22, 23, 24, 26]

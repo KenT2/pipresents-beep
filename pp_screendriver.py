@@ -1,7 +1,7 @@
 import os
-import ConfigParser
+import configparser
 import copy
-from Tkinter import NW,CENTER
+from tkinter import NW,CENTER
 from PIL import Image
 from PIL import ImageTk
 from pp_utils import Monitor
@@ -27,7 +27,7 @@ class ScreenDriver(object):
         else:
             #give congiparser an empty filename so it returns an empty config.
             filename=''
-        ScreenDriver.config = ConfigParser.ConfigParser()
+        ScreenDriver.config = configparser.ConfigParser(inline_comment_prefixes = (';',))
         ScreenDriver.config.read(filename)
         if filename != '':
             self.mon.log(self,"screen.cfg read from "+ filename)
@@ -57,7 +57,7 @@ class ScreenDriver(object):
                 break
 
             # calculate centre of polygon
-            vertices = len(points)/2
+            vertices = len(points)//2
             # print area, 'vertices',vertices
             sum_x=0
             sum_y=0

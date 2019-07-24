@@ -2,7 +2,7 @@
 
 import copy
 import os
-import ConfigParser
+import configparser
 import time
 
 
@@ -152,7 +152,7 @@ class pp_aplaydriver(object):
     def _read(self,filename,filepath):
         # try inside profile
         if os.path.exists(filepath):
-            self.config = ConfigParser.ConfigParser()
+            self.config = configparser.ConfigParser(inline_comment_prefixes = (';',))
             self.config.read(filepath)
             # self.mon.log(self,filename + " read from "+ filepath)
             return 'normal',filename+' read'
@@ -163,10 +163,10 @@ class pp_aplaydriver(object):
 
 
 if __name__ == '__main__':
-    from Tkinter import *
+    from tkinter import *
 
     def button_callback(symbol,source):
-        print 'callback',symbol,source
+        print('callback',symbol,source)
         if symbol=='pp-stop':
             idd.terminate()
             exit()
@@ -184,7 +184,7 @@ if __name__ == '__main__':
     pp_profile='/home/pi/pp_home/pp_profiles/beep'
     
     reason,message=idd.init('beep.cfg','/home/pi/pipresents/pp_resources/pp_templates/beep.cfg',root,pp_dir,pp_home,pp_profile,button_callback)
-    print reason,message
+    print(reason,message)
     if reason != 'error':
         idd.start()
         idd.handle_output_event('beep1','beep','',0)

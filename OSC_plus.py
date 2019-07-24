@@ -139,16 +139,16 @@ Original Comments
 """
 
 import math, re, socket, select, string, struct, sys, threading, time, types
-from SocketServer import UDPServer, DatagramRequestHandler, ForkingMixIn, ThreadingMixIn
+from socketserver import UDPServer, DatagramRequestHandler, ForkingMixIn, ThreadingMixIn
 
 global version
 version = ("0.3","5b", "$Rev: 5294 $"[6:-2])
 
 global FloatTypes
-FloatTypes = [types.FloatType]
+FloatTypes = [float]
 
 global IntTypes
-IntTypes = [types.IntType]
+IntTypes = [int]
 
 """
 # numpy/scipy support
@@ -233,7 +233,7 @@ class OSCMessage(object):
         """Clear any arguments appended so far
         """
         self.typetags = ","
-        self.message  = ""
+        self.message_bytes  = b""
 
     def append(self, argument, typehint=None):
         """Appends data to the message, updating the typetags based on
@@ -242,17 +242,18 @@ class OSCMessage(object):
         'argument' may also be a list or tuple, in which case its elements
         will get appended one-by-one, all using the provided typehint
         """
-        if type(argument) == types.DictType:
-            argument = argument.items()
+        if type(argument) == dict:
+            argument = list(argument.items())
+            
         elif isinstance(argument, OSCMessage):
             raise TypeError("Can only append 'OSCMessage' to 'OSCBundle'")
-        
-        if hasattr(argument, '__iter__'):
+
+        if type(argument) in (list,tuple):
             for arg in argument:
                 self.append(arg, typehint)
             
             return
-        
+            
         if typehint == 'b':
             binary = OSCBlob(argument)
             tag = 'b'
@@ -263,16 +264,17 @@ class OSCMessage(object):
             tag, binary = OSCArgument(argument, typehint)
 
         self.typetags += tag
-        self.message += binary
+        self.message_bytes += binary
         
     def getBinary(self):
         """Returns the binary representation of the message
         """
         binary = OSCString(self.address)
         binary += OSCString(self.typetags)
-        binary += self.message
+        binary += self.message_bytes
         
         return binary
+
 
     def __repr__(self):
         """Returns a string containing the decode Message
@@ -282,7 +284,7 @@ class OSCMessage(object):
     def __str__(self):
         """Returns the Message's address and contents as a string.
         """
-        return "%s %s" % (self.address, str(self.values()))
+        return "%s %s" % (self.address, str(list(self.values())))
     
     def __len__(self):
         """Returns the number of arguments appended so far
@@ -295,7 +297,7 @@ class OSCMessage(object):
         if not isinstance(other, self.__class__):
             return False
         
-        return (self.address == other.address) and (self.typetags == other.typetags) and (self.message == other.message)
+        return (self.address == other.address) and (self.typetags == other.typetags) and (self.message_bytes == other.message)
     
     def __ne__(self, other):
         """Return (not self.__eq__(other))
@@ -323,9 +325,9 @@ class OSCMessage(object):
         Returns the extended 'values' (list or tuple)
         """
         out = list(values)
-        out.extend(self.values())
+        out.extend(list(self.values()))
         
-        if type(values) == types.TupleType:
+        if type(values) == tuple:
             return tuple(out)
         
         return out
@@ -352,7 +354,7 @@ class OSCMessage(object):
         the arguments appended so far
         """
         out = []
-        values = self.values()
+        values = list(self.values())
         typetags = self.tags()
         for i in range(len(values)):
             out.append((typetags[i], values[i]))
@@ -362,32 +364,32 @@ class OSCMessage(object):
     def __contains__(self, val):
         """Test if the given value appears in the OSCMessage's arguments
         """
-        return (val in self.values())
+        return (val in list(self.values()))
 
     def __getitem__(self, i):
         """Returns the indicated argument (or slice)
         """
-        return self.values()[i]
+        return list(self.values())[i]
 
     def __delitem__(self, i):
         """Removes the indicated argument (or slice)
         """
-        items = self.items()
+        items = list(self.items())
         del items[i]
             
         self._reencode(items)
     
     def _buildItemList(self, values, typehint=None):
         if isinstance(values, OSCMessage):
-            items = values.items()
-        elif type(values) == types.ListType:
+            items = list(values.items())
+        elif type(values) == list:
             items = []
             for val in values:
-                if type(val) == types.TupleType:
+                if type(val) == tuple:
                     items.append(val[:2])
                 else:
                     items.append((typehint, val))
-        elif type(values) == types.TupleType:
+        elif type(values) == tuple:
             items = [values[:2]]
         else:       
             items = [(typehint, values)]
@@ -399,11 +401,11 @@ class OSCMessage(object):
         'val' can be a single int/float/string, or a (typehint, value) tuple.
         Or, if 'i' is a slice, a list of these or another OSCMessage.
         """
-        items = self.items()
+        items = list(self.items())
         
         new_items = self._buildItemList(val)
         
-        if type(i) != types.SliceType:
+        if type(i) != slice:
             if len(new_items) != 1:
                 raise TypeError("single-item assignment expects a single value or a (typetag, value) tuple")
             
@@ -417,7 +419,7 @@ class OSCMessage(object):
     def setItem(self, i, val, typehint=None):
         """Set indicated argument to a new value (with typehint)
         """
-        items = self.items()
+        items = list(self.items())
         
         items[i] = (typehint, val)
             
@@ -428,25 +430,25 @@ class OSCMessage(object):
         """
         msg = self.__class__(self.address)
         msg.typetags = self.typetags
-        msg.message = self.message
+        msg.message = self.message_bytes
         return msg
     
     def count(self, val):
         """Returns the number of times the given value occurs in the OSCMessage's arguments
         """
-        return self.values().count(val)
+        return list(self.values()).count(val)
     
     def index(self, val):
         """Returns the index of the first occurence of the given value in the OSCMessage's arguments.
         Raises ValueError if val isn't found
         """
-        return self.values().index(val)
+        return list(self.values()).index(val)
     
     def extend(self, values):
         """Append the contents of 'values' to this OSCMessage.
         'values' can be another OSCMessage, or a list/tuple of ints/floats/strings
         """
-        items = self.items() + self._buildItemList(values)
+        items = list(self.items()) + self._buildItemList(values)
         
         self._reencode(items)
         
@@ -454,7 +456,7 @@ class OSCMessage(object):
         """Insert given value (with optional typehint) into the OSCMessage
         at the given index.
         """
-        items = self.items()
+        items = list(self.items())
         
         for item in reversed(self._buildItemList(val)):
             items.insert(i, item)
@@ -465,7 +467,7 @@ class OSCMessage(object):
         """Delete the indicated argument from the OSCMessage, and return it
         as a (typetag, value) tuple.
         """
-        items = self.items()
+        items = list(self.items())
         
         item = items.pop(i)
         
@@ -481,7 +483,7 @@ class OSCMessage(object):
     def reverse(self):
         """Reverses the arguments of the OSCMessage (in place)
         """
-        items = self.items()
+        items = list(self.items())
         
         items.reverse()
         
@@ -491,7 +493,7 @@ class OSCMessage(object):
         """Removes the first argument with the given value from the OSCMessage.
         Raises ValueError if val isn't found.
         """
-        items = self.items()
+        items = list(self.items())
         
         # this is not very efficient...
         i = 0
@@ -511,28 +513,30 @@ class OSCMessage(object):
     def __iter__(self):
         """Returns an iterator of the OSCMessage's arguments
         """
-        return iter(self.values())
+        return iter(list(self.values()))
 
     def __reversed__(self):
         """Returns a reverse iterator of the OSCMessage's arguments
         """
-        return reversed(self.values())
+        return reversed(list(self.values()))
 
     def itervalues(self):
         """Returns an iterator of the OSCMessage's arguments
         """
-        return iter(self.values())
+        return iter(list(self.values()))
 
     def iteritems(self):
         """Returns an iterator of the OSCMessage's arguments as
         (typetag, value) tuples
         """
-        return iter(self.items())
+        return iter(list(self.items()))
 
     def itertags(self):
         """Returns an iterator of the OSCMessage's arguments' typetags
         """
         return iter(self.tags())
+
+
 
 class OSCBundle(OSCMessage):
     """Builds a 'bundle' of OSC messages.
@@ -549,6 +553,7 @@ class OSCBundle(OSCMessage):
       - OSC-bundles have a timetag to tell the receiver when the bundle should be processed.
       The default timetag value (0) means 'immediately'
     """
+    
     def __init__(self, address="", time=0):
         """Instantiate a new OSCBundle.
         The default OSC-address for newly created OSCMessages 
@@ -557,6 +562,9 @@ class OSCBundle(OSCMessage):
         """
         super(OSCBundle, self).__init__(address)
         self.timetag = time
+        self.message_bytes  = b''
+
+        
 
     def __str__(self):
         """Returns the Bundle's contents (and timetag, if nonzero) as a string.
@@ -567,7 +575,7 @@ class OSCBundle(OSCMessage):
             out = "#bundle ["
 
         if self.__len__():
-            for val in self.values():
+            for val in list(self.values()):
                 out += "%s, " % str(val)
             out = out[:-2]      # strip trailing space and comma
             
@@ -600,9 +608,10 @@ class OSCBundle(OSCMessage):
         """
         if isinstance(argument, OSCMessage):
             binary = OSCBlob(argument.getBinary())
+
         else:
             msg = OSCMessage(self.address)
-            if type(argument) == types.DictType:
+            if type(argument) == dict:
                 if 'addr' in argument:
                     msg.setAddress(argument['addr'])
                 if 'args' in argument:
@@ -612,15 +621,15 @@ class OSCBundle(OSCMessage):
             
             binary = OSCBlob(msg.getBinary())
 
-        self.message += binary
-        self.typetags += 'b'
-        
+        self.message_bytes += binary
+
+                
     def getBinary(self):
         """Returns the binary representation of the message
         """
         binary = OSCString("#bundle")
         binary += OSCTimeTag(self.timetag)
-        binary += self.message
+        binary += self.message_bytes
         
         return binary
 
@@ -654,7 +663,7 @@ class OSCBundle(OSCMessage):
         if not isinstance(other, self.__class__):
             return False
         
-        return (self.timetag == other.timetag) and (self.typetags == other.typetags) and (self.message == other.message)
+        return (self.timetag == other.timetag) and (self.typetags == other.typetags) and (self.message_bytes == other.message)
     
     def copy(self):
         """Returns a deep copy of this OSCBundle
@@ -663,68 +672,71 @@ class OSCBundle(OSCMessage):
         copy.timetag = self.timetag
         return copy
 
+
 ######
 #
 # OSCMessage encoding functions
 #
 ######
 
-def OSCString(next):
+def OSCString(param):
     """Convert a string into a zero-padded OSC String.
     The length of the resulting string is always a multiple of 4 bytes.
     The string ends with 1 to 4 zero-bytes ('\x00') 
     """
     
-    OSCstringLength = math.ceil((len(next)+1) / 4.0) * 4
-    return struct.pack(">%ds" % (OSCstringLength), str(next))
+    OSCstringLength = math.ceil((len(param)+1) / 4.0) * 4
+    return struct.pack(">%ds" % (OSCstringLength), param.encode('utf-8'))
 
-def OSCBlob(next):
+
+def OSCBlob(param):
     """Convert a string into an OSC Blob.
     An OSC-Blob is a binary encoded block of data, prepended by a 'size' (int32).
     The size is always a mutiple of 4 bytes. 
     The blob ends with 0 to 3 zero-bytes ('\x00') 
     """
 
-    if type(next) in types.StringTypes:
-        OSCblobLength = math.ceil((len(next)) / 4.0) * 4
-        binary = struct.pack(">i%ds" % (OSCblobLength), OSCblobLength, next)
+    if type(param) in (str,):
+        OSCblobLength = math.ceil((len(param)) / 4.0) * 4
+        binary = struct.pack(">i%ds" % (OSCblobLength), OSCblobLength, param.encode('utf-8'))
     else:
-        binary = ""
-
+        OSCblobLength=len(param)
+        binary = struct.pack(">i%ds" % (OSCblobLength), OSCblobLength, param)
     return binary
 
-def OSCArgument(next, typehint=None):
+def OSCArgument(param, typehint=None):
     """ Convert some Python types to their
     OSC binary representations, returning a
     (typetag, data) tuple.
     """
     if not typehint:
-        if type(next) in FloatTypes:
-            binary  = struct.pack(">f", float(next))
+        if type(param) in FloatTypes:
+            binary  = struct.pack(">f", float(param))
             tag = 'f'
-        elif type(next) in IntTypes:
-            binary  = struct.pack(">i", int(next))
+            
+        elif type(param) in IntTypes:
+            binary=param.to_bytes(4,'big')
             tag = 'i'
         else:
-            binary  = OSCString(next)
+            binary  = OSCString(param)
             tag = 's'
 
     elif typehint == 'f':
         try:
-            binary  = struct.pack(">f", float(next))
+            binary  = struct.pack(">f", float(param))
             tag = 'f'
         except ValueError:
-            binary  = OSCString(next)
+            binary  = OSCString(param)
             tag = 's'
     elif typehint == 'i':
         try:
-            binary  = struct.pack(">i", int(next))
+            binary=param.to_bytes(4,'big')
             tag = 'i'
         except ValueError:
-            binary  = OSCString(next)
+            binary  = OSCString(param)
             tag = 's'
     else:
-        binary  = OSCString(next)
+        binary  = OSCString(param)
         tag = 's'
 
     return (tag, binary)
@@ -735,9 +747,9 @@ def OSCTimeTag(time):
     """
     if time > 0:
         fract, secs = math.modf(time)
-        binary = struct.pack('>ll', long(secs), long(fract * 1e9))
+        binary = struct.pack('>ll', int(secs), int(fract * 1e9))
     else:
-        binary = struct.pack('>ll', 0L, 1L)
+        binary = struct.pack('>ll', 0, 1)
 
     return binary
 
@@ -750,14 +762,13 @@ def OSCTimeTag(time):
 def _readString(data):
     """Reads the next (null-terminated) block of data
     """
-    length   = string.find(data,"\0")
+    length   = bytes.find(data,0)
     nextData = int(math.ceil((length+1) / 4.0) * 4)
-    return (data[0:length], data[nextData:])
+    return (str(data[0:length],'UTF-8'), data[nextData:])
 
 def _readBlob(data):
     """Reads the next (numbered) block of data
     """
-    
     length   = struct.unpack(">i", data[0:4])[0]
     nextData = int(math.ceil((length) / 4.0) * 4) + 4
     return (data[4:length+4], data[nextData:])
@@ -767,7 +778,7 @@ def _readInt(data):
     as a 32-bit integer. """
     
     if(len(data)<4):
-        print "Error: too few bytes for int", data, len(data)
+        print("Error: too few bytes for int", data, len(data))
         rest = data
         integer = 0
     else:
@@ -782,7 +793,7 @@ def _readLong(data):
      """
 
     high, low = struct.unpack(">ll", data[0:8])
-    big = (long(high) << 32) + low
+    big = (int(high) << 32) + low
     rest = data[8:]
     return (big, rest)
 
@@ -804,7 +815,7 @@ def _readFloat(data):
     """
     
     if(len(data)<4):
-        print "Error: too few bytes for float", data, len(data)
+        print("Error: too few bytes for float", data, len(data))
         rest = data
         float = 0
     else:
@@ -845,7 +856,6 @@ def decodeOSC(data):
                 decoded.append(value)
         else:
             raise OSCError("OSCMessage's typetag-string lacks the magic ','")
-
     return decoded
 
 ######
@@ -857,7 +867,7 @@ def decodeOSC(data):
 def hexDump(bytes):
     """ Useful utility; prints the string in hexadecimal.
     """
-    print "byte   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F"
+    print("byte   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F")
 
     num = len(bytes)
     for i in range(num):
@@ -865,12 +875,12 @@ def hexDump(bytes):
              line = "%02X0 : " % (i/16)
         line += "%02X " % ord(bytes[i])
         if (i+1) % 16 == 0:
-            print "%s: %s" % (line, repr(bytes[i-15:i+1]))
+            print("%s: %s" % (line, repr(bytes[i-15:i+1])))
             line = ""
 
     bytes_left = num % 16
     if bytes_left:
-        print "%s: %s" % (line.ljust(54), repr(bytes[-bytes_left:]))
+        print("%s: %s" % (line.ljust(54), repr(bytes[-bytes_left:])))
 
 def getUrlStr(*args):
     """Convert provided arguments to a string in 'host:port/prefix' format
@@ -883,7 +893,7 @@ def getUrlStr(*args):
     if not len(args):
         return ""
         
-    if type(args[0]) == types.TupleType:
+    if type(args[0]) == tuple:
         host = args[0][0]
         port = args[0][1]
         args = args[1:]
@@ -905,7 +915,7 @@ def getUrlStr(*args):
     else:
         host = 'localhost'
     
-    if type(port) == types.IntType:
+    if type(port) == int:
         return "%s:%d%s" % (host, port, prefix)
     else:
         return host + prefix
@@ -914,7 +924,7 @@ def parseUrlStr(url):
     """Convert provided string in 'host:port/prefix' format to it's components
     Returns ((host, port), prefix)
     """
-    if not (type(url) in types.StringTypes and len(url)):
+    if not (type(url) in (str,) and len(url)):
         return (None, '')
 
     i = url.find("://")
@@ -1075,6 +1085,9 @@ class OSCClient(object):
             this call blocks until socket is available for writing. 
         Raises OSCClientError when timing out while waiting for the socket. 
         """
+        # print ('message.getbinary of sent message',msg.getBinary())
+
+        
         if not isinstance(msg, OSCMessage):
             raise TypeError("'msg' argument is not an OSCMessage or OSCBundle object")
             return
@@ -1089,7 +1102,7 @@ class OSCClient(object):
         try:
             self.socket.sendto(msg.getBinary(),address)
 
-        except socket.error, e:
+        except socket.error as e:
             if e[0] in (7, 65): # 7 = 'no address associated with nodename',  65 = 'no route to host'
                 raise e
             else:
@@ -1110,7 +1123,7 @@ def parseFilterStr(args):
     """
     out = {}
     
-    if type(args) in types.StringTypes:
+    if type(args) in (str,):
         args = [args]
         
     prefix = None
@@ -1151,18 +1164,18 @@ def getFilterStr(filters):
     if not len(filters):
         return []
     
-    if '/*' in filters.keys():
+    if '/*' in list(filters.keys()):
         if filters['/*']:
             out = ["+/*"]
         else:
             out = ["-/*"]
     else:
-        if False in filters.values():
+        if False in list(filters.values()):
             out = ["+/*"]
         else:
             out = ["-/*"]
     
-    for (addr, bool) in filters.items():
+    for (addr, bool) in list(filters.items()):
         if addr == '/*':
             continue
         
@@ -1174,7 +1187,8 @@ def getFilterStr(filters):
     return out
 
 # A translation-table for mapping OSC-address expressions to Python 're' expressions
-OSCtrans = string.maketrans("{,}?","(|).")
+# KRT
+OSCtrans = bytes.maketrans(b"{,}?",b"(|).")
 
 def getRegEx(pattern):
     """Compiles and returns a 'regular expression' object for the given address-pattern.
@@ -1216,7 +1230,7 @@ class OSCRequestHandler(DatagramRequestHandler):
         
         replies = []
         matched = 0
-        for addr in self.server.callbacks.keys():
+        for addr in list(self.server.callbacks.keys()):
             match = expr.match(addr)
             if match and (match.end() == len(addr)):
                 reply = self.server.callbacks[addr](pattern, tags, data, self.client_address)
@@ -1245,9 +1259,9 @@ class OSCRequestHandler(DatagramRequestHandler):
         """
 
         (self.packet, self.socket) = self.request
-        print 'MESSAGE RECEIVED'
-        print 'from: ',self.client_address
-        print 'raw contents; ',self.packet,'\n'
+        print('MESSAGE RECEIVED')
+        print('from: ',self.client_address)
+        print('raw contents; ',self.packet,'\n')
         self.replies = []
 
     def _unbundle(self, decoded):
@@ -1291,7 +1305,7 @@ class OSCRequestHandler(DatagramRequestHandler):
             return
         
         self.server.client.sendto(msg, self.client_address)
-        print 'sent reply to',self.client_address
+        print('sent reply to',self.client_address)
 
 
 
@@ -1509,7 +1523,7 @@ class OSCServer(UDPServer):
     def getOSCAddressSpace(self):
         """Returns a list containing all OSC-addresses registerd with this Server. 
         """
-        return self.callbacks.keys()
+        return list(self.callbacks.keys())
     
     def addDefaultHandlers(self, prefix="", info_prefix="/info", error_prefix="/error"):
         """Register a default set of OSC-address handlers with this Server:
@@ -1692,7 +1706,7 @@ class OSCServer(UDPServer):
             reply.append(('info_command', "clients | targets : list subscribed clients"))
         elif cmd in ('ls', 'list'):
             reply = OSCBundle(self.info_prefix)
-            for addr in self.callbacks.keys():
+            for addr in list(self.callbacks.keys()):
                 reply.append(('address', addr))
         elif cmd in ('clients', 'targets'):
             if hasattr(self.client, 'getOSCTargetStrings'):
@@ -1720,10 +1734,10 @@ class OSCServer(UDPServer):
         url = ""
         have_port = False
         for item in data:
-            if (type(item) == types.IntType) and not have_port:
+            if (type(item) == int) and not have_port:
                 url += ":%d" % item
                 have_port = True
-            elif type(item) in types.StringTypes:
+            elif type(item) in (str,):
                 url += item
 
         (addr, tail) = parseUrlStr(url)
@@ -1758,10 +1772,10 @@ class OSCServer(UDPServer):
         url = ""
         have_port = False
         for item in data:
-            if (type(item) == types.IntType) and not have_port:
+            if (type(item) == int) and not have_port:
                 url += ":%d" % item
                 have_port = True
-            elif type(item) in types.StringTypes:
+            elif type(item) in (str,):
                 url += item
 
         (addr, _) = parseUrlStr(url)
@@ -1782,7 +1796,7 @@ class OSCServer(UDPServer):
         
         try:
             self.client._delTarget(addr)
-        except NotSubscribedError, e:
+        except NotSubscribedError as e:
             txt = "%s: %s" % (e.__class__.__name__, str(e))
             self.printErr(txt)
 
@@ -1913,6 +1927,37 @@ class NotSubscribedError(OSCClientError):
         self.message = "Target osc://%s is not subscribed" % url            
 
 
+class TestOSC(object):
+
+    def test(self):
+        # some data for the start of the message
+        address="/pipresents"
+        arg_list=[["show",256.123, 257,'fred'],['bill']]
+        print ('input',address,arg_list,'\n')
+        
+        msg = OSCMessage()
+        msg.setAddress(address)
+        #for arg in arg_list:
+            #print ('arg',arg, type(arg))
+        msg.append(arg_list)
+        msg.append('1234567890',typehint='b') # blob
+        msg.append(4,typehint='i')
+        msg.append(4.2,typehint='f')
+        msg.append('5',typehint='s')
+
+        print ('message to send',msg.getBinary(),'\n')
+        print ('decoded',decodeOSC(msg.getBinary()),'\n')
+        
+        # test bundle
+        bun=OSCBundle("")
+        bun.append(msg)
+
+        bun.append(msg)        
+        print ('bundle to send',bun.getBinary(),'\n')
+        print ('decoded',decodeOSC(bun.getBinary()),'\n')        
+
+
 if __name__ == '__main__':
 
-    print 'test'
+    oc = TestOSC()
+    oc.test()

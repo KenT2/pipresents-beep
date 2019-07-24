@@ -7,14 +7,14 @@ https://trac.v2.nl/wiki/pyOSC
 example by www.ixi-audio.net based on pyOSC documentation
 """
 
-from Tkinter import Tk, StringVar, Menu,Frame,Label,Button,Scrollbar,Listbox,Entry,Text
-from Tkinter import Y,END,TOP,BOTH,LEFT,RIGHT,VERTICAL,SINGLE,NONE,W
-import tkFileDialog
-import tkMessageBox
-import tkSimpleDialog
+from tkinter import Tk, StringVar, Menu,Frame,Label,Button,Scrollbar,Listbox,Entry,Text
+from tkinter import Y,END,TOP,BOTH,LEFT,RIGHT,VERTICAL,SINGLE,NONE,W
+import tkinter.filedialog
+import tkinter.messagebox
+import tkinter.simpledialog
 import os
 import sys
-import ConfigParser
+import configparser
 import shutil
 import json
 import copy
@@ -43,7 +43,7 @@ class OSCRemote(object):
         self.pp_dir=sys.path[0]
             
         if not os.path.exists(self.pp_dir+os.sep+"pp_oscremote.py"):
-            tkMessageBox.showwarning("Pi Presents","Bad Application Directory")
+            tkinter.messagebox.showwarning("Pi Presents","Bad Application Directory")
             exit()
             
           
@@ -227,6 +227,7 @@ class OSCRemote(object):
         self.add_status('Send message:'+msg_text+ ' to '+ str(dest))
         self.mon.log(self,'send message: ' + msg_text )
         self.sendto(self.output_client,dest,osc_address,arg_list)
+        
 
 
     # ***************************************
@@ -238,6 +239,7 @@ class OSCRemote(object):
 
 
     def sendto(self,client,dest, address,arg_list):
+        #print (' message to send',address,arg_list)
         msg = OSC.OSCMessage()
         msg.setAddress(address)
         for arg in arg_list:
@@ -334,11 +336,11 @@ class OSCRemote(object):
 
 
     def show_help (self):
-        tkMessageBox.showinfo("Help","Read 'manual.pdf'")
+        tkinter.messagebox.showinfo("Help","Read 'manual.pdf'")
   
 
     def about (self):
-        tkMessageBox.showinfo("About","Simple Remote Control for Pi Presents\n"
+        tkinter.messagebox.showinfo("About","Simple Remote Control for Pi Presents\n"
                               +"Author: Ken Thompson"
                               +"\nWebsite: http://pipresents.wordpress.com/")
 
@@ -536,7 +538,7 @@ class OSCRemote(object):
         if os.path.exists(initial_dir) is False:
             self.mon.err(self,"Profiles directory not found: " + initial_dir + "\n\nHint: Data Home option must end in pp_home")
             return
-        dir_path=tkFileDialog.askdirectory(initialdir=initial_dir)
+        dir_path=tkinter.filedialog.askdirectory(initialdir=initial_dir)
         # dir_path="C:\Users\Ken\pp_home\pp_profiles\\ttt"
         if len(dir_path)>0:
             self.open_profile(dir_path)

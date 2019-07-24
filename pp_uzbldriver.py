@@ -102,7 +102,7 @@ class UZBLDriver(object):
     def control(self,data):
         if self.exists_fifo():
             self.mon.log(self,'send command to uzbl:'+ data)
-            f = open(self.fifo, 'a')
+            f = open(self.fifo, 'w')
             f.write('%s\n' % data)
             f.close()
             # self.mon.log(self,'sent command to uzbl:'+ data)

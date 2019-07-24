@@ -1,6 +1,6 @@
 import os
 import json
-import ConfigParser
+import configparser
 import remi.gui as gui
 from remi_plus import AdaptableDialog
 from pp_utils import parse_rectangle
@@ -69,7 +69,7 @@ class Validator(AdaptableDialog):
             self.display('f',"pp_showlist.json not in profile")
             self.display('t', "Validation Aborted")
             return False                   
-        ifile  = open(pp_profile+os.sep+"pp_showlist.json", 'rb')
+        ifile  = open(pp_profile+os.sep+"pp_showlist.json", 'r')
         sdict= json.load(ifile)
         ifile.close()
         v_shows=sdict['shows']
@@ -103,7 +103,7 @@ class Validator(AdaptableDialog):
                 v_media_lists.append(medialist_file)
 
                 # open a medialist and test its tracks
-                ifile  = open(pp_profile + os.sep + medialist_file, 'rb')
+                ifile  = open(pp_profile + os.sep + medialist_file, 'r')
                 sdict= json.load(ifile)
                 ifile.close()                          
                 tracks = sdict['tracks']
@@ -281,7 +281,7 @@ class Validator(AdaptableDialog):
                 
                 
                 # open medialist and produce a dictionary of its contents for use later
-                ifile  = open(pp_profile + os.sep + show['medialist'], 'rb')
+                ifile  = open(pp_profile + os.sep + show['medialist'], 'r')
                 tracks = json.load(ifile)['tracks']
                 ifile.close()
                 
@@ -479,7 +479,7 @@ class Validator(AdaptableDialog):
             self.display('f','Fields of  '+ name + ' are not positive integers: ' + item)
             return        
         if int(minutes)>59 or int(seconds)>59:
-            if len(fields)<>1:
+            if len(fields)!=1:
                 self.display('f','Fields of  '+ name + ' are out of range: ' + item)
             else:
                 self.display('w','Seconds or Minutes is greater then 59 in '+ name + ': ' + item)          
@@ -550,7 +550,7 @@ class Validator(AdaptableDialog):
     def check_schedule_for_show(self,show,v_show_labels):
         show_type=show['type']
         show_ref=show['show-ref']
-        print 'check schedule for show ',show_type,show_ref
+        print('check schedule for show ',show_type,show_ref)
         if 'sched-everyday' in show:
             text=show['sched-everyday']
             lines=text.splitlines()
@@ -931,7 +931,7 @@ class Validator(AdaptableDialog):
             self.display('f',"incorrect number of fields in Control: " + line)
             return
         operation=fields[1]
-        if operation in ('repeat','up','down','play','stop','exit','pause','no-command','null','pause-on','pause-off','mute','unmute','go') or operation[0:6] == 'mplay-' or operation[0:4] == 'omx-' or operation[0:5] == 'uzbl-':
+        if operation in ('repeat','up','down','play','stop','exit','pause','no-command','null','pause-on','pause-off','mute','unmute','go','inc-volume','dec-volume') or operation[0:6] == 'mplay-' or operation[0:4] == 'omx-' or operation[0:5] == 'uzbl-':
             return
         else:
             self.display('f',"unknown Command in Control: " + line)
@@ -1188,7 +1188,7 @@ class Validator(AdaptableDialog):
             else:
                 self.display('w', "gpio.cfg not found in pipresents/pp_resources - GPIO checking turned off")
                 return False
-        self.config = ConfigParser.ConfigParser()
+        self.config = configparser.ConfigParser(inline_comment_prefixes = (';',))
         self.config.read(filename)
         return True
 

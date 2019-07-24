@@ -1,6 +1,8 @@
-from Tkinter import NW,N,W,CENTER,LEFT,RIGHT
+from tkinter import NW,N,W,CENTER,LEFT,RIGHT,FLAT
 from pp_utils import StopWatch,calculate_text_position
 from pp_player import Player
+from tk_html_widgets import HTMLText
+import os
 
 class MessagePlayer(Player):
 
@@ -53,6 +55,8 @@ class MessagePlayer(Player):
             self.duration= int(self.track_params['duration'])
         else:
             self.duration= int(self.show_params['duration'])       
+        
+        self.html_message_text_obj = None
         
         # initialise the state machine
         self.play_state='initialised'    
@@ -183,19 +187,55 @@ class MessagePlayer(Player):
         # print 'show canvas',self.show_canvas_x1,self.show_canvas_y1,self.show_canvas_x2,self.show_canvas_y2
         #  print 'canvas width/height/centre',self.show_canvas_width,self.show_canvas_height,self.show_canvas_centre_x,self.show_canvas_centre_y
         #  print
+        
+        self.message_html_background_colour= self.track_params['message-html-background-colour']
+        if self.track_params['message-html-width'] == '':
+            self.message_html_width=self.show_canvas_x2-self.show_canvas_x1
+        else:
+            self.message_html_width=self.track_params['message-html-width']
+            
+        if self.track_params['message-html-height'] == '':
+            self.message_html_height=self.show_canvas_y2-self.show_canvas_y1
+        else:
+            self.message_html_height=self.track_params['message-html-height']
+            
+        self.message_text_type=self.track_params['message-text-type']
+        
+        if self.track_params['message-text-location'] != '':
+            text_path=self.complete_path(self.track_params['message-text-location'])
+            if not os.path.exists(text_path):
+                return 'error',"Message Text file not found "+ text_path
+            with open(text_path) as f:
+                message_text=f.read()
+        else:
+            message_text= self.track_params['text']
+                        
     
         x,y,anchor,justify=calculate_text_position(self.track_params['message-x'],self.track_params['message-y'],
                                      self.show_canvas_x1,self.show_canvas_y1,
                                      self.show_canvas_centre_x,self.show_canvas_centre_y,
                                      self.show_canvas_x2,self.show_canvas_y2,self.track_params['message-justify'])
         
+        if self.message_text_type=='html':
+            self.html_message_text_obj = HTMLText(self.canvas,background=self.message_html_background_colour,
+            relief=FLAT)
+            # self.html_text.pack(fill="both", expand=True)
+            self.html_message_text_obj.set_html(message_text,self.pp_home,self.pp_profile)
+            # self.html_text.fit_height()
+            self.track_obj=self.canvas.create_window(x,y,window=self.html_message_text_obj,
+                   anchor=anchor,width=self.message_html_width,
+                   height=self.message_html_height)
 
-        self.track_obj=self.canvas.create_text(x,y,
-                                               text=self.track.rstrip('\n'),
-                                               fill=self.track_params['message-colour'],
-                                               font=self.track_params['message-font'],
-                                               justify=justify,
-                                               anchor = anchor)
+            
+        else:
+
+
+            self.track_obj=self.canvas.create_text(x,y,
+                                                   text=message_text.rstrip('\n'),
+                                                   fill=self.track_params['message-colour'],
+                                                   font=self.track_params['message-font'],
+                                                   justify=justify,
+                                                   anchor = anchor)
             
         self.canvas.itemconfig(self.track_obj,state='hidden')
         return 'normal','message loaded'
@@ -206,6 +246,8 @@ class MessagePlayer(Player):
 
     def hide_track_content(self):
         self.canvas.itemconfig(self.track_obj,state='hidden')
+        if self.html_message_text_obj != None:
+            self.html_message_text_obj.delete_parser()
         self.canvas.delete(self.track_obj)
 
             

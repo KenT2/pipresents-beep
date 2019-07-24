@@ -182,7 +182,7 @@ class GapShow(Show):
             self.previous()
             
         elif operation == 'down' and self.state == 'playing':
-            self.next()
+            next(self)
             
         elif operation == 'repeat' and self.state == 'playing':
             self.repeat()
@@ -204,7 +204,7 @@ class GapShow(Show):
                     Show.delete_admin_message(self)
                     self.start_list()
 
-        elif operation in ('pause','pause-on','pause-off','mute','unmute','go'):
+        elif operation in ('pause','pause-on','pause-off','mute','unmute','go','inc-volume','dec-volume'):
             if self.current_player is not None:
                 self.current_player.input_pressed(operation)
 
@@ -221,7 +221,7 @@ class GapShow(Show):
         Show.delete_admin_message(self)
         self.what_next_after_showing()
 
-    def next(self):
+    def __next__(self):
         # stop track if running and set signal
         self.next_track_signal=True
         if self.shower is not None:
@@ -365,8 +365,7 @@ class GapShow(Show):
         else:
             self.enable_child=False
 
-    
-
+        
         # load the track or show
         # params - track,enable_menu
         enable=self.enable_child & self.enable_hint

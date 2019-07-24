@@ -13,7 +13,7 @@ from time import sleep
 
 def write_pins(value):
     for pin in pins:
-        print 'Pin ',pin,value
+        print('Pin ',pin,value)
         GPIO.output(pin,value)
 
 
@@ -33,10 +33,10 @@ for pin in pins:
     GPIO.setup(pin,GPIO.OUT)
 
 while True:
-        print '\n***** ON ******'
+        print('\n***** ON ******')
         write_pins(ON_VALUE)
         sleep (5)
-        print '\n***** OFF *****'
+        print('\n***** OFF *****')
         write_pins(OFF_VALUE)
         sleep(5)
 

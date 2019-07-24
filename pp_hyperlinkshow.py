@@ -340,7 +340,7 @@ class HyperlinkShow(Show):
             first_track=self.medialist.track(index)
             self.current_track_ref=first_track['track-ref']
             self.path.append(first_track['track-ref'])
-            if self.debug: print 'First Track: ' + first_track['track-ref']+self.path.pretty_path()
+            if self.debug: print('First Track: ' + first_track['track-ref']+self.path.pretty_path())
             self.start_load_show_loop(first_track)
         else:
             self.mon.err(self,"first-track not found in medialist: "+ self.show_params['first-track-ref'])
@@ -497,7 +497,7 @@ class HyperlinkShow(Show):
                 # play home
                 self.next_track_ref=self.home_track_ref
                 self.path.append(self.next_track_ref)
-                if self.debug: print 'Executed Home ' + self.path.pretty_path()
+                if self.debug: print('Executed Home ' + self.path.pretty_path())
 
             # return-by
             elif self.next_track_op in ('return-by'):
@@ -508,7 +508,7 @@ class HyperlinkShow(Show):
                     # use returned track
                     self.next_track_ref=back_ref
                     self.path.append(self.next_track_ref)
-                    if self.debug: print 'Executed Return By' + self.next_track_arg + self.path.pretty_path()
+                    if self.debug: print('Executed Return By' + self.next_track_arg + self.path.pretty_path())
 
             # repeat is return by 1
             elif self.next_track_op in ('repeat'):
@@ -518,7 +518,7 @@ class HyperlinkShow(Show):
                 self.next_track_ref=self.current_track_ref
                 self.path.append(self.current_track_ref)
                 self.continue_timeout=True
-                if self.debug: print 'Executed Repeat ' + self.path.pretty_path()
+                if self.debug: print('Executed Repeat ' + self.path.pretty_path())
 
             # return-to
             elif self.next_track_op in ('return-to'):
@@ -530,14 +530,14 @@ class HyperlinkShow(Show):
                 # and append the return to track
                 self.next_track_ref=self.next_track_arg
                 self.path.append(self.next_track_ref)
-                if self.debug: print 'Executed Return To' + self.next_track_arg + self.path.pretty_path()
+                if self.debug: print('Executed Return To' + self.next_track_arg + self.path.pretty_path())
                 
             # call
             elif self.next_track_op in ('call'):
                 # append the required track
                 self.path.append(self.next_track_arg)
                 self.next_track_ref=self.next_track_arg
-                if self.debug: print 'Executed Call ' + self.next_track_arg + self.path.pretty_path()
+                if self.debug: print('Executed Call ' + self.next_track_arg + self.path.pretty_path())
 
             # goto
             elif self.next_track_op in ('goto'):
@@ -545,7 +545,7 @@ class HyperlinkShow(Show):
                 # add the goto track
                 self.next_track_ref=self.next_track_arg
                 self.path.append(self.next_track_arg)
-                if self.debug: print 'Executed Goto ' + self.next_track_arg + self.path.pretty_path()
+                if self.debug: print('Executed Goto ' + self.next_track_arg + self.path.pretty_path())
 
             # jump
             elif self.next_track_op in ('jump'):
@@ -559,7 +559,7 @@ class HyperlinkShow(Show):
                 # append the jumped to track
                 self.next_track_ref=self.next_track_arg
                 self.path.append(self.next_track_ref)
-                if self.debug: print 'Executed Jump ' + self.next_track_arg + self.path.pretty_path()
+                if self.debug: print('Executed Jump ' + self.next_track_arg + self.path.pretty_path())
 
             else:
                 self.mon.err(self,"unaddressed what next: "+ self.next_track_op+ ' '+self.next_track_arg)

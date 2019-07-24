@@ -2,7 +2,7 @@
 # feb 2016 fix bug in pause properly
 
 import os
-from Tkinter import CENTER,NW
+from tkinter import CENTER,NW
 from PIL import Image
 from PIL import ImageTk
 from pp_utils import StopWatch, parse_rectangle,calculate_text_position
@@ -201,31 +201,31 @@ class ImagePlayer(Player):
             self.paused = True
             if self.pause_timeout>0:
                 # kick off the pause teimeout timer
-                print "!!toggle pause on"
+                print("!!toggle pause on")
                 self.pause_timer=self.canvas.after(self.pause_timeout*1000,self.pause_timeout_callback)
         else:
             self.paused=False
             # cancel the pause timer
             if self.pause_timer != None:
-                print "!!toggle pause off"
+                print("!!toggle pause off")
                 self.canvas.after_cancel(self.pause_timer)
                 self.pause_timer=None
 
 
     def pause_timeout_callback(self):
-        print "!!callback pause off"
+        print("!!callback pause off")
         self.pause_off()
         self.pause_timer=None
 
     def pause_on(self):
         self.paused = True
-        print "!!pause on"
+        print("!!pause on")
         self.pause_timer=self.canvas.after(self.pause_timeout*1000,self.pause_timeout_callback)
  
 
     def pause_off(self):
         self.paused = False
-        print "!!pause off"
+        print("!!pause off")
         # cancel the pause timer
         if self.pause_timer != None:
             self.canvas.after_cancel(self.pause_timer)
