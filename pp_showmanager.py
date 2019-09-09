@@ -1,6 +1,7 @@
 import copy
 from pp_utils import Monitor, parse_rectangle
 from pp_timeofday import TimeOfDay
+from pp_displaymanager import DisplayManager
 
 
 class ShowManager(object):
@@ -26,11 +27,10 @@ class ShowManager(object):
 
     # Initialise class variables, first time through only in pipresents.py
 
-    def init(self,canvas,all_shows_ended_callback,command_callback,showlist):
+    def init(self,all_shows_ended_callback,command_callback,showlist):
         ShowManager.all_shows_ended_callback=all_shows_ended_callback
         ShowManager.shows=[]
         ShowManager.shutdown_required=False
-        ShowManager.canvas=canvas
         ShowManager.command_callback = command_callback
         ShowManager.showlist = showlist
 
@@ -110,15 +110,16 @@ class ShowManager(object):
 
     # show manager can be initialised by a player, shower or by pipresents.py
     # if by pipresents.py then show_id=-1
-    def __init__(self,show_id,showlist,show_params,root,canvas,pp_dir,pp_profile,pp_home):
+    def __init__(self,show_id,showlist,show_params,root,pp_dir,pp_profile,pp_home):
         self.show_id=show_id
         self.showlist=showlist
         self.show_params=show_params
         self.root=root
-        self.show_canvas=canvas
         self.pp_dir=pp_dir
         self.pp_profile=pp_profile
         self.pp_home=pp_home
+        
+        self.dm=DisplayManager()
 
 
         self.mon=Monitor()
@@ -144,7 +145,7 @@ class ShowManager(object):
 
     def wait_for_openexclusive(self):
         if self.all_shows_exited() is False:
-            ShowManager.canvas.after(1,self.wait_for_openexclusive)
+            self.root.after(1,self.wait_for_openexclusive)
             return
         self.start_show(self.exclusive_show)
           
@@ -300,11 +301,14 @@ class ShowManager(object):
 
     def compute_show_canvas(self,show_params):
         canvas={}
-        canvas['canvas-obj']= ShowManager.canvas
+        display_name = show_params['display-name']
+        status,message,self.display_id,canvas_obj=self.dm.id_of_canvas(display_name)
+        if status != 'normal':
+            return 'error', message,None
+        canvas['canvas-obj']=canvas_obj       
         status,message,self.show_canvas_x1,self.show_canvas_y1,self.show_canvas_x2,self.show_canvas_y2= self.parse_show_canvas(show_params['show-canvas'])
         if status  == 'error':
-            # self.mon.err(self,'show canvas error: ' + message + ' in ' + show_params['show-canvas'])
-            return 'error','show canvas error: ' + message + ' in ' + show_params['show-canvas'],canvas
+            return 'error','show canvas error: ' + message + ' in ' + show_params['show-canvas'],None
         else:
             self.show_canvas_width = self.show_canvas_x2 - self.show_canvas_x1
             self.show_canvas_height=self.show_canvas_y2 - self.show_canvas_y1
@@ -318,6 +322,8 @@ class ShowManager(object):
             canvas['show-canvas-height'] = self.show_canvas_height
             canvas['show-canvas-centre-x'] = self.show_canvas_centre_x 
             canvas['show-canvas-centre-y'] = self.show_canvas_centre_y
+            canvas['display-name']=display_name
+            canvas['display-id']=self.display_id
             return 'normal','',canvas
 
 
@@ -326,7 +332,9 @@ class ShowManager(object):
         fields = text.split()
         # blank so show canvas is the whole screen
         if len(fields) < 1:
-            return 'normal','',0,0,int(self.canvas['width']),int(self.canvas['height'])
+            #get canvas dimensions from the display manager
+            width,height=self.dm.canvas_dimensions(self.display_id)
+            return 'normal','',0,0,width,height
              
         elif len(fields) in (1,4):
             # window is specified

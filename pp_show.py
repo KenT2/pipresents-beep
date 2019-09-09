@@ -48,6 +48,8 @@ class Show(object):
         self.show_canvas_height= canvas['show-canvas-height']
         self.show_canvas_centre_x= canvas['show-canvas-centre-x']
         self.show_canvas_centre_y= canvas['show-canvas-centre-y']
+        self.display_id=canvas['display-id']
+        self.display_name=canvas['display-name']
         self.showlist=showlist
         self.pp_dir=pp_dir
         self.pp_home=pp_home
@@ -67,7 +69,7 @@ class Show(object):
         self.tod=TimeOfDay()
         
         # create an  instance of showmanager so we can init child/subshows
-        self.show_manager=ShowManager(self.show_id,self.showlist,self.show_params,self.root,self.show_canvas,self.pp_dir,self.pp_profile,self.pp_home)
+        self.show_manager=ShowManager(self.show_id,self.showlist,self.show_params,self.root,self.pp_dir,self.pp_profile,self.pp_home)
      
         # init variables
         self.current_player=None

@@ -42,6 +42,8 @@ class Player(object):
         self.show_canvas_height= canvas['show-canvas-height']
         self.show_canvas_centre_x= canvas['show-canvas-centre-x']
         self.show_canvas_centre_y= canvas['show-canvas-centre-y']
+        self.show_canvas_display_name = canvas['display-name']
+        self.show_canvas_display_id = canvas['display-id']
         self.show_params=show_params
         self.track_params=track_params
         self.pp_dir=pp_dir
@@ -66,8 +68,8 @@ class Player(object):
         self.animate_begin_text=self.track_params['animate-begin']
         self.animate_end_text=self.track_params['animate-end']
 
-        # create an  instance of showmanager so we can control concurrent shows
-        # self.show_manager=ShowManager(self.show_id,self.showlist,self.show_params,self.root,self.canvas,self.pp_dir,self.pp_profile,self.pp_home)
+        # create an  instance of show manager so we can control concurrent shows
+        # self.show_manager=Show Manager(self.show_id,self.showlist,self.show_params,self.root,self.canvas,self.pp_dir,self.pp_profile,self.pp_home)
 
         # open the plugin Manager
         self.pim=PluginManager(self.show_id,self.root,self.canvas,self.show_params,self.track_params,self.pp_dir,self.pp_home,self.pp_profile) 

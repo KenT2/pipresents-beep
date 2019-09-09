@@ -2,6 +2,7 @@
 import copy
 import os
 import configparser
+from pp_displaymanager import DisplayManager
 
 
 class pp_kbddriver_plus(object):
@@ -25,7 +26,7 @@ class pp_kbddriver_plus(object):
 
     # executed by main program and by each object using the driver
     def __init__(self):
-        pass
+        self.dm=DisplayManager()
 
      # executed once from main program   
     def init(self,filename,filepath,widget,pp_dir,pp_home,pp_profile,event_callback=None):
@@ -84,23 +85,26 @@ class pp_kbddriver_plus(object):
     # sets up tkinter keyboard events such that any key press
     # does a callback to _key_received() with the event object
     def _bind_keys(self,widget,callback):
-
-        # bind all the normal keys that return a printing character such that x produces pp-key-x (but fileterd in _key_received)
-        widget.bind("<Key>", lambda event,match='<Key>',name='': self._key_received(event,match,name))
-        # print 'bind printing'
-
-        # Bind <Return> so that eol detection works, <Return> cannot be used to trigger an input event
-        # if you wnt that use keys.cfg
-        widget.bind("<Return>", lambda event,match='<Return>',name='': self._key_received(event,match,name))
-        # print 'bind Return to make eol work'
-            
-        # go through entries and bind all specific-character matches to _key_received
-        for entry in pp_kbddriver_plus.in_names:
-            if entry[pp_kbddriver_plus.MODE] == 'specific-character':
-                match = entry[pp_kbddriver_plus.MATCH]
-                name = entry[pp_kbddriver_plus.NAME]
-                widget.bind(match, lambda event, match=match,name=name: self._key_received(event,match,name))
-                # print 'bind specific-char', match,name
+        for display_name in DisplayManager.display_map:
+            status,message,display_id,canvas=self.dm.id_of_canvas(display_name)
+            if status !='normal':
+                continue
+            # bind all the normal keys that return a printing character such that x produces pp-key-x (but fileterd in _key_received)
+            canvas.bind("<Key>", lambda event,match='<Key>',name='': self._key_received(event,match,name))
+            # print 'bind printing'
+    
+            # Bind <Return> so that eol detection works, <Return> cannot be used to trigger an input event
+            # if you wnt that use keys.cfg
+            canvas.bind("<Return>", lambda event,match='<Return>',name='': self._key_received(event,match,name))
+            # print 'bind Return to make eol work'
+                
+            # go through entries and bind all specific-character matches to _key_received
+            for entry in pp_kbddriver_plus.in_names:
+                if entry[pp_kbddriver_plus.MODE] == 'specific-character':
+                    match = entry[pp_kbddriver_plus.MATCH]
+                    name = entry[pp_kbddriver_plus.NAME]
+                    canvas.bind(match, lambda event, match=match,name=name: self._key_received(event,match,name))
+                    # print 'bind specific-char', match,name
 
 
     # start method must be defined. If not using inputs just pass 

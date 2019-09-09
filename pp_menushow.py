@@ -301,7 +301,7 @@ class MenuShow(Show):
         # showing has finished with 'pause at end', showing the next track will close it after next has started showing
         self.mon.trace(self,'')
         self.mon.log(self,"pause at end of showing track with reason: "+reason+ ' and message: '+ message)
-        self.sr.hide_click_areas(self.controls_list)
+        self.sr.hide_click_areas(self.controls_list,self.canvas)
         if self.current_player.play_state == 'show-failed':
             self.req_next = 'error'
         else:
@@ -312,7 +312,7 @@ class MenuShow(Show):
         # showing has finished with closing of player but track instance is alive for hiding the x_content
         self.mon.trace(self,'')
         self.mon.log(self,"Closed after showing track with reason: "+reason+ ' and message: '+ message)
-        self.sr.hide_click_areas(self.controls_list)
+        self.sr.hide_click_areas(self.controls_list,self.canvas)
         if self.current_player.play_state == 'show-failed':
             self.req_next = 'error'
         else:
@@ -322,7 +322,7 @@ class MenuShow(Show):
     # subshow or child show has ended
     def end_shower(self,show_id,reason,message):
         self.mon.log(self,self.show_params['show-ref']+ ' '+ str(self.show_id)+ ': Returned from shower with ' + reason +' ' + message)
-        self.sr.hide_click_areas(self.controls_list)        
+        self.sr.hide_click_areas(self.controls_list,self.canvas)        
         self.req_next=reason
         Show.base_end_shower(self)
         self.what_next_after_showing()
@@ -402,7 +402,7 @@ class MenuShow(Show):
                 self.what_next_after_showing()
             self.controlsmanager.merge_controls(self.controls_list,track_controls)
 
-        self.sr.enable_click_areas(self.controls_list)
+        self.sr.enable_click_areas(self.controls_list,self.canvas)
         
         Show.base_track_ready_callback(self,enable_show_background)
 

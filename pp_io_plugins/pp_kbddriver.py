@@ -1,6 +1,7 @@
 import os
 import configparser
 from pp_utils import Monitor
+from pp_displaymanager import DisplayManager
 
 class pp_kbddriver(object):
 
@@ -12,6 +13,7 @@ class pp_kbddriver(object):
 
     def __init__(self):
         self.mon=Monitor()
+        self.dm=DisplayManager()
 
     def init(self,filename,filepath,widget,pp_dir,pp_home,pp_profile,callback=None):
 
@@ -60,17 +62,21 @@ class pp_kbddriver(object):
     # sets up tkinter keyboard events such that any key press
     # does a callback to 'callback' with the event object and a symbolic name.
     def _bind_keys(self,widget,callback):
-
-        # bind all the normal keys that return a printing character such that x produces pp-key-x
-        if self.bind_printing =='yes':
-            widget.bind("<Key>", lambda event : self._normal_key(callback,event))
-            
-        for option in self.config.items('keys'):
-            condition=option[0]
-            symbolic_name=option[1]
-            # print condition,symbolic_name
-            # print condition,symbolic_name
-            widget.bind(condition, lambda event, name=symbolic_name: self._specific_key(callback,name))
+        
+        for display_name in DisplayManager.display_map:
+            status,message,display_id,canvas=self.dm.id_of_canvas(display_name)
+            if status !='normal':
+                continue
+            # bind all the normal keys that return a printing character such that x produces pp-key-x
+            if self.bind_printing =='yes':
+                canvas.bind("<Key>", lambda event : self._normal_key(callback,event))
+                
+            for option in self.config.items('keys'):
+                condition=option[0]
+                symbolic_name=option[1]
+                # print condition,symbolic_name
+                # print condition,symbolic_name
+                canvas.bind(condition, lambda event, name=symbolic_name: self._specific_key(callback,name))
 
 
     def _specific_key(self,callback,name):

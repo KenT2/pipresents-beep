@@ -159,7 +159,7 @@ class HyperlinkShow(Show):
         self.do_first_track()
 
         
-# exit received from another concurrent show via ShowManager
+# exit received from another concurrent show via Show Manager
 
     def exit(self):
         self.stop_timers()
@@ -410,7 +410,7 @@ class HyperlinkShow(Show):
         # this will happen in track_ready_callback of next track or in end?????
         self.mon.trace(self, ' - pause at end')
         self.mon.log(self,"pause at end of showing track with reason: "+reason+ ' and message: '+ message)
-        self.sr.hide_click_areas(self.links)
+        self.sr.hide_click_areas(self.links,self.canvas)
         if self.current_player.play_state == 'show-failed':
             self.req_next = 'error'
         else:
@@ -423,7 +423,7 @@ class HyperlinkShow(Show):
         # this will happen in track_ready_callback of next track or in end?????
         self.mon.trace(self, ' - closed after showing')
         self.mon.log(self,"Closed after showing track with reason: "+reason+ ' and message: '+ message)
-        self.sr.hide_click_areas(self.links)
+        self.sr.hide_click_areas(self.links,self.canvas)
         if self.current_player.play_state == 'show-failed':
             self.req_next = 'error'
         else:
@@ -434,7 +434,7 @@ class HyperlinkShow(Show):
     # subshow or child show has ended
     def end_shower(self,show_id,reason,message):
         self.mon.log(self,self.show_params['show-ref']+ ' '+ str(self.show_id)+ ': Returned from shower with ' + reason +' ' + message)                                     
-        self.sr.hide_click_areas(self.links)
+        self.sr.hide_click_areas(self.links,self.canvas)
         if reason == 'error':
             self.req_next='error'
             self.what_next_after_showing()
@@ -638,7 +638,7 @@ class HyperlinkShow(Show):
         self.path.merge_links(self.links,track_links)
         
         # enable the click-area that are in the list of links
-        self.sr.enable_click_areas(self.links)
+        self.sr.enable_click_areas(self.links,self.canvas)
         
         Show.base_track_ready_callback(self,enable_show_background)
 

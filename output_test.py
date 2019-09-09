@@ -1,7 +1,9 @@
+#! /usr/bin/env python3
+
 """
 !!!! THIS PROGRAM COULD DAMAGE YOUR PI IF GPIO IS NOT CORRECTLY CONNECTED
-To Run - sudo python output_test.py from a terminal window
-All outputs that can be used by Pi Presents will change state every 5 seconds
+To Run - python3 output_test.py from a terminal window
+All outputs that can be used by Pi Presents for model b+ onwards will change state every 5 seconds
 A log will be written to the terminal window.
 To exit type CTRL-C
  
@@ -20,9 +22,9 @@ def write_pins(value):
 ON_VALUE= GPIO.HIGH
 OFF_VALUE=GPIO.LOW
 
-pins=[3,5,7,8,10,11,12,13,15,16,18,19, 21, 22, 23, 24, 26]
+# pins=[3,5,7,8,10,11,12,13,15,16,18,19, 21, 22, 23, 24, 26]
 
-# b+ etc. pins=[3,5,7,8,10,11,12,13,15,16,18,19, 21, 22, 23, 24, 26,29,31,32,33,35,36,37,38,40]
+pins=[3,5,7,8,10,11,12,13,15,16,18,19, 21, 22, 23, 24, 26,29,31,32,33,35,36,37,38,40]
 
 GPIO.setwarnings(False)
 GPIO.cleanup()

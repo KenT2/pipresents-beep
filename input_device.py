@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 import evdev
 from select import select
 from tkinter import Tk, StringVar,Frame,Label,Button,Scrollbar,Listbox,Entry,Text
@@ -121,7 +123,7 @@ class InputDevice(object):
         self.all_devices=[]
         devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
         for device in devices:
-            self.all_devices.append([device.name,device.fn])
+            self.all_devices.append([device.name,device.path])
             
 
     def get_matching_devices(self):
@@ -130,7 +132,7 @@ class InputDevice(object):
         devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
         for device in devices:
             if self.selected_device_name in device.name:
-                device_ref = evdev.InputDevice(device.fn)
+                device_ref = evdev.InputDevice(device.path)
                 self.matching_devices.append(device_ref)
                 self.matches+=1
 

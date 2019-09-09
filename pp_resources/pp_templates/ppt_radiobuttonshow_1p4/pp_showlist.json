@@ -1,5 +1,5 @@
 {
- "issue": "1.4.3",
+ "issue": "1.4.4",
  "shows": [
   {
    "background-colour": "#000000",
@@ -30,6 +30,7 @@
    "controls-in-subshows": "no",
    "disable-controls": "no",
    "disable-show-control-events": "no",
+   "display-name": "HDMI0",
    "duration": "0",
    "eggtimer-colour": "white",
    "eggtimer-font": "Helvetica 10 bold",

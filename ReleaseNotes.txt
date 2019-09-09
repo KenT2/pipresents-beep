@@ -1,3 +1,15 @@
+Version 1.4.4a 9/9/2019
+========================
+Pi Presents now supports 2 displays on Pi4 and to a limited extent on Pi3
+The 2 displays may be the official touchscreen and HDMI0, or HDMI0 and HDMI1 on Pi 4
+This version must use Raspbian Buster
+Read the section in the manual on using multiple displays as they need to be configured.
+
+Consequent changes:
+a. I the command line --screensize becomes --screensize0 and --screensize1, for Pi3 or single display use --screensize0
+b. Additional displays field in each section of screen.cfg
+
+
 Version 1.4.3a 24/7/2019
 ========================
 Pi Presents is now Python 3. It will not run under Python 2.

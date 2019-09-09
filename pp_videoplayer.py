@@ -3,6 +3,7 @@ import os
 from pp_omxdriver import OMXDriver
 from pp_player import Player
 from pp_utils import parse_rectangle
+from pp_displaymanager import DisplayManager
 
 class VideoPlayer(Player):
     """
@@ -26,6 +27,7 @@ class VideoPlayer(Player):
                  pp_profile,
                  end_callback,
                  command_callback):
+                     
 
         # initialise items common to all players   
         Player.__init__( self,
@@ -42,6 +44,8 @@ class VideoPlayer(Player):
                          command_callback)
         # print ' !!!!!!!!!!!videoplayer init'
         self.mon.trace(self,'')
+        
+        self.dm=DisplayManager()
 
         # get player parameters
         if self.track_params['omx-audio'] != "":
@@ -130,7 +134,20 @@ class VideoPlayer(Player):
         self.mon.trace(self,'')
 
         # do common bits of  load
-        Player.pre_load(self)           
+        Player.pre_load(self) 
+        
+        # set up video display
+        if self.track_params['display-name'] != "":
+            video_display_name = self.track_params['display-name']
+        else:
+            video_display_name = self.show_canvas_display_name
+        status,message,self.omx_display_id=self.dm.id_of_display(video_display_name)
+        if status == 'error':
+            self.mon.err(self,message)
+            self.play_state='load-failed'
+            if self.loaded_callback is not  None:
+                self.loaded_callback('error','Display not connected: '+ video_display_name)
+                return
 
         # set up video window
         status,message,command,has_window,x1,y1,x2,y2= self.parse_video_window(self.omx_window)
@@ -437,7 +454,7 @@ class VideoPlayer(Player):
         # load the selected track
         # options= '  ' + self.omx_audio+ ' --vol -6000 ' + self.omx_window_processed + ' ' + self.seamless_loop + ' ' + self.omx_other_options +" "
 
-        options= ' --no-osd ' + self.omx_audio+ ' --vol -6000 ' + self.omx_window_processed + ' ' + self.seamless_loop + ' ' + self.omx_other_options +" "
+        options= ' --display '+ str(self.omx_display_id) + ' --no-osd ' + self.omx_audio+ ' --vol -6000 ' + self.omx_window_processed + ' ' + self.seamless_loop + ' ' + self.omx_other_options +" "
         self.omx.load(track,self.freeze_at_start,options,self.mon.pretty_inst(self),self.omx_volume,self.omx_max_volume)
         # self.mon.log (self,'Send load command track '+ self.track + 'with options ' + options + 'from show Id: '+ str(self.show_id))
         # print 'omx.load started ',self.track

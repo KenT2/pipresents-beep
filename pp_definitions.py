@@ -1,5 +1,5 @@
 class PPdefinitions(object):
-    DEFINITIONS_VERSION_STRING='1.4.3'
+    DEFINITIONS_VERSION_STRING='1.4.4'
     IMAGE_FILES=('Image files', '.gif','.jpg','.jpeg','.bmp','.png','.tif')
     VIDEO_FILES= ('Video Files','.asf','.avi','.mpg','.mp4','.mpeg','.m2v','.m1v','.vob','.divx','.xvid','.mov','.m4v','.m2p','.mkv','.m2ts','.ts','.mts','.wmv','.webm')
     AUDIO_FILES=('Audio files','.mp3','.wav','.ogg','.ogm','.wma','.asf','.mp2')
@@ -15,7 +15,7 @@ class PPdefinitions(object):
 
         'artliveshow':[
             'tab-show','sep',  
-                'type','title','show-ref', 'medialist','live-tracks-dir1','live-tracks-dir2','sequence','repeat','show-canvas',
+                'type','title','show-ref', 'display-name','medialist','live-tracks-dir1','live-tracks-dir2','sequence','repeat','show-canvas',
             'tab-eggtimer','sep',  
                  'eggtimer-text','eggtimer-x','eggtimer-y','eggtimer-justify','eggtimer-font','eggtimer-colour',
             'tab-notices','sep',              
@@ -39,7 +39,7 @@ class PPdefinitions(object):
 
         'artmediashow':[
             'tab-show','sep',  
-                'type','title','show-ref', 'medialist','sequence','repeat','show-canvas',
+                'type','title','show-ref', 'display-name','medialist','sequence','repeat','show-canvas',
             'tab-eggtimer','sep',  
                  'eggtimer-text','eggtimer-x','eggtimer-y','eggtimer-justify','eggtimer-font','eggtimer-colour',
             'tab-notices','sep',              
@@ -62,7 +62,7 @@ class PPdefinitions(object):
     
         'mediashow':[
             'tab-show','sep',  
-                     'type','title','show-ref', 'medialist','show-timeout','sep',
+                     'type','title','show-ref', 'display-name', 'medialist','show-timeout','sep',
             'trigger-start-type','trigger-start-param','trigger-next-type','trigger-next-param','sequence','track-count-limit','repeat','interval','trigger-end-type','trigger-end-param',
             'empty-track-ref','escape-track-ref','sep','show-canvas',
             'tab-child','sep',  
@@ -90,7 +90,7 @@ class PPdefinitions(object):
                  
         'menu':[
             'tab-show','sep',  
-                'type','title','show-ref','medialist','show-timeout','track-timeout','menu-track-ref','show-canvas',
+                'type','title','show-ref','display-name','medialist','show-timeout','track-timeout','menu-track-ref','show-canvas',
             'tab-eggtimer','sep',  
                  'eggtimer-text','eggtimer-x','eggtimer-y','eggtimer-justify','eggtimer-font','eggtimer-colour',
             'tab-show-text','sep',
@@ -113,7 +113,7 @@ class PPdefinitions(object):
         
         'liveshow':[
             'tab-show','sep',  
-                'type','title','show-ref', 'medialist','live-tracks-dir1','live-tracks-dir2','show-timeout','sep',
+                'type','title','show-ref', 'display-name','medialist','live-tracks-dir1','live-tracks-dir2','show-timeout','sep',
             'trigger-start-type','trigger-start-param','trigger-next-type','trigger-next-param','sequence','track-count-limit','repeat','interval','trigger-end-type','trigger-end-param',
             'empty-track-ref','escape-track-ref','sep','show-canvas',
             'tab-child','sep',  
@@ -143,7 +143,7 @@ class PPdefinitions(object):
                    
         'hyperlinkshow':[
             'tab-show','sep',  
-                'type','title','show-ref','medialist','first-track-ref','home-track-ref','show-timeout','track-timeout','timeout-track-ref','show-canvas', 'debug-path',         
+                'type','title','show-ref','display-name','medialist','first-track-ref','home-track-ref','show-timeout','track-timeout','timeout-track-ref','show-canvas', 'debug-path',         
             'tab-eggtimer','sep',  
                  'eggtimer-text','eggtimer-x','eggtimer-y','eggtimer-justify','eggtimer-font','eggtimer-colour',
             'tab-show-text','sep',
@@ -166,7 +166,7 @@ class PPdefinitions(object):
 
         'radiobuttonshow':[
             'tab-show','sep',  
-                'type','title','show-ref','medialist','first-track-ref','show-timeout','track-timeout','show-canvas','controls-in-subshows',
+                'type','title','show-ref','display-name','medialist','first-track-ref','show-timeout','track-timeout','show-canvas','controls-in-subshows',
             'tab-eggtimer','sep',  
                  'eggtimer-text','eggtimer-x','eggtimer-y','eggtimer-font','eggtimer-justify','eggtimer-colour',
             'tab-show-text','sep',
@@ -206,7 +206,7 @@ class PPdefinitions(object):
     # field details for creating new shows and for update of profile    
     new_shows={
 
-                'artliveshow':{'title': 'New ArtLiveshow','show-ref':'','show-canvas':'',  'type': 'artliveshow', 'disable-controls':'no','sequence': 'ordered','repeat':'repeat','medialist': '',
+                'artliveshow':{'title': 'New ArtLiveshow','show-ref':'','show-canvas':'', 'display-name':'HDMI0', 'type': 'artliveshow', 'disable-controls':'no','sequence': 'ordered','repeat':'repeat','medialist': '',
                         'show-text':'','show-text-font':'Helvetica 20 bold','show-text-colour':'white','show-text-x':'0','show-text-y':'0','show-text-justify':'left','background-image':'','background-colour':'',
                        'show-text-type':'text','show-html-width':'300','show-html-height':'300','show-html-background-colour':'white','show-text-location':'',
                            'eggtimer-text':'Loading....', 'eggtimer-x':'100','eggtimer-y':'100','eggtimer-justify':'left','eggtimer-font':'Helvetica 10 bold','eggtimer-colour':'white',
@@ -219,7 +219,7 @@ class PPdefinitions(object):
                                'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no',
                                'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'},
 
-                'artmediashow':{'title': 'New ArtMediashow','show-ref':'','show-canvas':'',  'type': 'artmediashow', 'disable-controls':'no','sequence': 'ordered','repeat':'repeat','medialist': '',
+                'artmediashow':{'title': 'New ArtMediashow','show-ref':'','show-canvas':'', 'display-name':'HDMI0', 'type': 'artmediashow', 'disable-controls':'no','sequence': 'ordered','repeat':'repeat','medialist': '',
                         'show-text':'','show-text-font':'Helvetica 20 bold','show-text-colour':'white','show-text-x':'0','show-text-y':'0','show-text-justify':'left','background-image':'','background-colour':'',
                        'show-text-type':'text','show-html-width':'300','show-html-height':'300','show-html-background-colour':'white','show-text-location':'',
                         'eggtimer-text':'Loading....','eggtimer-x':'100','eggtimer-y':'100','eggtimer-justify':'left','eggtimer-font':'Helvetica 10 bold','eggtimer-colour':'white',
@@ -231,7 +231,7 @@ class PPdefinitions(object):
                                 'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no',
                                 'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'},
 
-               'hyperlinkshow':{ 'type':'hyperlinkshow','title':'New Hyperlink Show','show-ref':'', 'show-canvas':'', 'medialist':'','debug-path':'no',
+               'hyperlinkshow':{ 'type':'hyperlinkshow','title':'New Hyperlink Show','show-ref':'', 'show-canvas':'', 'display-name':'HDMI0','medialist':'','debug-path':'no',
                     'links':'','first-track-ref':'','home-track-ref':'','timeout-track-ref':'','disable-controls':'no','show-timeout': '0','track-timeout': '0',
                              'show-text':'','show-text-font':'Helvetica 20 bold','show-text-colour':'white','show-text-x':'0','show-text-y':'0','show-text-justify':'left','background-image':'','background-colour':'',
                        'show-text-type':'text','show-html-width':'300','show-html-height':'300','show-html-background-colour':'white','show-text-location':'',
@@ -245,7 +245,7 @@ class PPdefinitions(object):
                             },
 
     
-               'radiobuttonshow':{ 'type':'radiobuttonshow','title':'New Radio Button Show','show-ref':'', 'show-canvas':'', 'medialist':'',
+               'radiobuttonshow':{ 'type':'radiobuttonshow','title':'New Radio Button Show','show-ref':'', 'show-canvas':'', 'display-name':'HDMI0','medialist':'',
                     'links':'','first-track-ref':'','disable-controls':'no','show-timeout': '0','track-timeout': '0',
                              'show-text':'','show-text-font':'Helvetica 20 bold','show-text-colour':'white','show-text-x':'0','show-text-y':'0','show-text-justify':'left','background-image':'','background-colour':'',
                        'show-text-type':'text','show-html-width':'300','show-html-height':'300','show-html-background-colour':'white','show-text-location':'',
@@ -258,7 +258,7 @@ class PPdefinitions(object):
                                    'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'
                                    },
     
-                'mediashow':{'title': 'New Mediashow','show-ref':'', 'show-canvas':'', 'type': 'mediashow','medialist': '','show-timeout': '0','interval':'0','track-count-limit':'0',
+                'mediashow':{'title': 'New Mediashow','show-ref':'', 'show-canvas':'','display-name':'HDMI0', 'type': 'mediashow','medialist': '','show-timeout': '0','interval':'0','track-count-limit':'0',
                           'disable-controls':'no','trigger-start-type': 'start','trigger-start-param':'','trigger-next-type': 'continue','trigger-next-param':'','sequence': 'ordered','repeat': 'repeat','trigger-end-type':'none', 'trigger-end-param':'',
                             'child-track-ref': '', 'hint-text': '', 'hint-x':'200','hint-y': '750','hint-justify':'left','hint-font': 'Helvetica 30 bold','hint-colour': 'white',
                              'eggtimer-text':'Loading....','eggtimer-x':'100','eggtimer-y':'100','eggtimer-justify':'left','eggtimer-font':'Helvetica 10 bold','eggtimer-colour':'white',
@@ -272,7 +272,7 @@ class PPdefinitions(object):
                              'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no',
                              'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'},
                                      
-                'liveshow':{'title': 'New Liveshow','show-ref':'','show-canvas':'', 'type': 'liveshow','show-timeout': '0','interval':'0','track-count-limit':'0',
+                'liveshow':{'title': 'New Liveshow','show-ref':'','show-canvas':'', 'display-name':'HDMI0','type': 'liveshow','show-timeout': '0','interval':'0','track-count-limit':'0',
                             'disable-controls':'no','trigger-start-type':'start','trigger-start-param':'','trigger-next-type': 'continue','trigger-next-param':'','sequence': 'ordered','repeat': 'repeat','trigger-end-type':            'none', 'trigger-end-param':'','medialist': '',
                         'child-track-ref': '', 'hint-text': '','hint-x':'200', 'hint-y': '750','hint-justify':'left','hint-font': 'Helvetica 30 bold','hint-colour': 'white',
                         'trigger-wait-text':'Waiting for Trigger....','empty-track-ref':'','escape-track-ref':'','admin-font':'Helvetica 10 bold','admin-colour':'white','admin-x':'100','admin-y':'200','admin-justify':'left',
@@ -288,7 +288,7 @@ class PPdefinitions(object):
                             'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'},
                 
        
-              'menu':{'show-ref': '', 'title': 'New Menu','type': 'menu','medialist': '','show-canvas':'',
+              'menu':{'show-ref': '', 'title': 'New Menu','type': 'menu','medialist': '','show-canvas':'','display-name':'HDMI0',
                         'show-timeout': '0','track-timeout':'0','menu-track-ref':'menu-track',
                          'eggtimer-text':'Loading....','eggtimer-x':'100','eggtimer-y':'100','eggtimer-justify':'left','eggtimer-font':'Helvetica 10 bold','eggtimer-colour':'white',                       
                         'show-text':'','show-text-font':'Helvetica 20 bold','show-text-colour':'white','show-text-x':'100','show-text-y':'50','show-text-justify':'left','background-image':'','background-colour':'',
@@ -329,7 +329,8 @@ class PPdefinitions(object):
                     'track-count-limit':{'shape':'entry','text':'Track Count Limit','must':'no','read-only':'no'},
                     'debug-path':{'shape':'option-menu','text':'Print Path Debug ','must':'no','read-only':'no','values':['yes','no']},
                     'disable-show-control-events':{'shape':'option-menu','text':'Disable Show Control on Event ','must':'no','read-only':'no','values':['yes','no']},
-
+                    'display-name':{'shape':'option-menu','text':'Display','must':'no','read-only':'no',
+                                    'values':['HDMI','HDMI0','HDMI1','DSI0','A/V']},
                     'disable-controls':{'shape':'option-menu','text':'Disable Controls ','must':'no','read-only':'no','values':['yes','no']},
                     'duration':{'shape':'entry','text':'Duration (secs)','must':'no','read-only':'no'},
                     'eggtimer-text':{'shape':'text','text':'Egg Timer Text','must':'no','read-only':'no'},
@@ -466,7 +467,7 @@ class PPdefinitions(object):
     track_types={
         'video':[
             'tab-track','sep',  
-                    'type','title','track-ref','location','thumbnail','freeze-at-start','freeze-at-end','omx-audio','omx-volume','omx-max-volume','omx-window','omx-other-options',
+                    'type','title','display-name','track-ref','location','thumbnail','freeze-at-start','freeze-at-end','omx-audio','omx-volume','omx-max-volume','omx-window','omx-other-options',
                     'background-colour','background-image','display-show-background','plugin','seamless-loop','pause-timeout',
             'tab-track-text','sep',
                 'track-text','track-text-location','track-text-x','track-text-y','track-text-type','sep',
@@ -588,7 +589,7 @@ class PPdefinitions(object):
 
     new_tracks={
 
-                'video':{'title':'New Video','track-ref':'','type':'video','location':'','thumbnail':'','freeze-at-start':'','freeze-at-end':'','seamless-loop':'no',
+                'video':{'title':'New Video','track-ref':'','display-name':'','type':'video','location':'','thumbnail':'','freeze-at-start':'','freeze-at-end':'','seamless-loop':'no',
                          'omx-audio':'','omx-volume':'','omx-max-volume':'','omx-window':'','omx-other-options': '','background-colour':'','background-image':'','display-show-background':'yes','display-show-text':'yes',
                          'track-text':'','track-text-font':'',
                        'track-text-colour':'','track-text-x':'','track-text-y':'','track-text-justify':'',
@@ -654,11 +655,14 @@ class PPdefinitions(object):
                             'background-image':{'shape':'browse','text':'Background Image','must':'no','read-only':'no'},
                             'background-colour':{'shape':'colour','text':'Background Colour','must':'no','read-only':'no'},
                             'browser-commands':{'shape':'text','text':'Browser Commands','must':'no','read-only':'no'},
+                            'display-name':{'shape':'option-menu','text':'Display (video)','must':'no','read-only':'no',
+                                    'values':['','HDMI','HDMI0','HDMI1','DSI0','A/V']},
                             'display-show-background':{'shape':'option-menu','text':'Display Show Background','must':'no','read-only':'no',
                                        'values':['yes','no','']},
                             'display-show-text':{'shape':'option-menu','text':'Display Show Text','must':'no','read-only':'no',
                                        'values':['yes','no','']},
                             'duration':{'shape':'entry','text':'Duration (secs)','must':'no','read-only':'no'},
+                    
                        
                     'entry-font':{'shape':'font','text':'Entry Font','must':'no','read-only':'no'},
                     'entry-colour':{'shape':'colour','text':'Entry Colour','must':'no','read-only':'no'},

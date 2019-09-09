@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 """
 Pi Presents is a toolkit for construcing and deploying multimedia interactive presentations
 on the Raspberry Pi.
@@ -24,6 +24,7 @@ from time import sleep
 
 
 from pp_options import command_options
+from pp_displaymanager import DisplayManager
 from pp_showlist import ShowList
 from pp_showmanager import ShowManager
 from pp_screendriver import ScreenDriver
@@ -51,8 +52,8 @@ class PiPresents(object):
     def __init__(self):
         # gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_INSTANCES|gc.DEBUG_OBJECTS|gc.DEBUG_SAVEALL)
         gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_SAVEALL)
-        self.pipresents_issue="1.4.3"
-        self.pipresents_minorissue = '1.4.3a'
+        self.pipresents_issue="1.4.4"
+        self.pipresents_minorissue = '1.4.4a'
         # position and size of window without -f command line option
         self.nonfull_window_width = 0.45 # proportion of width
         self.nonfull_window_height= 0.7 # proportion of height
@@ -71,6 +72,7 @@ class PiPresents(object):
 # ***************************************
         # get command line options
         self.options=command_options()
+        # print (self.options)
 
         # get Pi Presents code directory
         pp_dir=sys.path[0]
@@ -269,71 +271,24 @@ class PiPresents(object):
             call(["xset","s", "off"])
             call(["xset","s", "-dpms"])
 
-        self.root=Tk()   
-       
-        self.title='Pi Presents - '+ self.pp_profile
-        self.icon_text= 'Pi Presents'
-        self.root.title(self.title)
-        self.root.iconname(self.icon_text)
-        self.root.config(bg=self.starter_show['background-colour'])
 
-        self.mon.log(self, 'monitor screen dimensions are ' + str(self.root.winfo_screenwidth()) + ' x ' + str(self.root.winfo_screenheight()) + ' pixels')
-        if self.options['screensize'] =='':        
-            self.screen_width = self.root.winfo_screenwidth()
-            self.screen_height = self.root.winfo_screenheight()
-        else:
-            reason,message,self.screen_width,self.screen_height=self.parse_screen(self.options['screensize'])
-            if reason =='error':
-                self.mon.err(self,message)
-                self.end('error',message)
+        # find connected displays and create a canvas for each display
+        self.dm=DisplayManager()
+        status,message,self.root=self.dm.init(self.options,self.handle_user_abort)
+        if status != 'normal':
+            self.mon.err(self,message)
+            self.end('error',message)
 
-        self.mon.log(self, 'forced screen dimensions (--screensize) are ' + str(self.screen_width) + ' x ' + str(self.screen_height) + ' pixels')
-       
-        # set window dimensions and decorations
-        if self.options['fullscreen'] is False:
-            self.window_width=int(self.root.winfo_screenwidth()*self.nonfull_window_width)
-            self.window_height=int(self.root.winfo_screenheight()*self.nonfull_window_height)
-            self.window_x=self.nonfull_window_x
-            self.window_y=self.nonfull_window_y
-            self.root.geometry("%dx%d%+d%+d" % (self.window_width,self.window_height,self.window_x,self.window_y))
-        else:
-            self.window_width=self.screen_width
-            self.window_height=self.screen_height
-            self.root.attributes('-fullscreen', True)
-            os.system('unclutter &')
-            self.window_x=0
-            self.window_y=0  
-            self.root.geometry("%dx%d%+d%+d"  % (self.window_width,self.window_height,self.window_x,self.window_y))
-            self.root.attributes('-zoomed','1')
-
-        # canvas cover the whole screen whatever the size of the window. 
-        self.canvas_height=self.screen_height
-        self.canvas_width=self.screen_width
-  
-        # make sure focus is set.
-        self.root.focus_set()
-
-        # define response to main window closing.
-        self.root.protocol ("WM_DELETE_WINDOW", self.handle_user_abort)
-
-        # setup a canvas onto which will be drawn the images or text
-        self.canvas = Canvas(self.root, bg=self.starter_show['background-colour'])
-
-
-        if self.options['fullscreen'] is True:
-            self.canvas.config(height=self.canvas_height,
-                               width=self.canvas_width,
-                               highlightthickness=0)
-        else:
-            self.canvas.config(height=self.canvas_height,
-                    width=self.canvas_width,
-                        highlightthickness=1,
-                               highlightcolor='yellow')
-            
-        self.canvas.place(x=0,y=0)
-        # self.canvas.config(bg='black')
-        self.canvas.focus_set()
-
+        self.mon.log(self,str(DisplayManager.num_displays)+ ' Displays are connected:')
+        
+        for display_name in DisplayManager.display_map:
+            status,message,display_id,canvas_obj=self.dm.id_of_canvas(display_name)
+            if status != 'normal':
+                continue
+            width,height=self.dm.real_display_dimensions(display_id)
+            self.mon.log(self,'   - '+ self.dm.name_of_display(display_id) + ' Id: '+str(display_id) + ' '+str(width)+'*'+str(height))
+            canvas_obj.config(bg=self.starter_show['background-colour'])
+        
 
                 
 # ****************************************
@@ -349,13 +304,11 @@ class PiPresents(object):
         if reason == 'error':
             self.end('error','cannot find, or error in screen.cfg')
 
-
-        # create click areas on the canvas, must be polygon as outline rectangles are not filled as far as find_closest goes
-        # click areas are made on the Pi Presents canvas not the show canvases.
-        reason,message = self.sr.make_click_areas(self.canvas,self.handle_input_event)
+        # create click areas on the canvases, must be polygon as outline rectangles are not filled as far as find_closest goes
+        reason,message = self.sr.make_click_areas(self.handle_input_event)
         if reason == 'error':
-            self.mon.err(self,message)
-            self.end('error',message)
+                self.mon.err(self,message)
+                self.end('error',message)
 
 
 # ****************************************
@@ -380,14 +333,14 @@ class PiPresents(object):
         
         # kick off animation sequencer
         self.animate = Animate()
-        self.animate.init(pp_dir,self.pp_home,self.pp_profile,self.canvas,200,self.handle_output_event)
+        self.animate.init(pp_dir,self.pp_home,self.pp_profile,self.root,200,self.handle_output_event)
         self.animate.poll()
 
         #create a showmanager ready for time of day scheduler and osc server
         show_id=-1
-        self.show_manager=ShowManager(show_id,self.showlist,self.starter_show,self.root,self.canvas,self.pp_dir,self.pp_profile,self.pp_home)
+        self.show_manager=ShowManager(show_id,self.showlist,self.starter_show,self.root,self.pp_dir,self.pp_profile,self.pp_home)
         # first time through set callback to terminate Pi Presents if all shows have ended.
-        self.show_manager.init(self.canvas,self.all_shows_ended_callback,self.handle_command,self.showlist)
+        self.show_manager.init(self.all_shows_ended_callback,self.handle_command,self.showlist)
         # Register all the shows in the showlist
         reason,message=self.show_manager.register_shows()
         if reason == 'error':
@@ -458,16 +411,6 @@ class PiPresents(object):
         # start Tkinters event loop
         self.root.mainloop( )
 
-
-    def parse_screen(self,size_text):
-        fields=size_text.split('*')
-        if len(fields)!=2:
-            return 'error','do not understand --screensize comand option',0,0
-        elif fields[0].isdigit()  is False or fields[1].isdigit()  is False:
-            return 'error','dimensions are not positive integers in --screensize',0,0
-        else:
-            return 'normal','',int(fields[0]),int(fields[1])
-        
 
 # *********************
 #  RUN START SHOWS
@@ -713,7 +656,11 @@ class PiPresents(object):
 
     # callback from ShowManager when all shows have ended
     def all_shows_ended_callback(self,reason,message):
-        self.canvas.config(bg=self.starter_show['background-colour'])
+        for display_name in DisplayManager.display_map:
+            status,message,display_id,canvas_obj=self.dm.id_of_canvas(display_name)
+            if status != 'normal':
+                continue
+            canvas_obj.config(bg=self.starter_show['background-colour'])
         if reason in ('killed','error') or self.shutdown_required is True or self.exitpipresents_required is True or self.reboot_required is True:
             self.end(reason,message)
 

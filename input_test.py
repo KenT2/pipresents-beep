@@ -1,6 +1,8 @@
+#! /usr/bin/env python3
+
 """
-To Run - sudo python input_test.py from a terminal window
-All inputs that can be used by Pi Presents will be read every second and printed to the terminal
+To Run - python3 input_test.py from a terminal window
+All inputs that can be used by Pi Presents from model b+ onwards will be read every second and printed to the terminal
 To exit type CTRL-C
 """
 
@@ -14,8 +16,8 @@ def read_pins():
         print("Pin ",pin,GPIO.input(pin))
             
 
-pins=[3,5,7,8,10,11,12,13,15,16,18,19, 21, 22, 23, 24, 26]
-# b+ etc. pins=[3,5,7,8,10,11,12,13,15,16,18,19, 21, 22, 23, 24, 26,29,31,32,33,35,36,37,38,40]
+# pins=[3,5,7,8,10,11,12,13,15,16,18,19, 21, 22, 23, 24, 26]
+pins=[3,5,7,8,10,11,12,13,15,16,18,19, 21, 22, 23, 24, 26,29,31,32,33,35,36,37,38,40]
 
 # pins 3 and 5 have permanent 1.8k pull ups to 3.3 volts and will therefore be 1 even if PULL_UP=GPIO.PUD_DOWN
 # comment out all but the internal pullup value you want

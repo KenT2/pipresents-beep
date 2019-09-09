@@ -1,8 +1,22 @@
+CHANGES FOR 1.4.4a 10/9/2019
+============================
+enhanced - Support for 2 displays on Pi4
+enhanced - limited support for 2 displays on earlier PI's
+enhanced - Support for official touchscreen on all Pi's
+modified - input_test.py and output_test.py now set for 40 pin Pi's by default
+enhanced - the conversion to Python3 should support Unicode
+
+regression - Subtitles on videos are currently not supported. If you want subtitles then you must use a Pi3 or earlier.
+limitation - HDMI audio output is currently limited to one HDMI screen (HDMI0)
+limitation - CEC and Power control of the individual screens is currently not supported.
+
+
 CHANGES FOR 1.4.3a 24/7/2019
 ============================
 modified - upgraded code to Python 3. SEE RELEASE NOTES FOR UPGRADE PROCEDURE
-
 modified - web track, reduce the delay to load the image behind the browser to 1 second
+
+enhanced - track text, message text and Show text can now show HTML in a pane
 enhanced - added 'open show' record to statistics recording- param required
 enhanced - the maximum volume of video sound can now be set
 enhanced - inc-volume and dec-volume commands for video and audio tracks omx-+/- and mplay-0/9 are deprecated

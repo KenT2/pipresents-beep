@@ -1,9 +1,9 @@
-PI PRESENTS  - Version 1.4.3
+PI PRESENTS  - Version 1.4.4
 ============================
 
 This repository contains the latest and greatest version Pi Presents. Use if you are happy with bleeding edge software that is under development.
 
-VERSION 1.4.3 IS PYTHON 3
+VERSION 1.4.3 ONWARDS IS PYTHON 3 ONLY
 
 
 TO INSTALL PIPRESENTS-BEEP
@@ -52,7 +52,7 @@ The full manual in English is here https://github.com/KenT2/pipresents-beep/blob
 Requirements
 -------------
 
-	* must use the latest version of Raspbian Stretch or Buster with Desktop (not the Lite version)
+	* must use the latest version of Raspbian Buster with Desktop (not the Lite version)
 	* must be run from the PIXEL desktop.
 	* must be installed and run from user Pi
         * must have Python 3 installed (which Raspbian does)
