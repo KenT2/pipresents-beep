@@ -768,13 +768,11 @@ class VideoPlayer(Player):
 
         video_width=x2-x1
         video_height=y2-y1
-        canvas_width=self.show_canvas_x2-self.show_canvas_x1
-        canvas_height=self.show_canvas_y2-self.show_canvas_y1
-
+        display_width,display_height=self.dm.canvas_dimensions(display_id)
 
         if rotation =='right':
-            x1_res=canvas_height-video_height -y1
-            x2_res=canvas_height -y1
+            x1_res=display_height-video_height -y1
+            x2_res=display_height -y1
             
             y1_res= y1
             y2_res=video_width +y1
@@ -789,22 +787,22 @@ class VideoPlayer(Player):
             x1_res= y1
             x2_res=video_height +y1
 
-            y1_res= canvas_width-video_width-x1            
-            y2_res= canvas_width-x1
+            y1_res= display_width-video_width-x1            
+            y2_res= display_width-x1
 
         else:
             # inverted
-            x2_res= canvas_width -x1
-            x1_res=canvas_width-video_width -x1
+            x2_res= display_width -x1
+            x1_res=display_width-video_width -x1
 
-            y2_res= canvas_height-y1            
-            y1_res= canvas_height-video_height-y1            
+            y2_res= display_height-y1            
+            y1_res= display_height-video_height-y1            
           
         if VideoPlayer.debug:
             print ('\nWarp calculation for Display Id',display_id,rotation)
             print ('Video Window',x1,y1,x2,y2)
             print ('video width/height', video_width,video_height)
-            print ('canvas width/height',canvas_width,canvas_height)
+            print ('display width/height',display_width,display_height)
             print ('Translated Window',x1_res,y1_res,x2_res,y2_res)
         return x1_res,y1_res,x2_res,y2_res
         
