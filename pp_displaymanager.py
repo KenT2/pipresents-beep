@@ -86,6 +86,9 @@ class DisplayManager(object):
 # Methods for rest of Pi Presents
 # ************************************************
 
+    def model_of_pi(self):
+        return DisplayManager.pi_model
+
     def id_of_display(self,display_name):
         if display_name not in DisplayManager.display_map:
             return 'error','Display Name not known '+ display_name,-1
@@ -156,6 +159,7 @@ class DisplayManager(object):
 
         # get model of Pi. Only interested if it is 4 or less
         self.model=self.pi_model()
+        DisplayManager.pi_model=self.model
 
         self.print_info()
 

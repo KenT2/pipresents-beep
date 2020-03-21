@@ -711,8 +711,12 @@ class VideoPlayer(Player):
 
 
     def parse_video_window(self,line,display_id):
-        
-        rotation= self.dm.real_display_orientation(self.omx_display_id)
+        # model other than 4 video is rotated by hdmi_display_rotate in config.txt
+        if self.dm.model_of_pi() == 4:
+            rotation= self.dm.real_display_orientation(self.omx_display_id)
+        else:
+            rotation = 'normal'
+            
         if rotation == 'normal':
             self.omx_rotate=''            
         elif rotation == 'right':
