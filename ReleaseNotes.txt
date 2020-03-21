@@ -1,3 +1,25 @@
+Version 1.4.4b 20/3/2020
+========================
+Support for 2 displays has been improved to include rotation of the displays
+touchscreens are automatically calibrated depending on monitor position and rotation
+
+Read the Section of the Manual on setting up displays and touchscreen. Setup has changed (for the better)
+
+There is a new configuration file /pipresents/pp_config/pp_display.cfg
+The out of the box values in this file should work for most situations but will need editing if:
+* A HDMI monitor has a touchscreen
+* On Model 3/2/1 you are using screen rotation
+* You have used --screensize
+* You have altered the size or position of the windowed non-fullscreen display
+
+Track plugins can now be in a profile or pp_home. In the examples they have been moved from 
+/pipresents/pp_track_plugins and there are now none of the exmple plugins in this directory.
+I recommend you move any you have created to the profile where they will not be overwritten by software upgrades
+
+The Monitor Show Control Command must now have the name of the monitor
+
+The 'original' video window type of a Video Track has been ??? in favour of 'default'. 'original may be deleted some time in the future.
+
 Version 1.4.4a 9/9/2019
 ========================
 Pi Presents now supports 2 displays on Pi4 and to a limited extent on Pi3

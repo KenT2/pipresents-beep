@@ -54,6 +54,10 @@ class IOPluginManager(object):
         #read information from DRIVER section
         entry['title']=config.get('DRIVER','title')
         if config.get('DRIVER','enabled')=='yes':
+            if config.has_option('DRIVER','driver-ref'):
+                entry['driver-ref']=config.get('DRIVER','driver-ref')
+            else:
+                entry['driver-ref']=''
             driver_name=config.get('DRIVER','module')
             driver_path=self.pp_dir+os.sep+'pp_io_plugins'+os.sep+driver_name+'.py'
             if not os.path.exists(driver_path):
@@ -88,11 +92,12 @@ class IOPluginManager(object):
                 plugin.terminate()
                 self.mon.log(self,'I/O plugin '+entry['title']+ ' terminated')
 
-    def get_input(self,key):
+    def get_input(self,key,driver_ref=''):
         for entry in IOPluginManager.plugins:
             plugin=entry['instance']
-            # print 'trying ',entry['title'],plugin.is_active()
-            if plugin.is_active() is True:
+            # print ('trying ',entry['title'],plugin.is_active())
+            if plugin.is_active() is True and driver_ref == entry['driver-ref']:
+                # need to test found in plugin to allow key to match if driver-ref not used
                 found,value = plugin.get_input(key)
                 if found is True:
                     return found,value
@@ -102,8 +107,9 @@ class IOPluginManager(object):
     def handle_output_event(self,name,param_type,param_values,req_time):
         for entry in IOPluginManager.plugins:
             plugin=entry['instance']
-            # print 'trying ',entry['title'],name,param_type,plugin.is_active()
+            # print ('trying ',entry['title'],name,param_type,plugin.is_active())
             if plugin.is_active() is True:
+                # print (name,param_type,param_values,req_time)
                 reason,message= plugin.handle_output_event(name,param_type,param_values,req_time)
                 if reason == 'error':
                     # self.mon.err(self,message)

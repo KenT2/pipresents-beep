@@ -87,6 +87,9 @@ class pp_aplaydriver(object):
     def is_active(self):
         return pp_aplaydriver.driver_active
 
+    # dummy get input
+    def get_input(self,channel):
+            return False, None
 
   # called by main program only. Called when PP is closed down               
     def terminate(self):

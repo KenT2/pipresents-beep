@@ -3,7 +3,7 @@ from tkinter import NW,FLAT,RIDGE
 from PIL import Image
 from PIL import ImageTk
 
-from pp_pluginmanager import PluginManager
+from pp_trackpluginmanager import TrackPluginManager
 from pp_animate import Animate
 from pp_utils import Monitor,calculate_text_position
 from tk_html_widgets import HTMLText
@@ -72,7 +72,7 @@ class Player(object):
         # self.show_manager=Show Manager(self.show_id,self.showlist,self.show_params,self.root,self.canvas,self.pp_dir,self.pp_profile,self.pp_home)
 
         # open the plugin Manager
-        self.pim=PluginManager(self.show_id,self.root,self.canvas,self.show_params,self.track_params,self.pp_dir,self.pp_home,self.pp_profile) 
+        self.pim=TrackPluginManager(self.show_id,self.root,self.canvas,self.show_params,self.track_params,self.pp_dir,self.pp_home,self.pp_profile) 
 
         # create an instance of Animate so we can send animation commands
         self.animate = Animate()

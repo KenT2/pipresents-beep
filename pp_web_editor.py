@@ -1,7 +1,10 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
-import os
 import sys
+if sys.version_info[0] != 3:
+        sys.stdout.write("ERROR: Pi Presents requires python 3\nHint: python3 pp_web_editor.py .......\n")
+        exit(102)
+import os
 import configparser
 import shutil
 import copy

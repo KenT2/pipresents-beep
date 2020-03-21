@@ -232,7 +232,7 @@ class AudioPlayer(Player):
             self.mplayer.pause_on()
             if self.mplayer.paused is True and self.pause_timeout>0:
                 # kick off the pause teimeout timer
-                print("!!pause on")
+                # print("!!pause on")
                 self.pause_timer=self.canvas.after(self.pause_timeout*1000,self.pause_timeout_callback)
             return True
         else:
@@ -244,7 +244,7 @@ class AudioPlayer(Player):
         if self.play_state == 'showing' and self.track != '':
             self.mplayer.pause_off()
             if self.mplayer.paused is False:
-                print("!!pause off")
+                # print("!!pause off")
                 # cancel the pause timer
                 if self.pause_timer != None:
                     self.canvas.after_cancel(self.pause_timer)
@@ -261,12 +261,12 @@ class AudioPlayer(Player):
             self.mplayer.pause()
             if self.mplayer.paused is True and self.pause_timeout>0:
                 # kick off the pause teimeout timer
-                print("!!toggle pause on")
+                # print("!!toggle pause on")
                 self.pause_timer=self.canvas.after(self.pause_timeout*1000,self.pause_timeout_callback)
             else:
                 # cancel the pause timer
                 if self.pause_timer != None:
-                    print("!!toggle pause off")
+                    # print("!!toggle pause off")
                     self.canvas.after_cancel(self.pause_timer)
                     self.pause_timer=None
             return True
@@ -275,7 +275,7 @@ class AudioPlayer(Player):
             return False
 
     def pause_timeout_callback(self):
-        print("!!callback pause off")
+        # print("!!callback pause off")
         self.pause_off()
         self.pause_timer=None
 
@@ -328,9 +328,12 @@ class AudioPlayer(Player):
             self.duration_count = 0
 
             # select the sound device
+            # print (self.mplayer_audio)
             if self.mplayer_audio != "":
-                if self.mplayer_audio == 'hdmi':
+                if self.mplayer_audio in ('hdmi','hdmi0'):
                     os.system("amixer -q -c 0 cset numid=3 2")
+                elif self.mplayer_audio == 'hdmi1':
+                    os.system("amixer -q -c 0 cset numid=3 3")                    
                 else:
                     os.system("amixer -q -c 0 cset numid=3 1")   
             # play the track               

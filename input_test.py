@@ -2,9 +2,15 @@
 
 """
 To Run - python3 input_test.py from a terminal window
-All inputs that can be used by Pi Presents from model b+ onwards will be read every second and printed to the terminal
+All inputs that can be used by Pi Presents from model b+ onwards will be read every second
+and their state printed to the terminal
 To exit type CTRL-C
 """
+
+import sys
+if sys.version_info[0] != 3:
+        sys.stdout.write("ERROR: Pi Presents requires python 3\nHint: python3 input_test.py .......\n")
+        exit(102)
 
 import RPi.GPIO as GPIO
 from time import sleep

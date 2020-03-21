@@ -10,9 +10,11 @@ Copyright 2012/2013/2014/2015/2016/2017/2018/2019, Ken Thompson
 See github for licence conditions
 See readme.md and manual.pdf for instructions.
 """
-
-import os
 import sys
+if sys.version_info[0] != 3:
+        sys.stdout.write("ERROR: Pi Presents requires python 3\nHint: python3 pipresents.py .......\n")
+        exit(102)
+import os
 import signal
 from subprocess import call, check_output
 import time
@@ -53,7 +55,7 @@ class PiPresents(object):
         # gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_INSTANCES|gc.DEBUG_OBJECTS|gc.DEBUG_SAVEALL)
         gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_SAVEALL)
         self.pipresents_issue="1.4.4"
-        self.pipresents_minorissue = '1.4.4a'
+        self.pipresents_minorissue = '1.4.4b'
         # position and size of window without -f command line option
         self.nonfull_window_width = 0.45 # proportion of width
         self.nonfull_window_height= 0.7 # proportion of height
@@ -101,7 +103,7 @@ class PiPresents(object):
                             'GapShow','Show','ArtShow',
                             'AudioPlayer','BrowserPlayer','ImagePlayer','MenuPlayer','MessagePlayer','VideoPlayer','Player',
                             'MediaList','LiveList','ShowList',
-                            'PathManager','ControlsManager','ShowManager','PluginManager','IOPluginManager',
+                            'PathManager','ControlsManager','ShowManager','TrackPluginManager','IOPluginManager',
                             'MplayerDriver','OMXDriver','UZBLDriver',
                             'TimeOfDay','ScreenDriver','Animate','OSCDriver','CounterManager','BeepsManager',
                             'Network','Mailer'
@@ -147,6 +149,7 @@ class PiPresents(object):
         self.root=None
         self.ppio=None
         self.tod=None
+        self.dm=None
         self.animate=None
         self.ioplugin_manager=None
         self.oscdriver=None
@@ -233,10 +236,6 @@ class PiPresents(object):
 
         self.mon.start_stats(self.options['profile'])
         
-        if self.options['verify'] is True:
-            self.mon.err(self,"Validation option not supported - use the editor")
-            self.end('error','Validation option not supported - use the editor')
-
          
         # initialise and read the showlist in the profile
         self.showlist=ShowList()
@@ -274,19 +273,32 @@ class PiPresents(object):
 
         # find connected displays and create a canvas for each display
         self.dm=DisplayManager()
-        status,message,self.root=self.dm.init(self.options,self.handle_user_abort)
+        status,message,self.root=self.dm.init(self.options,self.handle_user_abort,self.pp_dir)
         if status != 'normal':
             self.mon.err(self,message)
             self.end('error',message)
 
         self.mon.log(self,str(DisplayManager.num_displays)+ ' Displays are connected:')
         
-        for display_name in DisplayManager.display_map:
-            status,message,display_id,canvas_obj=self.dm.id_of_canvas(display_name)
-            if status != 'normal':
-                continue
+        for display_id in DisplayManager.displays:
+            canvas_obj= self.dm.canvas_widget(display_id)
+            name=self.dm.name_of_display(display_id)
             width,height=self.dm.real_display_dimensions(display_id)
-            self.mon.log(self,'   - '+ self.dm.name_of_display(display_id) + ' Id: '+str(display_id) + ' '+str(width)+'*'+str(height))
+            x,y=self.dm.real_display_position(display_id)
+            matrix,ms=self.dm.touch_matrix_for(display_id)
+            rotation=self.dm.real_display_orientation(display_id)
+            self.mon.log(self,'   - '+ name + ' Id: '+str(display_id) + ' '+str(x)+'+'+str(y)+'+'+str(width)+'*'+str(height) + ' '+rotation)
+            self.mon.log(self,'     '+ ms)
+                        
+            status,message,driver_name=self.dm.get_driver_name(display_id)
+            if status == 'normal':
+                self.mon.log(self,name + ':  Touch Driver: '+driver_name+ '\n')
+            elif status == 'null':
+                self.mon.log(self,name + ':  Touch Driver not Defined\n')
+            else:
+                self.mon.err(self,message)
+                
+            
             canvas_obj.config(bg=self.starter_show['background-colour'])
         
 
@@ -534,7 +546,26 @@ class PiPresents(object):
             else:
                 self.beepsmanager.do_beep(location)
             return
-                           
+            
+        if fields[0]=='backlight':
+            # on, off, inc val, dec val, set val fade val duration
+            status,message=self.dm.do_backlight_command(command_text)
+            if status == 'error':
+                self.mon.err(self,message)
+                self.end('error',message)
+                return
+            return
+            
+        if fields[0] =='monitor':
+            status,message = self.dm.handle_monitor_command(fields[1:])
+            if status == 'error':
+                self.mon.err(self,message)
+                self.end('error',message)
+                return
+            return
+
+                
+        # show commands
         show_command=fields[0]
         if len(fields)>1:
             show_ref=fields[1]
@@ -547,9 +578,6 @@ class PiPresents(object):
             else:
                 return
             
-        elif show_command =='monitor':
-            self.handle_monitor_command(show_ref)
-            return
 
         elif show_command =='cec':
             self.handle_cec_command(show_ref)
@@ -586,12 +614,6 @@ class PiPresents(object):
             self.mon.err(self,message)
         return
 
-
-    def handle_monitor_command(self,command):
-        if command == 'on':
-            os.system('vcgencmd display_power 1 >/dev/null')
-        elif command == 'off':
-            os.system('vcgencmd display_power 0 >/dev/null')
 
     def handle_cec_command(self,command):
         if command == 'on':
@@ -714,8 +736,9 @@ class PiPresents(object):
 
     # tidy up all the peripheral bits of Pi Presents
     def tidy_up(self):
-        self.handle_monitor_command('on')
         self.mon.log(self, "Tidying Up")
+        if self.dm != None:
+            self.dm.handle_monitor_command(['reset'])
         # turn screen blanking back on
         if self.options['noblank'] is True:
             call(["xset","s", "on"])
@@ -838,7 +861,7 @@ class PiPresents(object):
 
          
 if __name__ == '__main__':
-
+        
     # wait for environment variables to stabilize. Required for Jessie autostart
     tries=0
     success=False

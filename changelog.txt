@@ -1,3 +1,35 @@
+CHANGES FOR 1.4.4b 20/3/2020
+============================
+Code
+enhanced - Display setup for Pi4 is now fully automatic  including rotation and variation in position of the monitors
+enhanced - On Pi3 display setup is semi-automatic. It requires the monitor to be rotated in /boot/config.txt and in pp_display.cfg  
+enhanced - On Pi4 both displays can be touchscreens (on Pi3 1), requires configuration in pp_display.cfg.
+modified - new configuration file for displays /pipresents/pp_config/pp_display.cfg
+modified - --screensize has been removed from the command line into the pp_display.cfg file
+enhanced - size and position of the windowed non-fullscreen displays can be set in pp_display.cfg
+enhanced - video track does not object if location is a stream (udp: tcp: rtsp:)
+enhanced - additional video window types in a video track based on omxplayer types
+modified - 'default' video window type replaces 'original' which is deprecated. 'default' better describes its purpose
+enhanced - PP plays nicely if python 3 is not used, instead of crashing
+enhanced - out of the box output_test.py has no pins selected (for gpio pin safety).
+enhanced - Monitor Show Control command can be used to power off/on individual displays
+enhanced - audio track 'audio player audio' can now specify hdmi0 or hdmi1 hdmi > hdmi0 if used for pi4
+modified - removed --verify command line option
+enhanced - track plugins can now be in /pp_home/pp_track_plugins (+), /profile/pp_track_plugins (@) in addition /pipresents/pp_track_plugins (no first char)
+modified - renamed PluginsManager class to TrackPluginsManager
+enhanced - added driver-ref field to I/O plugins. If specified in config file will be used to select the plugin queried by get_input() 
+
+note - cec appears broken in Raspbian/RPi with Buster. Tried on Pi 4 and Pi 1
+
+fixed - message track's message now modified correctly by a track plugin.
+fixed - crash on start up if using a Pi Zero or Pi 1
+fixed - web track can now be added to a liveshow by a track plugin.
+fixed - crash if two video tracks are started at the same time
+
+Examples
+modified - moved all track plugins out of /pipresents/pp_track_plugins to their profiles
+
+
 CHANGES FOR 1.4.4a 10/9/2019
 ============================
 enhanced - Support for 2 displays on Pi4

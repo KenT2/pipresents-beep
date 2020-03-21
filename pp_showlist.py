@@ -84,7 +84,7 @@ class ShowList(object):
     def first(self):
         self.select(0)
 
-    def __next__(self):
+    def do_next(self):
         if self.length()>0:
             if self._selected_show_index== self.length()-1:
                 index=0

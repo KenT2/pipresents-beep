@@ -1,5 +1,10 @@
 #! /usr/bin/env python3
 
+import sys
+if sys.version_info[0] != 3:
+        sys.stdout.write("ERROR: Pi Presents requires python 3\nHint: python3 input_device.py .......\n")
+        exit(102)
+
 import evdev
 from select import select
 from tkinter import Tk, StringVar,Frame,Label,Button,Scrollbar,Listbox,Entry,Text

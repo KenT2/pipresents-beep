@@ -3,7 +3,7 @@ import imp
 import configparser
 from pp_utils import Monitor
 
-class PluginManager(object):
+class TrackPluginManager(object):
 
     def __init__(self,show_id,root,canvas,show_params,track_params,pp_dir,pp_home,pp_profile):
         """
@@ -34,25 +34,23 @@ class PluginManager(object):
 
  
     # called by players to load a plugin during load
-    # load_plugin is expected to modify track file and load ant Tkinter objects to the canvas hiding them
+    # load_plugin is expected to modify track file and load any Tkinter objects to the canvas hiding them
     def load_plugin(self,track_file,plugin_cfg):
 
         # checks existence of and reads the plugin config file
         plugin_cfg_file= self.complete_path(plugin_cfg)
         if not os.path.exists(plugin_cfg_file):
             return 'error','plugin configuration file not found '+ plugin_cfg_file,''
-        # print plugin_cfg_file
+        # print (plugin_cfg_file)
+        
         self.plugin_params=self.read(plugin_cfg_file)
         # print self.plugin_params
         # checks the plugin exists
-        plugin_dir = self.pp_dir+os.sep+'pp_track_plugins'
-        plugin_file = plugin_dir+os.sep+self.plugin_params['plugin']+'.py'
-
+        plugin_dir,plugin_file,name=self.plugin_path(self.plugin_params['plugin'])
         if not os.path.exists(plugin_file):
             return 'error','plugin file not found '+ plugin_file,''
 
         # import and run the plugin
-        name = self.plugin_params['plugin']
         self.load_plugin_file(name, plugin_dir)
         if self.show_params['type'] in ('artliveshow','liveshow'):
             liveshow= True
@@ -138,3 +136,18 @@ class PluginManager(object):
         elif track_file[0] == "@":
             track_file=self.pp_profile+track_file[1:]
         return track_file     
+
+
+    def plugin_path(self,name):
+        #  complete path of the plugin file
+        if name[0] == "+":
+            track_dir=self.pp_home+os.sep+'pp_track_plugins'
+            leaf = name[1:]
+        elif name[0] == "@":
+            track_dir=self.pp_profile+os.sep+'pp_track_plugins'
+            leaf = name[1:]
+        else:
+            track_dir=self.pp_dir+os.sep+'pp_track_plugins'
+            leaf=name
+        track_file=track_dir+os.sep+leaf+'.py'
+        return track_dir,track_file,leaf 

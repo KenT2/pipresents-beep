@@ -55,7 +55,7 @@ Requirements
 	* must use the latest version of Raspbian Buster with Desktop (not the Lite version)
 	* must be run from the PIXEL desktop.
 	* must be installed and run from user Pi
-        * must have Python 3 installed (which Raspbian does)
+	* must have Python 3 installed (which Raspbian does)
 
 
 Set the GPU Memory size to 256MB
@@ -148,7 +148,10 @@ Rename the existing pipresents directory to old-pipresents
 
 Rename the new directory to pipresents.
 
-Copy pp_editor.cfg, pp_web.cfg, pp_email.cfg, pp_oscmonitor.cfg, and pp_oscremote.cfg from the old to new /pipresents/pp_config directory.
+Copy any files you have changed from old to new /pipresents/pp_config directory.
+Copy any files you have changed from old to new /pipresents/pp_io_config directory.
+Copy any files you have changed from old to new /pipresents/pp_io_plugins directory.
+Copy any files you have used or changed from old to new /pipresents/pp_track_plugins directory. Note: in 1.4.1b track plugins have been moved to their examples
 
 
 Getting examples for this version.

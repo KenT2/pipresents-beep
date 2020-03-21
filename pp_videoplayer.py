@@ -4,6 +4,8 @@ from pp_omxdriver import OMXDriver
 from pp_player import Player
 from pp_utils import parse_rectangle
 from pp_displaymanager import DisplayManager
+import copy
+import numpy as np
 
 class VideoPlayer(Player):
     """
@@ -14,6 +16,9 @@ class VideoPlayer(Player):
     States - 'initialised' when done successfully
     Initialisation is immediate so just returns with error code.
     """
+    
+    debug = False
+    debug = True
     
     def __init__(self,
                  show_id,
@@ -148,9 +153,10 @@ class VideoPlayer(Player):
             if self.loaded_callback is not  None:
                 self.loaded_callback('error','Display not connected: '+ video_display_name)
                 return
+                
 
-        # set up video window
-        status,message,command,has_window,x1,y1,x2,y2= self.parse_video_window(self.omx_window)
+        # set up video window and calc orientation
+        status,message,command,has_window,x1,y1,x2,y2= self.parse_video_window(self.omx_window,self.omx_display_id)
         if status  == 'error':
             self.mon.err(self,'omx window error: ' + message + ' in ' + self.omx_window)
             self.play_state='load-failed'
@@ -158,10 +164,10 @@ class VideoPlayer(Player):
                 self.loaded_callback('error','omx window error: ' + message + ' in ' + self.omx_window)
                 return
         else:
-            if has_window is True:
+            if has_window is True:                  
                 self.omx_window_processed= '--win " '+ str(x1) +  ' ' + str(y1) + ' ' + str(x2) + ' ' + str(y2) + ' " '
             else:
-                self.omx_window_processed=''
+                self.omx_window_processed=self.omx_aspect_mode
 
         # load the plugin, this may modify self.track and enable the plugin drawign to canvas
         if self.track_params['plugin'] != '':
@@ -182,14 +188,15 @@ class VideoPlayer(Player):
                 self.loaded_callback('error',message)
                 return
 
-
-        if not os.path.exists(track):
-            self.mon.err(self,"Track file not found: "+ track)
-            self.play_state='load-failed'
-            if self.loaded_callback is not  None:
-                self.loaded_callback('error','track file not found: '+ track)
-                return
-
+        if not (track[0:3] in ('udp','tcp') or track[0:4] in ('rtsp',)):
+        
+            if not os.path.exists(track):
+                    self.mon.err(self,"Track file not found: "+ track)
+                    self.play_state='load-failed'
+                    if self.loaded_callback is not  None:
+                        self.loaded_callback('error','track file not found: '+ track)
+                        return
+        
         self.omx=OMXDriver(self.canvas,self.pp_dir)
         self.start_state_machine_load(self.track)
 
@@ -454,7 +461,7 @@ class VideoPlayer(Player):
         # load the selected track
         # options= '  ' + self.omx_audio+ ' --vol -6000 ' + self.omx_window_processed + ' ' + self.seamless_loop + ' ' + self.omx_other_options +" "
 
-        options= ' --display '+ str(self.omx_display_id) + ' --no-osd ' + self.omx_audio+ ' --vol -6000 ' + self.omx_window_processed + ' ' + self.seamless_loop + ' ' + self.omx_other_options +" "
+        options= ' --display '+ str(self.omx_display_id) + ' --no-osd ' + self.omx_audio+ ' --vol -6000 ' + self.omx_window_processed + self.omx_rotate +' ' + self.seamless_loop + ' ' + self.omx_other_options +" "
         self.omx.load(track,self.freeze_at_start,options,self.mon.pretty_inst(self),self.omx_volume,self.omx_max_volume)
         # self.mon.log (self,'Send load command track '+ self.track + 'with options ' + options + 'from show Id: '+ str(self.show_id))
         # print 'omx.load started ',self.track
@@ -703,38 +710,102 @@ class VideoPlayer(Player):
                 self.finished_callback('error','show state machine in unknown state: '+ self.play_state)
 
 
-    def parse_video_window(self,line):
+    def parse_video_window(self,line,display_id):
+        
+        rotation= self.dm.real_display_orientation(self.omx_display_id)
+        if rotation == 'normal':
+            self.omx_rotate=''            
+        elif rotation == 'right':
+            self.omx_rotate= ' --orientation 90 '
+        elif rotation =='left':
+            self.omx_rotate = ' --orientation 270 '
+        else:
+            #inverted
+            self.omx_rotate = ' --orientation 180 '
         fields = line.split()
         # check there is a command field
         if len(fields) < 1:
             return 'error','no type field: '+line,'',False,0,0,0,0
-            
-        # deal with original which has 1
-        if fields[0] == 'original':
+
+        # deal with types which have no paramters
+        if fields[0] in ('original','letterbox','fill','default','stretch'):
             if len(fields)  !=  1:
-                return 'error','number of fields for original: '+line,'',False,0,0,0,0    
+                return 'error','number of fields for original: '+line,'',False,0,0,0,0
+            if fields[0] in ('letterbox','fill','stretch'):
+                self.omx_aspect_mode = ' --aspect-mode '+fields[0]
+            else:
+                self.omx_aspect_mode=''
             return 'normal','',fields[0],False,0,0,0,0
 
 
-        # deal with warp which has 1 or 5  arguments
+        # deal with warp which has 0 or 1 or 4 parameters (1 is x+y+w*h)
         # check basic syntax
         if  fields[0]  != 'warp':
             return 'error','not a valid type: '+fields[0],'',False,0,0,0,0
         if len(fields) not in (1,2,5):
             return 'error','wrong number of coordinates for warp: '+ line,'',False,0,0,0,0
 
-        # deal with window coordinates    
+        # deal with window coordinates, just warp   
         if len(fields) == 1:
-            # fullscreen
             has_window=True
-            return 'normal','',fields[0],has_window,self.show_canvas_x1,self.show_canvas_y1,self.show_canvas_x2,self.show_canvas_y2
+            x1=self.show_canvas_x1
+            y1=self.show_canvas_y1
+            x2=self.show_canvas_x2
+            y2=self.show_canvas_y2
         else:
-            # window is specified
+            # window is specified warp + dimesions etc. 
             status,message,x1,y1,x2,y2=parse_rectangle(' '.join(fields[1:]))
             if status == 'error':                                   
                 return 'error',message,'',False,0,0,0,0
-            else:
-                has_window=True
-                return 'normal','',fields[0],has_window,self.show_canvas_x1+x1,self.show_canvas_y1+y1,self.show_canvas_x1+x2,self.show_canvas_y1+y2
+            has_window=True
+        x1_res,y1_res,x2_res,y2_res=self.transform_for_rotation(display_id,rotation,x1,y1,x2,y2)
+        return 'normal','',fields[0],has_window,x1_res,y1_res,x2_res,y2_res
+        
+        
+    def transform_for_rotation(self,display_id,rotation,x1,y1,x2,y2):
 
+        # adjust rotation of video for display rotation
+
+        video_width=x2-x1
+        video_height=y2-y1
+        canvas_width=self.show_canvas_x2-self.show_canvas_x1
+        canvas_height=self.show_canvas_y2-self.show_canvas_y1
+
+
+        if rotation =='right':
+            x1_res=canvas_height-video_height -y1
+            x2_res=canvas_height -y1
+            
+            y1_res= y1
+            y2_res=video_width +y1
+        
+        elif rotation=='normal':
+            x1_res=x1
+            y1_res=y1
+            x2_res=x2
+            y2_res=y2
+            
+        elif rotation =='left':
+            x1_res= y1
+            x2_res=video_height +y1
+
+            y1_res= canvas_width-video_width-x1            
+            y2_res= canvas_width-x1
+
+        else:
+            # inverted
+            x2_res= canvas_width -x1
+            x1_res=canvas_width-video_width -x1
+
+            y2_res= canvas_height-y1            
+            y1_res= canvas_height-video_height-y1            
+          
+        if VideoPlayer.debug:
+            print ('\nWarp calculation for Display Id',display_id,rotation)
+            print ('Video Window',x1,y1,x2,y2)
+            print ('video width/height', video_width,video_height)
+            print ('canvas width/height',canvas_width,canvas_height)
+            print ('Translated Window',x1_res,y1_res,x2_res,y2_res)
+        return x1_res,y1_res,x2_res,y2_res
+        
 

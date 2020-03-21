@@ -12,6 +12,11 @@
    limitations under the License.
 """
 
+import sys
+if sys.version_info[0] != 3:
+        sys.stdout.write("ERROR: Pi Presents requires python 3\n")
+        exit(102)
+
 import remi.gui as gui
 from remi import start, App
 from threading import Timer
@@ -350,5 +355,5 @@ if __name__ == "__main__":
     # optional parameters
     # start(MyApp,address='127.0.0.1', port=8081, multiple_instance=False,enable_file_cache=True, update_interval=0.1, start_browser=True)
 
-    start(MyApp, debug=False, address='192.168.1.67',start_browser=False,enable_file_cache=False,multiple_instance=True)
+    start(MyApp, debug=False, address='127.0.0.1',port=8081,start_browser=True,enable_file_cache=False,multiple_instance=True)
     # start(MyApp, debug=True, address='192.168.1.67',start_browser=False)

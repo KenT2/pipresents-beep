@@ -550,7 +550,7 @@ class Validator(AdaptableDialog):
     def check_schedule_for_show(self,show,v_show_labels):
         show_type=show['type']
         show_ref=show['show-ref']
-        print('check schedule for show ',show_type,show_ref)
+        # print('check schedule for show ',show_type,show_ref)
         if 'sched-everyday' in show:
             text=show['sched-everyday']
             lines=text.splitlines()
@@ -1338,29 +1338,30 @@ class Validator(AdaptableDialog):
             return
 
         # deal with original which has 1
-        if fields[0] == 'original':
-            if len(fields)  !=  1:
-                self.display('f','Video Window, wrong number of fields for original in: '+line)  
+        if fields[0] not in ('warp','original','letterbox','fill','default','stretch'): 
+                self.display('f','Video Window, '+fields[0] + 'is not a valid type in : '+ line)  
+                return                   
+        if fields[0] in ('original','letterbox','fill','default','stretch') and len(fields)  !=  1:
+                self.display('f','Video Window, wrong number of fields for '+fields[0] +' in: '+line)  
                 return
-        else:
-            # deal with warp which has 1 or 5  arguments
-            # check basic syntax
-            if  fields[0]  != 'warp':
-                self.display('f','Video Window, '+fields[0] + 'is not a valid type in : '+ line)
+    
+        # deal with warp which has 1 or 5  arguments
+        # check basic syntax
+        if  fields[0]  == 'warp':
+        
+            if len(fields) not in (1,2,5):
+                self.display('f','Video Window, wrong number of coordinates for warp in: '+ line)
+                return
+                             
+            # deal with window coordinates    
+            if len(fields) == 1:
+                return 
             else:
-            
-                if len(fields) not in (1,2,5):
-                    self.display('f','Video Window, wrong number of coordinates for warp in: '+ line)
-                    return
-                                 
-                # deal with window coordinates    
-                if len(fields) == 1:
-                    return 
-                else:
-                    # window is specified
-                    status,message,x1,y1,x2,y2=parse_rectangle(' '.join(fields[1:]))
-                    if status == 'error':                                   
-                        self.display('f','Video Window, '+message)
+                # window is specified
+                status,message,x1,y1,x2,y2=parse_rectangle(' '.join(fields[1:]))
+                if status == 'error':                                   
+                    self.display('f','Video Window, '+message)
+                        
 
 
 

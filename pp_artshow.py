@@ -130,7 +130,7 @@ class ArtShow(Show):
                     self.current_player.input_pressed('stop')
 
         elif operation == 'down':
-            next(self)
+            self.do_next()
 
         elif operation  in ('pause','pause-on','pause-off','mute','unmute','go'):
             # pass down if show or track running.
@@ -145,7 +145,7 @@ class ArtShow(Show):
                 self.current_player.input_pressed(operation)
      
 
-    def __next__(self):
+    def do_next(self):
         # stop track if running and set signal
         self.next_track_signal=True
         if self.current_player is not None:

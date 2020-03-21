@@ -184,7 +184,7 @@ class GapShow(Show):
             self.previous()
             
         elif operation == 'down' and self.state == 'playing':
-            next(self)
+            self.do_next()
             
         elif operation == 'repeat' and self.state == 'playing':
             self.repeat()
@@ -223,7 +223,7 @@ class GapShow(Show):
         Show.delete_admin_message(self)
         self.what_next_after_showing()
 
-    def __next__(self):
+    def do_next(self):
         # stop track if running and set signal
         self.next_track_signal=True
         if self.shower is not None:

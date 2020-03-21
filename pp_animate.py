@@ -208,7 +208,7 @@ class Animate(object):
                 param=fields[index]
                 params.append(param)
     
-        # print 'event parsed OK',delay,name,param_type,params
+        # print ('event parsed OK',delay,name,param_type,params)
         return 'normal','event parsed OK',delay,name,param_type,params
         
 

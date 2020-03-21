@@ -57,6 +57,7 @@ class MessagePlayer(Player):
             self.duration= int(self.show_params['duration'])       
         
         self.html_message_text_obj = None
+        self.track_obj=None
         
         # initialise the state machine
         self.play_state='initialised'    
@@ -72,9 +73,10 @@ class MessagePlayer(Player):
         # do common bits of  load
         Player.pre_load(self)   
 
-        # load the plugin, this may modify self.ttack and enable the plugin drawign to canvas
+        # load the plugin, this may modify self.track and enable the plugin drawing to canvas
         if self.track_params['plugin'] != '':
             status,message=self.load_plugin()
+            # can modify self.track with new text, does not touch message location
             if status == 'error':
                 self.mon.err(self,message)
                 self.play_state='load-failed'
@@ -208,7 +210,7 @@ class MessagePlayer(Player):
             with open(text_path) as f:
                 message_text=f.read()
         else:
-            message_text= self.track_params['text']
+            message_text= self.track
                         
     
         x,y,anchor,justify=calculate_text_position(self.track_params['message-x'],self.track_params['message-y'],
@@ -245,7 +247,8 @@ class MessagePlayer(Player):
         self.canvas.itemconfig(self.track_obj,state='normal')
 
     def hide_track_content(self):
-        self.canvas.itemconfig(self.track_obj,state='hidden')
+        if self.track_obj!= None:
+            self.canvas.itemconfig(self.track_obj,state='hidden')
         if self.html_message_text_obj != None:
             self.html_message_text_obj.delete_parser()
         self.canvas.delete(self.track_obj)

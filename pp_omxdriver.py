@@ -86,12 +86,10 @@ class OMXDriver(object):
         # self.mon.log(self,'TIME OF DAY: '+ strftime("%Y-%m-%d %H:%M"))
         self.dbus_user = os.environ["USER"]
 
-        self.id=str(int(time()*10))
-
-
+        self.id=str(int(time()*1000000))
 
         self.dbus_name = "org.mpris.MediaPlayer2.omxplayer"+self.id
-        
+        # print ('DBUS NAME',self.dbus_name)
         self.omxplayer_cmd = OMXDriver._LAUNCH_CMD + options + " --dbus_name '"+ self.dbus_name + "' " + track
         # self.mon.log(self, 'dbus user ' + self.dbus_user)
         # self.mon.log(self, 'dbus name ' + self.dbus_name)
@@ -149,7 +147,7 @@ class OMXDriver(object):
     'after_first_frame' - don't unpause in show, test > -yy large enough so that first frame always shows
     """
     after_first_frame_position = -50000 #microseconds
-    before_first_frame_position = -70000 #microseconds
+    before_first_frame_position = -80000 #microseconds
     
     def _status_loop(self):
             if self.is_running() is False:

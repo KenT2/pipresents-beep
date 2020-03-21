@@ -150,7 +150,7 @@ class MenuShow(Show):
             if operation=='up':
                 self.previous()
             else:
-                next(self)
+                self.do_next()
                 
         elif operation =='play':
             self.next_track_signal=True
@@ -182,7 +182,7 @@ class MenuShow(Show):
                 self.current_player.input_pressed(operation)
 
         
-    def __next__(self):
+    def do_next(self):
         # remove highlight
         if self.current_player.__class__.__name__ == 'MenuPlayer':
             self.current_player.highlight_menu_entry(self.menu_index,False)

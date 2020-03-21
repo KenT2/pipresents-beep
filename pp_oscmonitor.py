@@ -6,14 +6,17 @@ sending OSC with pyOSC
 https://trac.v2.nl/wiki/pyOSC
 example by www.ixi-audio.net based on pyOSC documentation
 """
-
+import sys
+if sys.version_info[0] != 3:
+        sys.stdout.write("ERROR: Pi Presents requires python 3\nHint: python3 pp_oscmonitor.py .......\n")
+        exit(102)
+        
 from tkinter import Tk, StringVar, Menu,Frame,Label,Button,Scrollbar,Listbox,Entry,Text
 from tkinter import Y,END,TOP,BOTH,LEFT,RIGHT,VERTICAL,SINGLE,NONE,W
 import tkinter.filedialog
 import tkinter.messagebox
 import tkinter.simpledialog
 import os
-import sys
 import configparser
 import shutil
 import json
