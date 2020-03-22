@@ -6,7 +6,7 @@ It is aimed at primarily at  musems, exhibitions and galleries
 but has many other applications including digital signage
 
 Version 1.4 [pipresents-beep]
-Copyright 2012/2013/2014/2015/2016/2017/2018/2019, Ken Thompson
+Copyright 2012/2013/2014/2015/2016/2017/2018/2019/2020, Ken Thompson
 See github for licence conditions
 See readme.md and manual.pdf for instructions.
 """
@@ -281,7 +281,9 @@ class PiPresents(object):
         self.mon.log(self,str(DisplayManager.num_displays)+ ' Displays are connected:')
         
         for display_id in DisplayManager.displays:
-            canvas_obj= self.dm.canvas_widget(display_id)
+            if self.dm.has_canvas(display_id):
+                canvas_obj= self.dm.canvas_widget(display_id)
+                canvas_obj.config(bg=self.starter_show['background-colour'])
             name=self.dm.name_of_display(display_id)
             width,height=self.dm.real_display_dimensions(display_id)
             x,y=self.dm.real_display_position(display_id)
@@ -299,7 +301,7 @@ class PiPresents(object):
                 self.mon.err(self,message)
                 
             
-            canvas_obj.config(bg=self.starter_show['background-colour'])
+
         
 
                 
@@ -435,7 +437,7 @@ class PiPresents(object):
             reason,message=self.show_manager.control_a_show(show_ref,'open')
             if reason == 'error':
                 self.mon.err(self,message)
-                
+                self.end(reason,message)
 
 
 # *********************

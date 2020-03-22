@@ -772,7 +772,7 @@ class VideoPlayer(Player):
 
         video_width=x2-x1
         video_height=y2-y1
-        display_width,display_height=self.dm.canvas_dimensions(display_id)
+        display_width,display_height=self.dm.real_display_dimensions(display_id)
 
         if rotation =='right':
             x1_res=display_height-video_height -y1

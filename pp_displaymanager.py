@@ -108,6 +108,12 @@ class DisplayManager(object):
     def name_of_display(self,display_id):
         return DisplayManager.display_reverse_map[display_id]
 
+    def has_canvas(self,display_id):
+        if display_id not in DisplayManager.canvas_obj:
+            return False
+        else:
+            return True
+
     def canvas_widget(self,display_id):
         return DisplayManager.canvas_obj[display_id]
 
