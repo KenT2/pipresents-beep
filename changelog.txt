@@ -1,3 +1,17 @@
+CHANGES FOR 1.4.4c 2/4/2020
+============================
+
+FIXED -    Nasty bug in pp_manager where deleting a profile, media file, or livelist file
+           without first selecting it deletes all files in the directory.
+enhanced - Optional lock on livelist upload, for systems with dynamically updated
+           liveshows.
+enhanced - Update Remi to latest version.
+enhanced  - pp_manager.py and pp_web_editor.py now use only one port hence
+            should be useable with LAN's that have all but common ports locked down.
+enhanced - added a 'sender' field to pp_mail.cfg for ISP's where username
+           is not an email address (See release notes)
+enhanced - emails now have date field supplied for those ISP's that do not add it.
+
 CHANGES FOR 1.4.4b 20/3/2020
 ============================
 Code

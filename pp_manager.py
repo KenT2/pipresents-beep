@@ -2,7 +2,7 @@
 
 import remi.gui as gui
 from remi import start, App
-from remi_plus import OKDialog, OKCancelDialog, AdaptableDialog, append_with_label,FileSelectionDialog
+from remi_plus import OKDialog,LinkDialog, OKCancelDialog, AdaptableDialog, append_with_label,FileSelectionDialog
 
 import time
 import subprocess
@@ -20,10 +20,11 @@ class PPManager(App):
 
     def __init__(self, *args):
         super(PPManager, self).__init__(*args)
+        
     
-    def read_options(self,options_file_path):
+    def read_options(self,manager_options_file_path):
         self.options=Options()
-        self.options.read_options(options_file_path)
+        self.options.read_options(manager_options_file_path)
         
         self.pp_home_dir=self.options.pp_home_dir
 
@@ -39,71 +40,40 @@ class PPManager(App):
         self.editor_port=self.options.editor_port
 
 
-    def main(self):
 
-        #create upload and download directories if necessary
-        self.upload_dir='/tmp/pipresents/upload'
-        self.download_dir='/tmp/pipresents/download'
-
+    def main(self,pp_dir,upload_dir,download_dir,ip):
         
-        # get directory holding the code
-        self.pp_dir=sys.path[0]
-            
-        if not os.path.exists(self.pp_dir + os.sep + 'pp_manager.py'):
-            print('Manager: Bad Application Directory', file=sys.stderr)
-            exit()
-
-        # object if there is no options file
-        self.options_file_path=self.pp_dir+os.sep+'pp_config'+os.sep+'pp_web.cfg'
-        if not os.path.exists(self.options_file_path):
-            print('Manager: Cannot find web options file', file=sys.stderr)
-            exit()
-
-        # read the options
-        self.read_options(self.options_file_path)
-
-        # get interface and IP
-        network=Network()
-        self.interface, self.ip = network.get_ip()
-        print('Manager: Network Details '+ self.interface, self.ip)
-
-        # create a mailer instance and read mail options
-        self.email_options_file_path=self.pp_dir+os.sep+'pp_config'+os.sep+'pp_email.cfg'
-        if not os.path.exists(self.email_options_file_path):
-            print('Manager: Cannot find email options file', file=sys.stderr)
-            exit()
-        self.mailer=Mailer()
-        self.mailer.read_config(self.email_options_file_path)
-        print('Manager: read email options from '+self.email_options_file_path, file=sys.stderr)
-
-        if not os.path.exists(self.pp_profiles_dir):
-            print('Manager: Profiles directory does not exist: ' + self.pp_profiles_dir, file=sys.stderr)
-            exit()
-
-        print('Manager: Web server started by pp_manager', file=sys.stderr)
+        self.pp_dir=pp_dir
+        self.manager_options_file_path=self.pp_dir+os.sep+'pp_config'+os.sep+'pp_web.cfg'
+        self.upload_dir= upload_dir
+        self.download_dir = download_dir
+        self.ip=ip
 
         #init variables
         self.profile_objects=[]
         self.current_profile=''
 
+            
         # Initialise an instance of the Pi Presents and Web Editor driver classes
         self.pp=PiPresents()
         self.ed = WebEditor()
         self.ed.init(self.pp_dir)
 
+        self.read_options(self.pp_dir+'/pp_config/pp_web.cfg')
 
+        #Init Mailer to save it config
+        self.mailer=Mailer()
+        
+        #build gui
         mww=550
+        
         # root and frames
-
         root = gui.VBox(width=mww, margin='0px auto') #the margin 0px auto centers the main container
         root.style['display'] = 'block'
         root.style['overflow'] = 'hidden'
-        # root = gui.VBox(width=mww,height=600) #10
-        top_frame=gui.VBox(width=mww,height=40) #1
+        
         middle_frame=gui.VBox(width=mww,height=500) #5
-        # middle_frame.style['background-color'] = 'LightGray'
         button_frame=gui.HBox(width=280,height=30) #10
-
         menubar=gui.MenuBar(width='100%', height='30px')
 
 
@@ -168,10 +138,12 @@ class PPManager(App):
 
         # Pi menu
         pi_menu=gui.MenuItem('Pi',width=miw,height=30)
-        pi_reboot_menu=gui.MenuItem('Reboot',width=miw,height=30)
+        pi_reboot_menu=gui.MenuItem('Reboot Pi',width=miw+30,height=30)
         pi_reboot_menu.set_on_click_listener(self.pi_reboot_menu_clicked)
-        pi_shutdown_menu=gui.MenuItem('Shutdown',width=miw,height=30)
+        pi_shutdown_menu=gui.MenuItem('Shutdown Pi',width=miw+30,height=30)
         pi_shutdown_menu.set_on_click_listener(self.pi_shutdown_menu_clicked)
+        pi_close_manager_menu=gui.MenuItem('Exit PPManager',width=miw+30,height=30)
+        pi_close_manager_menu.set_on_click_listener(self.pi_close_manager_menu_clicked)
         
         # list of profiles
         self.profile_list = gui.ListView(width=250, height=300)
@@ -183,7 +155,7 @@ class PPManager(App):
         self.profile_name = gui.Label('Selected Profile: ',width=400, height=20)
         
         self.pp_state_display = gui.Label('',width=400, height=20)
-        
+        self.pp_state_display.css_font_weight='bold'
         self.run_pp = gui.Button('Run',width=80, height=30)
         self.run_pp.set_on_click_listener(self.on_run_button_pressed)
         
@@ -235,6 +207,7 @@ class PPManager(App):
 
         pi_menu.append(pi_reboot_menu)
         pi_menu.append(pi_shutdown_menu)
+        pi_menu.append(pi_close_manager_menu)
         
         menu.append(profile_menu)
         menu.append(media_menu)
@@ -246,9 +219,6 @@ class PPManager(App):
 
         menubar.append(menu)
         
-
-        
-        # root.append(top_frame)
         root.append(middle_frame)
         
 
@@ -265,7 +235,7 @@ class PPManager(App):
 
 
     # ******************
-    # Pi Reboot
+    # Pi Menu
     # ******************
 
     def pi_reboot_menu_clicked(self,widget):
@@ -274,12 +244,23 @@ class PPManager(App):
     def pi_shutdown_menu_clicked(self,widget):
         subprocess.call (['sudo','shutdown','now','SHUTTING DOWN'])
 
+    # listener function
+    def pi_close_manager_menu_clicked(self, _):
+        self.close()  # closes the application
+
+    def on_close(self):
+        """ Overloading App.on_close event allows to perform some 
+             activities before app termination.
+        """
+        self.state_timer.cancel()  
+        print("PPManager Closing")
+        super(PPManager, self).on_close()
+     
+     
         
     # ******************
     # MANAGER OPTIONS
     # ******************
-
-
     def on_options_autostart_menu_clicked(self,widget):
         self.options_autostart_dialog=AutostartOptionsDialog(self.pp_home_dir,self.pp_profiles_dir)
         self.options_autostart_dialog.show(self)
@@ -292,7 +273,7 @@ class PPManager(App):
 
     def options_manager_callback(self):
         # and display the new list of profiles after editing options
-        self.read_options(self.options_file_path)
+        self.read_options(self.manager_options_file_path)
         self.display_profiles()
 
 
@@ -341,7 +322,7 @@ class PPManager(App):
             from_head,from_tail=os.path.split(item)
             to_path=os.path.join(self.import_to,from_tail)                  
             if os.path.exists(to_path):
-                OKCancelDialog('Import Media','Item already exists: ' + self.current_item +'<br>Overwrite?',callback=self.do_import_media_item).show(self)
+                OKCancelDialog('Import Media','Item already exists: ' + self.current_item +'Overwrite?',callback=self.do_import_media_item).show(self)
             else:
                 self.do_import_media_item(True)
 
@@ -359,7 +340,7 @@ class PPManager(App):
 
 
     def on_media_upload_clicked(self,widget):
-        self.media_upload_dialog=AdaptableDialog(width=300,height=200,title='<b>Upload Media</b>',
+        self.media_upload_dialog=AdaptableDialog(width=300,height=200,title='Upload Media',
                                                    message='Select Media to Upload',
                                                  cancel_name='Done')
         self.media_upload_button=gui.FileUploader(self.upload_dir+'/',width=250,height=30,multiple_selection_allowed=False)
@@ -388,7 +369,7 @@ class PPManager(App):
         from_head,from_tail=os.path.split(item)
         self.to_path=os.path.join(self.upload_to,from_tail)                  
         if os.path.exists(self.to_path):
-            OKCancelDialog('Upload Media','Item already exists: ' + self.current_item +'<br>Overwrite?',callback=self.do_upload_media_item).show(self)
+            OKCancelDialog('Upload Media','Item already exists: ' + self.current_item +'Overwrite?',callback=self.do_upload_media_item).show(self)
         else:
             self.do_upload_media_item(True)
 
@@ -401,7 +382,7 @@ class PPManager(App):
 ##            from_head,from_tail=os.path.split(item)
 ##            to_path=os.path.join(self.upload_to,from_tail)                  
 ##            if os.path.exists(to_path):
-##                OKCancelDialog('Upload Media','Item already exists: ' + self.current_item +'<br>Overwrite?',callback=self.do_upload_media_item).show(self)
+##                OKCancelDialog('Upload Media','Item already exists: ' + self.current_item +'Overwrite?',callback=self.do_upload_media_item).show(self)
 ##            else:
 ##                self.do_upload_media_item(True)
 
@@ -472,7 +453,7 @@ class PPManager(App):
             from_head,from_tail=os.path.split(item)
             to_path=os.path.join(self.import_to,from_tail)                  
             if os.path.exists(to_path):
-                OKCancelDialog('Import Live Tracks','Item already exists: ' + self.current_item +'<br>Overwrite?',callback=self.do_import_livetracks_item).show(self)
+                OKCancelDialog('Import Live Tracks','Item already exists: ' + self.current_item +'Overwrite?',callback=self.do_import_livetracks_item).show(self)
             else:
                 self.do_import_livetracks_item(True)
 
@@ -487,7 +468,7 @@ class PPManager(App):
     #upload
 
     def on_livetracks_upload_clicked(self,widget):
-        self.livetracks_upload_dialog=AdaptableDialog(width=500,height=200,title='<b>Upload Live Tracks</b>',
+        self.livetracks_upload_dialog=AdaptableDialog(width=500,height=200,title='Upload Live Tracks',
                                                    message='Select Live Tracks to Upload',
                                                       cancel_name='Done')
         self.livetracks_upload_button=gui.FileUploader(self.upload_dir+'/',width=250,height=30,
@@ -518,7 +499,7 @@ class PPManager(App):
         from_head,from_tail=os.path.split(item)
         self.to_path=os.path.join(self.upload_to,from_tail)                  
         if os.path.exists(self.to_path):
-            OKCancelDialog('Upload Livetracks','Item already exists: ' + self.current_item +'<br>Overwrite?',callback=self.do_upload_livetracks_item).show(self)
+            OKCancelDialog('Upload Livetracks','Item already exists: ' + self.current_item +'Overwrite?',callback=self.do_upload_livetracks_item).show(self)
         else:
             self.do_upload_livetracks_item(True)
 
@@ -531,7 +512,7 @@ class PPManager(App):
 ##            from_head,from_tail=os.path.split(item)
 ##            to_path=os.path.join(self.upload_to,from_tail)                  
 ##            if os.path.exists(to_path):
-##                OKCancelDialog('Upload Livetracks','Item already exists: ' + self.current_item +'<br>Overwrite?',callback=self.do_upload_media_item).show(self)
+##                OKCancelDialog('Upload Livetracks','Item already exists: ' + self.current_item +'Overwrite?',callback=self.do_upload_media_item).show(self)
 ##            else:
 ##                self.do_upload_livetracks_item(True)
 
@@ -622,9 +603,9 @@ class PPManager(App):
             base=self.pp_home_dir+os.sep+'pp_profiles/'+self.current_profile
             # print 'proflie',base
             shutil.make_archive(dest,'zip',base)
-            self.profile_download_dialog=AdaptableDialog(width=500,height=200,title='<b>Download Profile</b>',
+            self.profile_download_dialog=AdaptableDialog(width=500,height=200,title='Download Profile',
                                                            message='',confirm_name='Done')
-            self.profile_download_button = gui.FileDownloader('<br>Click Link to Download', dest+'.zip', width=200, height=80)
+            self.profile_download_button = gui.FileDownloader('Click Link to Download', dest+'.zip', width=200, height=80)
             self.profile_download_status=gui.Label('', width=450, height=30)
             self.profile_download_status.set_text('Selected Profile: '+ self.current_profile)
             self.profile_download_dialog.append_field(self.profile_download_status)
@@ -646,7 +627,7 @@ class PPManager(App):
 
     # upload
     def on_profile_upload_clicked(self,widget):
-        self.profile_upload_dialog=AdaptableDialog(width=500,height=200,title='<b>Upload Profile</b>',
+        self.profile_upload_dialog=AdaptableDialog(width=500,height=200,title='Upload Profile',
                                                      message='Select Profile to Upload',
                                                    cancel_name='Done')
         self.profile_upload_button=gui.FileUploader(self.upload_dir+os.sep,width=250,height=30,multiple_selection_allowed=False)
@@ -762,9 +743,9 @@ class PPManager(App):
     # download
     def on_logs_download_clicked(self,log_file,name):
         self.logs_dir=self.pp_dir+os.sep+'pp_logs'
-        self.logs_download_dialog=AdaptableDialog(width=500,height=200,title='<b>Download ' + name+ '</b>',
+        self.logs_download_dialog=AdaptableDialog(width=500,height=200,title='Download ' + name,
                                                        message='',confirm_name='Done')
-        self.logs_download_button = gui.FileDownloader('<br>Click Link to Start Download',self.logs_dir+os.sep+log_file, width=200, height=80)
+        self.logs_download_button = gui.FileDownloader('Click Link to Start Download',self.logs_dir+os.sep+log_file, width=200, height=80)
         self.logs_download_status=gui.Label('', width=450, height=30)
         self.logs_download_dialog.append_field(self.logs_download_status)
         self.logs_download_status.set_text('Download: '+log_file)
@@ -792,10 +773,11 @@ class PPManager(App):
             # Poll state of Pi Presents
             pid,user,profile=self.pp.is_pp_running()
             if pid!=-1:
-                self.pp_state_display.set_text('<b>'+self.unit +  ':</b>   RUNNING   '+ profile)   
+                self.pp_state_display.set_text(self.unit +  ':   RUNNING   '+ profile)   
             else:
-                self.pp_state_display.set_text('<b>' +self.unit + ':</b>   STOPPED   (' + self.pp.lookup_state(my_state)+')')
-        Timer(0.5,self.display_state).start()  
+                self.pp_state_display.set_text(self.unit + ':   STOPPED   (' + self.pp.lookup_state(my_state)+')')
+        self.state_timer=Timer(0.5,self.display_state)
+        self.state_timer.start()  
             
 
 
@@ -835,9 +817,9 @@ class PPManager(App):
             # Poll state of Editor
             pid,user=self.pp.is_ed_running()
             if pid!=-1:
-                self.ed_state_display.set_text('<b>'+self.unit +  ':</b>   RUNNING  Web Editor as '+user)   
+                self.ed_state_display.set_text(self.unit +  ': RUNNING  Web Editor as '+user)   
             else:
-                self.ed_state_display.set_text('<b>' +self.unit + ':</b>   STOPPED   (' + self.ed.lookup_state(my_state)+')')
+                self.ed_state_display.set_text(self.unit + ':  STOPPED   (' + self.ed.lookup_state(my_state)+')')
         Timer(0.5,self.ed_display_state).start()  
             
 
@@ -851,7 +833,7 @@ class PPManager(App):
         # run editor if it is not already running
         self.ed.run_ed(command,self.ed_options)
         # and show a dialog to open a browser tab
-        OKDialog('Open Editor Page',' <br><a href="http://'+self.ip+':'+self.editor_port +'"target="_blank">Click to Open Editor Page</a> ').show(self)
+        LinkDialog('Open Editor Page','','http://' + self.ip + ':'+self.editor_port +'"target="_blank"','Click to Open Editor Page').show(self)
 
 
     def on_editor_exit_menu_clicked(self,widget):
@@ -874,7 +856,7 @@ class RenameDialog(AdaptableDialog):
         self.callback=callback
         self.width=400
         self.height=200
-        super(RenameDialog, self).__init__('<b>'+title+'</b>','',width=self.width,height=self.height,
+        super(RenameDialog, self).__init__(title,'',width=self.width,height=self.height,
                                            confirm_name='Ok',cancel_name='Cancel')
 
         self.spacer=gui.Label('',width=400, height=30)
@@ -885,8 +867,8 @@ class RenameDialog(AdaptableDialog):
         self.append_field(self.name_field,'name_field')
         
 
-
-    def confirm_dialog(self):
+    @gui.decorate_event
+    def confirm_dialog(self,emitter):
         new_name=self.get_field('name_field').get_value()
         files_in_dir = os.listdir(self.file_dir)
         if new_name in files_in_dir:
@@ -913,7 +895,7 @@ class FileManager(AdaptableDialog):
         self.callback=callback
         self.current_media_name=''
 
-        super(FileManager, self).__init__('<b>'+title+'</b>','',
+        super(FileManager, self).__init__(title,'',
                                           width=root_width,height=root_height,
                                           cancel_name='Done')
         self.style['display'] = 'block'
@@ -974,24 +956,29 @@ class FileManager(AdaptableDialog):
         self.current_media_name=self.media_list.children[key].get_text()
         self.media_name.set_text('Selected File:   '+ self.current_media_name)
 
-
-    def cancel_dialog(self):
+    @gui.decorate_event
+    def cancel_dialog(self,emitter):
         self.hide()
         self.callback()
 
     def on_delete_media_button_pressed(self,widget):
-        OKCancelDialog('Delete Item','Delete '+self.current_media_name +'<br>Are you sure?',callback=self.on_delete_media_confirm).show(self._base_app_instance)
+        if self.current_media_name=='':
+            OKDialog('Delete','No File Selected').show(self._base_app_instance )
+            return
+            
+        OKCancelDialog('Delete Item','Delete '+self.current_media_name +' Are you sure?',callback=self.on_delete_media_confirm).show(self._base_app_instance)
         return
 
     def on_deleteall_media_button_pressed(self,widget):
-        OKCancelDialog('DELETE ALL ITEMS','DELETE ALL ITEMS<br>Are you sure?',callback=self.on_deleteall_media_confirm).show(self._base_app_instance)
+        OKCancelDialog('DELETE ALL ITEMS','DELETE ALL ITEMS, Are you sure?',callback=self.on_deleteall_media_confirm).show(self._base_app_instance)
         return
     
     def on_deleteall_media_confirm(self,result):
         if result is False:
             return
+        #print ('delete ALL ')
         for item in os.listdir(self.current_media):
-            # print self.current_media+os.sep+item
+            #print ('delete one of all '+self.current_media+os.sep+item)
             os.remove(self.current_media+os.sep+item)
         self.display_media()
         
@@ -1000,10 +987,14 @@ class FileManager(AdaptableDialog):
     def on_delete_media_confirm(self,result):
         if result is False:
             return
-        # print self.current_media+os.sep+self.current_media_name
+        print ('delete ONE' +self.current_media+os.sep+self.current_media_name)
         if self.is_profile is True:
+            pass
+            #print ('delete one profile '+self.current_media+os.sep+self.current_media_name)
             shutil.rmtree(self.current_media+os.sep+self.current_media_name)
         else:
+            pass
+            #print ('delete one media '+self.current_media+os.sep+self.current_media_name)
             os.remove(self.current_media+os.sep+self.current_media_name)        
         self.display_media()
         self.media_name.set_text('Selected File:')
@@ -1034,7 +1025,6 @@ class Options(object):
     def read_options(self,options_file=None):
         if options_file != None:
             Options.options_file=options_file
-            
         """reads options from options file """
         Options.config=configparser.ConfigParser(inline_comment_prefixes = (';',))
         Options.config.read(Options.options_file)
@@ -1090,7 +1080,7 @@ class EmailOptionsDialog(AdaptableDialog,Mailer):
     def __init__(self, title='Title', message='Message',callback=None,**kwargs):
         self.callback=callback
         dialog_width=450
-        super(EmailOptionsDialog, self).__init__(title='<b>Email Options</b>',message='Edit then click OK or Cancel',
+        super(EmailOptionsDialog, self).__init__(title='Email Options',message='Edit then click OK or Cancel',
                                                      width=dialog_width,height=500,
                                                      confirm_name='OK',cancel_name='Cancel')
         self.read_config() # no arguemnt because file is read elsewhere
@@ -1104,6 +1094,12 @@ class EmailOptionsDialog(AdaptableDialog,Mailer):
         self.email_to_field.set_text(self.email_to)
         self.append_field_with_label('To',self.email_to_field,
                                                        None,width=dialog_width-20,key='email_to_field')
+
+        self.email_sender_field= gui.TextInput(single_line=False,width=250, height=90)
+        self.email_sender_field.set_text(self.email_sender)
+        self.append_field_with_label('Sender',self.email_sender_field,
+                                                       None,width=dialog_width-20,key='email_sender_field')
+
 
         self.email_with_ip_field= gui.TextInput(single_line=True,width=250, height=30)
         email_with_ip='yes'if self.email_with_ip is True else'no'
@@ -1137,14 +1133,16 @@ class EmailOptionsDialog(AdaptableDialog,Mailer):
   
 
     
-
-    def confirm_dialog(self):
+    @gui.decorate_event
+    def confirm_dialog(self,emitter):
         email_allowed=self.get_field('email_allowed_field').get_value()
         if email_allowed not in ('yes','no'):
             OKDialog('Email Options','Allow Email must be Yes or No').show(self._base_app_instance)
             return
         
         email_to=self.get_field('email_to_field').get_value()
+        
+        email_sender=self.get_field('email_sender_field').get_value()
 
         email_with_ip=self.get_field('email_with_ip_field').get_value()
         if email_with_ip not in ('yes','no'):
@@ -1174,6 +1172,7 @@ class EmailOptionsDialog(AdaptableDialog,Mailer):
         # all correct so save
         self.email_allowed = True if email_allowed == 'yes' else False
         self.email_to=email_to
+        self.email_sender=email_sender
         self.email_with_ip = True if email_with_ip == 'yes' else False
         self.email_at_start = True if email_at_start == 'yes' else False
         self.email_on_error = True if email_on_error == 'yes' else False
@@ -1192,7 +1191,7 @@ class AutostartOptionsDialog(AdaptableDialog,Options):
         self.pp_home_dir = pp_home_dir
         self.pp_profiles_dir = pp_profiles_dir
         dialog_width=450
-        super(AutostartOptionsDialog, self).__init__(title='<b>AutostartOptions</b>',message='Edit then click OK or Cancel',
+        super(AutostartOptionsDialog, self).__init__(title='AutostartOptions',message='Edit then click OK or Cancel',
                                                      width=450,height=300,
                                                      confirm_name='Ok',cancel_name='Cancel')           
         self.read_options()
@@ -1208,8 +1207,8 @@ class AutostartOptionsDialog(AdaptableDialog,Options):
                                                         None,width=dialog_width-20,key='autostart_options_field')
 
 
-
-    def confirm_dialog(self):
+    @gui.decorate_event
+    def confirm_dialog(self,emitter):
         result=self.get_field('autostart_path_field').get_value()            
         autostart_profile_path=self.pp_home_dir+os.sep+'pp_profiles'+os.sep+result
         if not os.path.exists(autostart_profile_path):
@@ -1234,7 +1233,7 @@ class ManagerOptionsDialog(AdaptableDialog,Options):
 
         #parent,text,field,button,width=300,key=''
         dialog_width=450
-        super(ManagerOptionsDialog, self).__init__(title='<b>Manager Options</b>',message='Edit then click OK or Cancel',
+        super(ManagerOptionsDialog, self).__init__(title='Manager Options',message='Edit then click OK or Cancel',
                                                      width=450,height=300,
                                                      confirm_name='Ok',cancel_name='Cancel')
 
@@ -1264,8 +1263,8 @@ class ManagerOptionsDialog(AdaptableDialog,Options):
         self.append_field_with_label('Pi Presents Options',self.options_field,
                                                        None,width=dialog_width-20,key='options_field')   
       
-
-    def confirm_dialog(self):
+    @gui.decorate_event
+    def confirm_dialog(self,emitter):
         media_offset=self.get_field('media_field').get_value()
         media_dir=self.pp_home_dir+media_offset
         if not os.path.exists(media_dir):
@@ -1481,13 +1480,13 @@ class Autostart(Options,object):
             print('Manager: Bad Application Directory', file=sys.stderr)
             exit()
 
-        self.options_file_path=self.pp_dir+os.sep+'pp_config'+os.sep+'pp_web.cfg'
-        if not os.path.exists(self.options_file_path):
+        self.manager_options_file_path=self.pp_dir+os.sep+'pp_config'+os.sep+'pp_web.cfg'
+        if not os.path.exists(self.manager_options_file_path):
             print('Manager: web options file not found', file=sys.stderr)
             exit()
 
         # read the options
-        self.read_options(self.options_file_path)
+        self.read_options(self.manager_options_file_path)
 
 
         # and construct the paths
@@ -1519,14 +1518,14 @@ class Autostart(Options,object):
         
 
 
-# ***************************************
-# MAIN
-# ***************************************
-
-if __name__  ==  "__main__":
 
 
-    def try_connect(mailer):
+class PPManagerLauncher(object):
+    
+    def __init__(self):
+        return
+    
+    def try_connect(self,mailer):
         tries=1
         while True:
             success, error = mailer.connect()
@@ -1539,8 +1538,8 @@ if __name__  ==  "__main__":
                     print('Manager: Failed to connect to email SMTP server after ' + str(tries), file=sys.stderr)
                     return False
 
-    def send_email(mailer,reason,subject,message):
-        if try_connect(mailer) is False:
+    def send_email(self,mailer,reason,subject,message):
+        if self.try_connect(mailer) is False:
             return False
         else:
             success,error = mailer.send(subject,message)
@@ -1557,114 +1556,153 @@ if __name__  ==  "__main__":
                     print('Manager: Failed disconnect ' + str(error), file=sys.stderr)
                 return True
 
-
-    print('\n *** Pi Presents Manager Started ***', file=sys.stderr)
-
-    # wait for environment variables to stabilize. Required for Jessie autostart
-    tries=0
-    success=False
-    while tries < 40:
-        # get directory holding the code
-        pp_dir=sys.path[0]
-        manager_path=pp_dir+os.sep+'pp_manager.py'
-        if os.path.exists(manager_path):
-            success =True
-            break
-        tries +=1
-        sleep (0.5)
+    def read_options(self,manager_options_file_path):
+        self.options=Options()
+        self.options.read_options(manager_options_file_path)
         
-    if success is False:
-        print("Manager: Bad application directory: " + pp_dir, file=sys.stderr)
-        # tkMessageBox.showwarning("pp_manager.py","Bad application directory: "+ pp_dir)
-        exit()
+        self.pp_home_dir=self.options.pp_home_dir
 
-    print('Manager: Found pp_manager.py in ', pp_dir, file=sys.stderr)
-
-
-    #create upload and download directories if necessary
-    upload_dir='/tmp/pipresents/upload'
-    download_dir='/tmp/pipresents/download'
-    if os.path.exists('/tmp/pipresents'):
-        shutil.rmtree('/tmp/pipresents')
-    os.makedirs(upload_dir)
-    os.makedirs(download_dir)
+        self.pp_profiles_offset=self.options.pp_profiles_offset
+        self.pp_profiles_dir=self.options.pp_profiles_dir
+        self.top_dir=self.options.top_dir
+        self.media_dir=self.options.media_dir
+        self.media_offset=self.options.media_offset
+        self.livetracks_dir=self.options.livetracks_dir
+        self.livetracks_offset=self.options.livetracks_offset
+        self.pp_options=self.options.pp_options
+        self.unit=self.options.unit
+        self.editor_port=self.options.editor_port
 
 
-    # Autostart Pi Presents if necessary
-    auto=Autostart()
-    auto_profile=auto.autostart()
-
-    # wait for network to be available
-    network=Network()
-    print('Manager: Waiting for Network', file=sys.stderr)
-    network_connected=network.wait_for_network(10)
-    if network_connected is False:
-        print('Manager: Failed to connect to network after 10 seconds', file=sys.stderr)
-        # tkMessageBox.showwarning("Pi Presents Manager","Failed to connect to network after 10 seconds")       
-        # exit()   
-
-    # Read network config  -  pp_web.cfg
-    manager_options_file_path=pp_dir+os.sep+'pp_config'+os.sep+'pp_web.cfg'
-    if not os.path.exists(manager_options_file_path):
-        print('Manager: pp_web.cfg not found at ' + manager_options_file_path, file=sys.stderr)
-        # tkMessageBox.showwarning("Pi Presents Manager",'pp_web.cfg not found at ' + manager_options_file_path)
-        exit()
-    network.read_config(manager_options_file_path)
-    print('Manager: Found pp_web.cfg in ', manager_options_file_path, file=sys.stderr)
-
-
-    # get interface and IP details of preferred interface
-    if network_connected is True:
-        interface,ip = network.get_preferred_ip()
-        print('Manager: Network details ' + network.unit + ' ' + interface + ' ' + ip, file=sys.stderr)
-        network.set_ip(interface,ip)
-
-
-        # start the mailer
-        email_file_path = pp_dir+os.sep+'pp_config'+os.sep+'pp_email.cfg'
-        if not os.path.exists(email_file_path):
-            print('Manager: pp_email.cfg not found at ' + email_file_path, file=sys.stderr)
-            # tkMessageBox.showwarning("Pi Presents Manager",'pp_email.cfg not found at ' + email_file_path)
+    def init(self):
+        print('\n *** Pi Presents Manager Started ***', file=sys.stderr)
+        
+        # Find directory in which the manager is running
+        #-----------------------------------------------------
+        #  wait for environment variables to stabilize.
+        # Required for Jessie autostart
+        tries=0
+        success=False
+        while tries < 40:
+            # get directory holding the code
+            self.pp_dir=sys.path[0]
+            manager_path=self.pp_dir+os.sep+'pp_manager.py'
+            if os.path.exists(manager_path):
+                success =True
+                break
+            tries +=1
+            sleep (0.5)
+            
+        if success is False:
+            print("Manager: Bad application directory: " + self.pp_dir, file=sys.stderr)
             exit()
-        print('Manager: Found pp_email.cfg at ' + email_file_path, file=sys.stderr)
+
+        print('Manager: Found pp_manager.py in ', self.pp_dir, file=sys.stderr)
+
+
+        # create upload and download directories if necessary
+        # ---------------------------------------------------
+        self.upload_dir='/tmp/pipresents/upload'
+        self.download_dir='/tmp/pipresents/download'
+        if os.path.exists('/tmp/pipresents'):
+            shutil.rmtree('/tmp/pipresents')
+        os.makedirs(self.upload_dir)
+        os.makedirs(self.download_dir)
+
+        # Autostart Pi Presents if necessary
+        # -----------------------------------
+        auto=Autostart()
+        auto_profile=auto.autostart()
         
-        mailer=Mailer()
-        email_enabled=False
-        mailer.read_config(options_file=email_file_path)    
-        # all Ok so can enable email if config file allows it.
-        if mailer.email_allowed is True:
-            email_enabled=True
-            print('Manager: Email Enabled', file=sys.stderr)
         
-        # send an email with IP address of the server.
-        if email_enabled is True and mailer.email_with_ip is True:
-            subject= '[Pi Presents] ' + network.unit + ' Manager started: ' + ip + ':' + str(network.manager_port)
 
-            message_text = time.strftime("%Y-%m-%d %H:%M") + ' \n ' + network.unit + '\n ' + interface + '\n'
-            message_text +=' Manager: http://' + ip + ':' + str(network.manager_port) + '\n'
-            message_text +=' Editor: http://' + ip + ':' + str(network.editor_port) + '\n'
-            if auto_profile != '':
-                message_text = message_text + 'Autostarting profile: '+ auto_profile
-            # print >> sys.stderr,subject,message_text
-            send_email(mailer,'IP Address',subject,message_text)
-    else:
-        ip='127.0.0.1'
-        interface = 'local'
+        # wait for network to be available and get network details
+        #----------------------------------
+        self.network=Network()
+        print('Manager: Waiting for Network', file=sys.stderr)
+        network_connected=self.network.wait_for_network(10)
+        if network_connected is False:
+            print('Manager: Failed to connect to network after 10 seconds', file=sys.stderr)
+            exit()   
 
+        # Read network config  -  pp_web.cfg
+        self.manager_options_file_path=self.pp_dir+os.sep+'pp_config'+os.sep+'pp_web.cfg'
+        if not os.path.exists(self.manager_options_file_path):
+            print('Manager: pp_web.cfg not found at ' + self.manager_options_file_path, file=sys.stderr)
+            exit()
+            
+        self.network.read_config(self.manager_options_file_path)
+        print('Manager: Found pp_web.cfg in ', self.manager_options_file_path, file=sys.stderr)
 
-    # setting up remi debug level 
-    #   2=all debug messages   1=error messages   0=no messages
-    import remi.server
-    # remi.server.DEBUG_MODE = 0
-
-    # start the web server to serve the Pi Presents Manager App
-    start(PPManager,address=ip, port=network.manager_port,
-          username=network.manager_username,
-          password=network.manager_password,
-          multiple_instance=False,enable_file_cache=True,
-          update_interval=0.2, start_browser=False,debug=False)
+        # get interface and IP details of preferred interface
+        if network_connected is True:
+            self.interface,self.ip = self.network.get_preferred_ip()
+            print('Manager: Network details ' + self.network.unit + ' ' + self.interface + ' ' + self.ip, file=sys.stderr)
+            self.network.set_ip(self.interface,self.ip)
 
 
+            # start the mailer
+            email_file_path = self.pp_dir+os.sep+'pp_config'+os.sep+'pp_email.cfg'
+            if not os.path.exists(email_file_path):
+                print('Manager: pp_email.cfg not found at ' + email_file_path, file=sys.stderr)
+                exit()
+            print('Manager: Found pp_email.cfg at ' + email_file_path, file=sys.stderr)
+            
+            self.mailer=Mailer()
+            email_enabled=False
+            self.mailer.read_config(options_file=email_file_path)
+               
+            # all Ok so can enable email if config file allows it.
+            if self.mailer.email_allowed is True:
+                email_enabled=True
+                print('Manager: Email Enabled', file=sys.stderr)
+            
+            # send an email with IP address of the server.
+            if email_enabled is True and self.mailer.email_with_ip is True:
+                subject= '[Pi Presents] ' + self.network.unit + ': Manager started: ' + self.ip + ':' + str(self.network.manager_port)
+
+                message_text = time.strftime("%Y-%m-%d %H:%M") + ' \n ' + self.network.unit + '\n ' + self.interface + '\n'
+                message_text +=' Manager: http://' + self.ip + ':' + str(self.network.manager_port) + '\n'
+                message_text +=' Editor: http://' + self.ip + ':' + str(self.network.editor_port) + '\n'
+                if auto_profile != '':
+                    message_text = message_text + 'Autostarting profile: '+ auto_profile
+                # print >> sys.stderr,subject,message_text
+                self.send_email(self.mailer,'IP Address',subject,message_text)
+        else:
+            self.ip='127.0.0.1'
+            self.interface = 'local'
+
+        print('Manager: Web server started by pp_manager', file=sys.stderr)
+
+        return
 
 
+    def start_remi(self):
+
+        # setting up remi debug level 
+        #   2=all debug messages   1=error messages   0=no messages
+        #import remi.server
+        #remi.server.DEBUG_MODE = 2
+
+        # start the web server to serve the Pi Presents Manager App
+        start(PPManager,address=self.ip,
+              port=self.network.manager_port,
+              username=self.network.manager_username,
+              password=self.network.manager_password,
+              multiple_instance=False,enable_file_cache=False,
+              update_interval=0.2, start_browser=False,debug=False,
+              userdata=(self.pp_dir,self.upload_dir,self.download_dir,
+              self.ip))
+
+
+
+# ***************************************
+# MAIN
+# ***************************************
+
+if __name__  ==  "__main__":
+    ppl=PPManagerLauncher()
+    ppl.init()
+    ppl.start_remi()
+    exit()
 

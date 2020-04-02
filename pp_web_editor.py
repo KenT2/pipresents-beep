@@ -54,21 +54,25 @@ class PPWebEditor(App):
         self.init() 
 
         # BUILD THE GUI
+
+        
         # frames
-        root = gui.Widget(width=770,height=500, margin='0px auto') #the margin 0px auto centers the main container
-        bottom_frame=gui.Widget(width=770,height=400)#1
-        bottom_frame.set_layout_orientation(gui.Widget.LAYOUT_HORIZONTAL)       
+        root = gui.Container(width=770,height=500, margin='0px auto') #the margin 0px auto centers the main container
+        bottom_frame=gui.Container(width=770,height=400)#1
+
+        bottom_frame.set_layout_orientation(gui.Container.LAYOUT_HORIZONTAL)       
         # bottom_frame.style['display'] = 'block'
         # bottom_frame.style['overflow'] = 'auto'
         
-        left_frame=gui.Widget(width=300,height=400)#1
-        # left_frame.set_layout_orientation(gui.Widget.LAYOUT_VERTICAL)
+        left_frame=gui.Container(width=300,height=400)#1
+        # left_frame.set_layout_orientation(gui.Container.LAYOUT_VERTICAL)
         left_frame.style['margin']='10px'
+
         
         middle_frame=gui.VBox(width=50,height=250)#1
         middle_frame.style['margin']='10px'
         
-        right_frame=gui.Widget(width=300,height=400)#1
+        right_frame=gui.Container(width=300,height=400)#1
         
         updown_frame=gui.VBox(width=50,height=400)#1
         updown_frame.style['margin']='10px'
@@ -283,12 +287,14 @@ class PPWebEditor(App):
         menubar.append(menu)
         
         #shows and medialists
-        shows_label=gui.Label('<b>Shows</b>',width=300, height=20)
+        shows_label=gui.Label('Shows',width=300, height=20)
+        shows_label.css_font_weight='bold'
         shows_label.style['margin']='5px'
         self.shows_display= gui.ListView(width=300, height=150)
         self.shows_display.set_on_selection_listener(self.show_selected)
         
-        medialists_label=gui.Label('<b>Medialists</b>',width=300, height=25)
+        medialists_label=gui.Label('Medialists',width=300, height=25)
+        medialists_label.css_font_weight='bold'
         medialists_label.style['margin']='5px'
         self.medialists_display= gui.ListView(width=300, height=150)
         self.medialists_display.set_on_selection_listener(self.medialist_selected)
@@ -304,7 +310,8 @@ class PPWebEditor(App):
         middle_frame.append(edit_show)
 
         #tracks
-        tracks_label=gui.Label('<b>Tracks in Selected Medialist</b>',width=300, height=20)
+        tracks_label=gui.Label('Tracks in Selected Medialist',width=300, height=20)
+        tracks_label.css_font_weight='bold'
         tracks_label.style['margin']='5px'
         self.tracks_display= gui.ListView(width=300, height=350)
         self.tracks_display.set_on_selection_listener(self.track_selected)
@@ -334,7 +341,7 @@ class PPWebEditor(App):
         updown_frame.append(delete_track)
 
         root.append(menubar)
-        self.profile_name_field=gui.Label('<br>')
+        self.profile_name_field=gui.Label('\n')
         root.append(self.profile_name_field)
 
         bottom_frame.append(left_frame)
@@ -363,13 +370,16 @@ class PPWebEditor(App):
         self.tracks_display.empty()
 
     def show_help (self,widget):
-        OKDialog("Help","Please Read 'manual.pdf'",width=400,height=200).show(self)
+        OKDialog("Help","Please Read /home/pipresents/manual.pdf'",width=400,height=200).show(self)
 
   
     def show_about (self,widget):
-        OKDialog("About","Web Editor for Pi Presents Profiles<br>"
-                              +"For profiles of version: " + self.editor_issue + "<br>Author: Ken Thompson"
-                              +"<br>Website: http://pipresents.wordpress.com/<br>",width=400,height=200).show(self)
+        helpme=OKDialog("About","",width=400,height=250)
+        helpme.append_label(gui.Label("Editor for Pi Presents Profiles",width=400,height=30),bold=False)
+        helpme.append_label(gui.Label("For Pi Presents Version: " + self.editor_issue,width=400,height=30),bold=False)
+        helpme.append_label(gui.Label("Author: Ken Thompson",width=400,height=30),bold=False)
+        helpme.append_label(gui.Label("Website: http://pipresents.wordpress.com/",width=400,height=30),bold=False)
+        helpme.show(self)
 
     def validate_profile(self,widget):
         if self.current_showlist != None:
@@ -435,7 +445,11 @@ class PPWebEditor(App):
     def open_existing_profile(self,widget):
         initial_dir=self.pp_home_dir+os.sep+"pp_profiles"+self.pp_profiles_offset
         if os.path.exists(initial_dir) is False:
-            OKDialog('Open Profile',"Profiles directory not found: " + initial_dir + "<br><br>Hint: Data Home option must end in pp_home").show(self)
+            uc=OKDialog('Open Profile','')
+            uc.append_label(gui.Label("Profiles directory not found: "),bold=False)
+            uc.append_label(gui.Label(initial_dir),bold=False)
+            uc.append_label(gui.Label("Hint: Data Home option must end in pp_home"),bold=False)
+            uc.show(self)
             return
         open_existing_profile_dialog = FileSelectionDialog('Open Profile','Select profile',False, initial_dir,allow_folder_selection=True,
                                                            allow_file_selection=False, 
@@ -455,8 +469,12 @@ class PPWebEditor(App):
 
     def open_profile(self,dir_path):
         if self.editor_version()!= self.definitions_version():
-            OKDialog('Open Profile','Incorrect version of Editor: '+ self.editor_issue +'<br>Definitions are: '+ PPdefinitions.DEFINITIONS_VERSION_STRING).show(self)
+            ev=OKDialog("OpenProfile","",width=400,height=250)
+            ev.append_label(gui.Label('Incorrect version of Editor: '+self.editor_issue,width=400,height=30),bold=False)
+            ev.append_label(gui.Label('Definitions are: '+ PPdefinitions.DEFINITIONS_VERSION_STRING,width=400,height=30),bold=False)
+            ev.show(self)
             return
+            
         showlist_file = dir_path + os.sep + "pp_showlist.json"
         #print 'open profile',showlist_file
         if os.path.exists(showlist_file) is False:
@@ -478,8 +496,10 @@ class PPWebEditor(App):
             OKDialog('Open Profile',"ERROR, Version of profile is greater than Pi Presents").show(self)
             return
             
-        OKCancelDialog('Open Profile',"Version of Profile is earlier then Pi Presents<br>OK to Update?",self.profile_update_confirm).show(self)
-
+        uv = OKCancelDialog("OpenProfile","",self.profile_update_confirm,width=400,height=250)
+        uv.append_label(gui.Label("Version of Profile is earlier then Pi Presents",width=400,height=30))
+        uv.append_label(gui.Label("OK to Update?",width=400,height=30))
+        uv.show(self)
 
     def profile_update_confirm(self,result):
         if result is False:
@@ -496,13 +516,12 @@ class PPWebEditor(App):
         self.refresh_shows_display()        
         self.open_medialists(self.pp_profile_dir)
         self.refresh_tracks_display()
-        self.profile_name_field.set_text('<b>'+self.pp_profile_dir+'</b>')
-
+        self.profile_name_field.set_text(self.pp_profile_dir)
+        self.profile_name_field.css_font_weight='bold'
 
     def new_profile(self,profile):
         d = InputDialog("New Profile","Name",width=400,height=200,callback=self.new_profile_confirm)
         self.new_profile_template=profile
-
         d.show(self)
 
     def new_profile_confirm(self,name):
@@ -584,7 +603,7 @@ class PPWebEditor(App):
     def copy_profile(self,widget,to_file=''):
         if self.pp_profile_dir != '':
             if to_file is '':
-                d = InputDialog("Copy Profile","To File",width=400,height=200,callback=self.copy_profile_confirm)
+                d = InputDialog("Copy Profile","To new Profile",width=400,height=200,callback=self.copy_profile_confirm)
                 d.show(self)
             else:
                 self.copy_profile_confirm(to_file)
@@ -724,7 +743,7 @@ class PPWebEditor(App):
                     else:
                         #deal with hanging medialist in show
                         self.open_medialist_by_name('')
-                        OKDialog('Select Show','Medialist in specified in the Show does not exist').show(self)
+                        OKDialog('Select Show','Medialist '+medialist+' specified in the Show does not exist').show(self)
             else:
                 #deal with start show that does not have a medialist
                     self.open_medialist_by_name('')
@@ -739,9 +758,9 @@ class PPWebEditor(App):
         
 
     def edit_show(self,show_types,field_specs):
-        show_title=self.current_showlist.selected_show()['title']
-        show_ref=self.current_showlist.selected_show()['show-ref']  
         if self.current_showlist is not None and self.current_showlist.show_is_selected():
+            show_title=self.current_showlist.selected_show()['title']
+            show_ref=self.current_showlist.selected_show()['show-ref']  
             self.edit_show_dialog=WebEditItem("Edit Show - "+show_title + ' ['+show_ref+']',
                                               self.current_showlist.selected_show(),show_types,field_specs,self.show_refs(),
                        self.initial_media_dir,self.pp_home_dir,self.pp_profile_dir,'show',self.finished_edit_show)
@@ -801,7 +820,7 @@ class PPWebEditor(App):
 
         path = self.pp_profile_dir + os.sep + name
         if os.path.exists(path) is  True:
-            OKDialog("Add Medialist","Medialist file exists<br>" + path).show(self)
+            OKDialog("Add Medialist","Medialist file exists: " + name).show(self)
             return ''
         nfile = open(path,'w')
         nfile.write("{")
@@ -1159,9 +1178,12 @@ class PPWebEditor(App):
 
 
     def m_update_all(self,widget):
-          all_dir=self.pp_home_dir+os.sep+'pp_profiles'+self.pp_profiles_offset
-          OKCancelDialog('Update All','OK to update all profiles in <br>'+ all_dir,self.update_all_confirm).show(self)
-
+        all_dir=self.pp_home_dir+os.sep+'pp_profiles'+self.pp_profiles_offset
+        uc=OKCancelDialog('Update All','',self.update_all_confirm)
+        uc.append_label(gui.Label('OK to update all profiles in: '))
+        uc.append_label(gui.Label(all_dir))
+        uc.show(self)
+                
     def update_all_confirm(self,result):
         if result is True:
             self.update_all()
@@ -1393,7 +1415,7 @@ class PPWebEditor(App):
 class Options(AdaptableDialog):
 
     def __init__(self, *args):
-        super(Options, self).__init__(title='<b>Edit Options</b>',width=450,height=300,confirm_name='Ok',cancel_name='Cancel')
+        super(Options, self).__init__(title='Edit Options',width=450,height=300,confirm_name='Ok',cancel_name='Cancel')
 
         # build the gui in _init as it is subclassed
         home_dir_field= gui.TextInput(width=250, height=30)
@@ -1453,8 +1475,9 @@ class Options(AdaptableDialog):
         self.get_field('media_dir').set_value(self.initial_media_dir)       
         self.get_field('offset').set_value(self.pp_profiles_offset)
         self.get_field('error').set_text('')
-
-    def confirm_dialog(self):
+        
+    @gui.decorate_event
+    def confirm_dialog(self,emitter):
         text=''
 
         home_dir=self.get_field('home_dir').get_value()
@@ -1464,20 +1487,20 @@ class Options(AdaptableDialog):
         
         if os.path.exists(home_dir) is  False:
             OKDialog('Editor Options','Data Home directory not found ' + home_dir).show(self._base_app_instance)
-            text="<b>Data Home directory not found "+home_dir+ "</b>"
+            text="Data Home directory not found "+home_dir
             self.get_field('error').set_text(text)
             return
 
         if os.path.exists(media_dir) is  False:
             OKDialog('Editor Options','Media directory not found ' + media_dir).show(self._base_app_instance)
-            text="<b>Media directory not found " + media_dir + "</b>"
+            text="Media directory not found " + media_dir
             self.get_field('error').set_text(text)
             return
 
         path=home_dir+os.sep+'pp_profiles'+ offset
         if os.path.exists(path) is  False:
             OKDialog('Editor Options','Current Profiles Directory not found '+path).show(self._base_app_instance)
-            text="<b> Current Profiles Directory not found "+path+ "</b>"
+            text="Current Profiles Directory not found "+path
             self.get_field('error').set_text(text)
             return
         
@@ -1559,7 +1582,7 @@ if __name__  ==  "__main__":
     else:
         # start the web server to serve the Web Editor App
         start(PPWebEditor,address=ip, port=network.editor_port,username=network.editor_username,password=network.editor_password,
-          multiple_instance=True,enable_file_cache=True, debug=False,
+          multiple_instance=True,enable_file_cache=False, debug=False,
           update_interval=0.3, start_browser=start_browser)
         exit()
 

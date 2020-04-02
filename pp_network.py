@@ -1,6 +1,7 @@
 import subprocess
 import smtplib
 from email.mime.text import MIMEText
+import email.utils
 import configparser
 import time
 from time import sleep
@@ -27,6 +28,10 @@ class Mailer(object):
         self.email_to=self.config.get('email-editable','to')
         self.is_to_list= self.email_to.splitlines()
         self.is_to = ', '.join(self.is_to_list)
+        if self.config.has_option('email-editable','sender'):
+            self.email_sender = self.config.get('email-editable','sender')
+        else:
+            self.email_sender = self.username
 
         email_allowed=self.config.get('email-editable','email_allowed')
         if email_allowed == 'yes':
@@ -69,6 +74,7 @@ class Mailer(object):
     def save_config(self):
         self.config.set('email-editable','email_allowed','yes' if self.email_allowed is True else'no')
         self.config.set('email-editable','to',self.email_to)
+        self.config.set('email-editable','sender',self.email_sender)
         self.config.set('email-editable','email_with_ip','yes' if self.email_with_ip is True else'no')
         self.config.set('email-editable','email_at_start','yes'if self.email_at_start is True else 'no')
         self.config.set('email-editable','email_on_error','yes' if self.email_on_error is True else 'no')
@@ -117,12 +123,14 @@ class Mailer(object):
 
         msg = MIMEText(message)
         msg['Subject'] = subject
-        msg['From'] = self.username
+        msg['From'] = self.email_sender
         msg['To'] = self.is_to
+        msg['Date']= email.utils.formatdate(localtime=True)
 
+        #print (self.username,self.email_sender,self.is_to_list,msg)
         
         try:
-            self.smtpserver.sendmail(self.username, self.is_to_list, msg.as_string())
+            self.smtpserver.sendmail(self.email_sender, self.is_to_list, msg.as_string())
         except Exception as ex:
             return False,'sendmail ' + str(ex)
         return True,''

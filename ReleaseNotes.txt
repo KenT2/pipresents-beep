@@ -1,3 +1,12 @@
+Version 1.4.4c 2/4/2020
+========================
+There is a new field 'sender' in /pp_config/pp_email.cfg. This is used in From: field
+of the email and allows From to be different from username.
+Add the field to pp_email.cfg. If you do not username will be used instead. Editing the
+email configuration when running pp_manager will also add the field.
+
+
+
 Version 1.4.4b 20/3/2020
 ========================
 Support for 2 displays has been improved to include rotation of the displays

@@ -27,19 +27,19 @@ class MyApp(App):
         super(MyApp, self).__init__(*args)
 
     def main(self):
-        verticalContainer = gui.Widget(width=540, margin='0px auto') #the margin 0px auto centers the main container
+        verticalContainer = gui.Container(width=540, margin='0px auto') #the margin 0px auto centers the main container
         verticalContainer.style['display'] = 'block'
         verticalContainer.style['overflow'] = 'hidden'
 
-        horizontalContainer = gui.Widget(width='100%', layout_orientation=gui.Widget.LAYOUT_HORIZONTAL, margin='0px')
+        horizontalContainer = gui.Container(width='100%', layout_orientation=gui.Container.LAYOUT_HORIZONTAL, margin='0px')
         horizontalContainer.style['display'] = 'block'
         horizontalContainer.style['overflow'] = 'auto'
         
-        subContainerLeft = gui.Widget(width=320)
+        subContainerLeft = gui.Container(width=320)
         subContainerLeft.style['display'] = 'block'
         subContainerLeft.style['overflow'] = 'auto'
         subContainerLeft.style['text-align'] = 'center'
-        self.img = gui.Image('/res/logo.png', width=100, height=100, margin='10px')
+        self.img = gui.Image('/res:logo.png', width=100, height=100, margin='10px')
         self.img.set_on_click_listener(self.on_img_clicked)
 
         self.table = gui.Table.new_from_list([('ID', 'First Name', 'Last Name'),
@@ -50,7 +50,7 @@ class MyApp(App):
                                    ('105', 'Maria', 'Papadopoulos')], width=300, height=200, margin='10px')
 
         # the arguments are	width - height - layoutOrientationOrizontal
-        subContainerRight = gui.Widget()
+        subContainerRight = gui.Container()
         subContainerRight.style['width'] = '220px'
         subContainerRight.style['display'] = 'block'
         subContainerRight.style['overflow'] = 'auto'
@@ -104,10 +104,13 @@ class MyApp(App):
         self.date = gui.Date('2015-04-13', width=200, height=20, margin='10px')
         self.date.set_on_change_listener(self.date_changed)
 
-        # self.video = gui.VideoPlayer('http://www.w3schools.com/tags/movie.mp4',
-        #                             'http://www.oneparallel.com/wp-content/uploads/2011/01/placeholder.jpg',
-        #                             width=300, height=270, margin='10px')
-        self.video=None
+        self.video = gui.Widget( _type='iframe', width=290, height=200, margin='10px')
+        self.video.attributes['src'] = "https://drive.google.com/file/d/0B0J9Lq_MRyn4UFRsblR3UTBZRHc/preview"
+        self.video.attributes['width'] = '100%'
+        self.video.attributes['height'] = '100%'
+        self.video.attributes['controls'] = 'true'
+        self.video.style['border'] = 'none'
+
                                      
         self.tree = gui.TreeView(width='100%', height=300)
         ti1 = gui.TreeItem("Item1")
@@ -155,7 +158,7 @@ class MyApp(App):
         subContainerLeft.append(self.table)
         subContainerLeft.append(self.listView)
         subContainerLeft.append(self.link)
-        # subContainerLeft.append(self.video)
+        subContainerLeft.append(self.video)
 
         horizontalContainer.append(subContainerLeft)
         horizontalContainer.append(subContainerRight)

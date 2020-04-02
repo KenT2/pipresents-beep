@@ -75,10 +75,10 @@ class OSCWebEditor(AdaptableDialog):
     
 
     def __init__(self, *args):
-        super(OSCWebEditor, self).__init__(width=550,height=600,title='<b>Edit OSC Configuration</b>',
+        super(OSCWebEditor, self).__init__(width=550,height=600,title='Edit OSC Configuration',
                                            confirm_name='OK',cancel_name='Cancel')
 
-        self.append_field(gui.Label('<b>This Unit</b>',width=250,height=30))
+        self.append_label(gui.Label('This Unit',width=250,height=30))
         e_this_unit_name_field = gui.TextInput(width=250,height=30)
         self.append_field_with_label('OSC Name of This Unit:',e_this_unit_name_field,key='e_this_unit_name')       
 
@@ -86,7 +86,7 @@ class OSCWebEditor(AdaptableDialog):
         self.append_field_with_label('IP of This Unit:',e_this_unit_ip_field,key='e_this_unit_ip')
 
         #SLAVE
-        self.append_field(gui.Label('<b>OSC Slave</b>',width=250,height=30))
+        self.append_label(gui.Label('OSC Slave',width=250,height=30))
 
         e_slave_enabled_field = gui.TextInput(width=250,height=30)
         self.append_field_with_label('OSC Slave enabled (yes/no):',e_slave_enabled_field,key='e_slave_enabled')  
@@ -96,7 +96,7 @@ class OSCWebEditor(AdaptableDialog):
         
 
         # MASTER
-        self.append_field(gui.Label('<b>OSC Master</b>',width=250,height=30))
+        self.append_label(gui.Label('OSC Master',width=250,height=30))
         
         e_master_enabled_field = gui.TextInput(width=250,height=30)
         self.append_field_with_label('OSC Master enabled (yes/no):',e_master_enabled_field,key='e_master_enabled')  
@@ -137,8 +137,8 @@ class OSCWebEditor(AdaptableDialog):
         self.get_field('e_slave_units_ip').set_value(config.get('master','slave-units-ip'))
 
 
-
-    def confirm_dialog(self):
+    @gui.decorate_event
+    def confirm_dialog(self,emitter):
 
         if self.get_field('e_this_unit_name').get_value() =='':
             OKDialog('OSC Config','This Unit OSC Name must not be blank').show(self._base_app_instance)

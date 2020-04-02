@@ -7,6 +7,7 @@ import time
 
 from pp_definitions import PPdefinitions
 from pp_utils import Monitor
+from pp_livelistfetcher import LiveListFetcher
 
 class LiveList(object):
 
@@ -17,6 +18,7 @@ class LiveList(object):
         self._tracks=[]
         self._num_tracks=0
         self.last_num_tracks=-1
+        self.llf = LiveListFetcher()  # start livelist fetcher
         
 
 # ***************************
@@ -75,10 +77,12 @@ class LiveList(object):
 
 # the methods mirror medialist methods for anonymous tracks
 
-    # pass live_track directories from child
+    # get live_track directories from liveshow
     def live_tracks(self,dir1,dir2):
         self.pp_live_dir1=dir1
         self.pp_live_dir2=dir2
+        # and pass them to the fetcher
+        self.llf.live_tracks(dir1,dir2)
 
     def length(self):
         return self._num_tracks
@@ -249,6 +253,8 @@ class LiveList(object):
 
 
     def create_new_livelist(self):
+        # fetch new livelist if available
+        self.llf.fetch_livelist()
         self.new_livelist=[]
         if os.path.exists(self.pp_live_dir1):
             for track_file in os.listdir(self.pp_live_dir1):

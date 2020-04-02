@@ -29,7 +29,7 @@ class WebEditItem(AdaptableDialog):
         self.okcancel_height=100
 
 
-        super(WebEditItem, self).__init__('<b>'+title+'</b>','',width=self.frame_width+700,height=self.fields_height+self.tab_height+self.okcancel_height,
+        super(WebEditItem, self).__init__(title,'',width=self.frame_width+700,height=self.fields_height+self.tab_height+self.okcancel_height,
                                           confirm_name='OK',cancel_name='Cancel')
 
         self.field_content = field_content   # dictionary - the track parameters to be edited and returned
@@ -113,11 +113,11 @@ class WebEditItem(AdaptableDialog):
             width=len(field_spec['text'])*8+4
             self.current_tab = self.tabview.add_tab(width,field_spec['name'],field_spec['text'])
             # print 'make tab', field_spec['name']
-            self.current_tab.set_layout_orientation(gui.Widget.LAYOUT_HORIZONTAL)
-            self.col_0=gui.Widget(width=self.frame_width/2) #0
-            self.col_0.set_layout_orientation(gui.Widget.LAYOUT_VERTICAL)
-            self.col_1=gui.Widget(width=self.frame_width/2) #0
-            self.col_1.set_layout_orientation(gui.Widget.LAYOUT_VERTICAL)
+            self.current_tab.set_layout_orientation(gui.Container.LAYOUT_HORIZONTAL)
+            self.col_0=gui.Container(width=self.frame_width/2) #0
+            self.col_0.set_layout_orientation(gui.Container.LAYOUT_VERTICAL)
+            self.col_1=gui.Container(width=self.frame_width/2) #0
+            self.col_1.set_layout_orientation(gui.Container.LAYOUT_VERTICAL)
 
             self.current_tab.append(self.col_0,key='col_0')
             self.current_tab.append(self.col_1,key='col_1')
@@ -202,8 +202,10 @@ class WebEditItem(AdaptableDialog):
                 self.tab_row+=1
                 self.col_row+=1
                 return obj,button
-
-    def confirm_dialog(self):
+                
+                
+    @gui.decorate_event
+    def confirm_dialog(self,emitter):
         # OK button is pressed so update the field values in the profile
         # self.field_content - dictionary - the track parameters to be edited and returned
         # key is field name e.g. omx-window

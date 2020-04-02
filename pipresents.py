@@ -55,7 +55,7 @@ class PiPresents(object):
         # gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_INSTANCES|gc.DEBUG_OBJECTS|gc.DEBUG_SAVEALL)
         gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_SAVEALL)
         self.pipresents_issue="1.4.4"
-        self.pipresents_minorissue = '1.4.4b'
+        self.pipresents_minorissue = '1.4.4c'
         # position and size of window without -f command line option
         self.nonfull_window_width = 0.45 # proportion of width
         self.nonfull_window_height= 0.7 # proportion of height
@@ -710,7 +710,7 @@ class PiPresents(object):
         elif reason == 'error':
             if self.email_enabled is True and self.mailer.email_on_error is True:
                 subject= '[Pi Presents] ' + self.unit + ': PP Exited with reason: Error'
-                message_text = 'Error message: '+ message + '\n'+ time.strftime("%Y-%m-%d %H:%M") + '\n ' + self.unit + '\n ' + self.interface + '\n ' + self.ip 
+                message_text = 'Download log for error message\n'+ time.strftime("%Y-%m-%d %H:%M") + '\n ' + self.unit + '\n ' + self.interface + '\n ' + self.ip 
                 self.send_email(reason,subject,message_text)   
             self.mon.sched(self,None, "Pi Presents closing because of error, sorry\n")
             self.mon.log(self, "Pi Presents closing because of error, sorry")

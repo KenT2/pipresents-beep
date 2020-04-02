@@ -5,10 +5,6 @@ import remi.gui as gui
 from remi_plus import AdaptableDialog
 from pp_utils import parse_rectangle
 from pp_timeofday import TimeOfDay
-"""
-1/12/2016 - warn if foreign files in profile rather than abort
-
-"""
 
 
 class Validator(AdaptableDialog):
@@ -22,8 +18,8 @@ class Validator(AdaptableDialog):
         self.textb = gui.TextInput(width=550,height=400,single_line=False)
         self.append_field(self.textb,'text')
 
-
-    def confirm_dialog(self):
+    @gui.decorate_event
+    def confirm_dialog(self,emitter):
           self.hide()
 
     def display(self,priority,text):

@@ -11,8 +11,8 @@ def append_with_label(parent,text,field,button,width=300,key=''):
     field_height = int(gui.from_pix(field.style['height']))
     field_width = int(gui.from_pix(field.style['width']))
     label = gui.Label(text,width=width-field_width - 3*fields_spacing-20, height=field_height)
-    _container = gui.Widget(width=width, height=field_height)
-    _container.set_layout_orientation(gui.Widget.LAYOUT_HORIZONTAL)
+    _container = gui.Container(width=width, height=field_height)
+    _container.set_layout_orientation(gui.Container.LAYOUT_HORIZONTAL)
     _container.style['margin']='4px'
     _container.append(label,key='lbl' + str(key))
     _container.append(field,key='field'+str(key))
@@ -21,20 +21,17 @@ def append_with_label(parent,text,field,button,width=300,key=''):
     parent.append(_container,key=key)
 
 
+
 # *****************************************
 #  Dialog
 # *****************************************
 
-class Dialog(gui.Widget):
+class Dialog(gui.Container):
     """Dialog widget. It can be customized to create personalized dialog windows.
     """
 
-    @gui.decorate_constructor_parameter_types([])
+    #@gui.decorate_constructor_parameter_types([])
     def __init__(self,  **kwargs):
-        """
-        Args:
-            kwargs: See Widget.__init__()
-        """
         super(Dialog, self).__init__(**kwargs)
         self._base_app_instance = None
         self._old_root_widget = None
@@ -55,94 +52,96 @@ class Dialog(gui.Widget):
         self._base_app_instance.set_root_widget(self._old_root_widget)
 
 
-
 class AdaptableDialog(Dialog):
-
-    """
-    provides flexibility in the use of the Ok and cancel buttons
-    defines a vertical container with optional Ok and Cancel buttons
-    Args:
-        title (str): The title of the dialog.
-        message (str): The message description.
-        _name  - If non-blank display confirm or cancel buttons with the provided name
-        kwargs: See Widget.__init__()
+    """ Generic Dialog widget. It can be customized to create personalized dialog windows.
+        You can setup the content adding content widgets with the functions add_field or add_field_with_label.
+        The user can confirm or dismiss the dialog with the common buttons Cancel/Ok.
+        Each field added to the dialog can be retrieved by its key, in order to get back the edited value. Use the function
+         get_field(key) to retrieve the field.
+        The Ok button emits the 'confirm_dialog' event. Register the listener to it with connect.
+        The Cancel button emits the 'cancel_dialog' event. Register the listener to it with set_on_cancel_dialog_listener.
     """
 
-    EVENT_ONCONFIRM = 'confirm_dialog'
-    EVENT_ONCANCEL = 'cancel_dialog'
-
-    @gui.decorate_constructor_parameter_types([str, str,bool,bool,bool,bool,str,str,int])
-    def __init__(self, title='', message='',confirm_name='',cancel_name='',frame_height=0,**kwargs):
+    def __init__(self, title='', message='',confirm_name='',cancel_name='',frame_height=0,*args,**kwargs):
         """
         Args:
             title (str): The title of the dialog.
             message (str): The message description.
-            
-            kwargs: See Widget.__init__()
+            kwargs: See Container.__init__()
         """
-        super(AdaptableDialog, self).__init__(**kwargs)
-        self.set_layout_orientation(gui.Widget.LAYOUT_VERTICAL)
-        self.style['display'] = 'block'
-        self.style['overflow'] = 'auto'
-        self.style['margin'] = '0px auto'
+        super(AdaptableDialog, self).__init__(*args, **kwargs)
+        self.set_layout_orientation(gui.Container.LAYOUT_VERTICAL)
+        self.style.update({'display':'block', 'overflow':'auto', 'margin':'0px auto'})
 
-
-        
         if len(title) > 0:
             t = gui.Label(title)
             t.add_class('DialogTitle')
-            self.append(t)
+            #t.css_font_weight='bold'
+            self.append(t, "title")   ###
 
         if len(message) > 0:
-            m = gui.Label('<br>'+message)
-            m.style['margin'] = '5px'
-            self.append(m)
+            m = gui.Label(message)
+            m.css_margin = '5px'
+            self.append(m, "message")  ###
 
         # container for user widgets
         if frame_height !=0:
-            self._container = gui.Widget(height=frame_height)
+            self._container = gui.Container(height=frame_height)
         else:
-            self._container = gui.Widget()        
-        self._container.style['display'] = 'block'
-        self._container.style['overflow'] = 'auto'
-        self._container.style['margin'] = '5px'
-        self._container.set_layout_orientation(gui.Widget.LAYOUT_VERTICAL)
-        self.append(self._container)
+            self._container = gui.Container() 
+        self._container.style.update({'display':'block', 'overflow':'auto', 'margin':'5px'})
+        self._container.set_layout_orientation(gui.Container.LAYOUT_VERTICAL)
+        self.append(self._container, "central_container")  #moved
 
-        if cancel_name !='' or confirm_name !='':
-            hlay = gui.Widget(height=35)
-            hlay.style['display'] = 'block'
+        if cancel_name !='' or confirm_name !='':            
+            hlay = gui.Container(height=35)
+            hlay.css_display = 'block'
             hlay.style['overflow'] = 'visible'
-
+            self.append(hlay, "buttons_container")
 
         if confirm_name !='':
             self.conf = gui.Button(confirm_name)
             self.conf.set_size(100, 30)
-            self.conf.style['margin'] = '3px'
-            self.conf.style['float'] = 'right'
-            self.conf.attributes[self.EVENT_ONCLICK] = "sendCallback('%s','%s');" % (self.identifier, self.EVENT_ONCONFIRM)
-            hlay.append(self.conf)
+            self.conf.css_margin = '3px'
+            self.conf.style['float'] = 'right'  #new
+            hlay.append(self.conf, "confirm_button")            
+            self.conf.onclick.connect(self.confirm_dialog)
             
-        if cancel_name != '':
+        if cancel_name != '':                    
             self.cancel = gui.Button(cancel_name)
             self.cancel.set_size(100, 30)
-            self.cancel.style['margin'] = '3px'
-            self.cancel.style['float'] = 'right'
-            self.cancel.attributes[self.EVENT_ONCLICK] = "sendCallback('%s','%s');" % (self.identifier, self.EVENT_ONCANCEL)
-            hlay.append(self.cancel)
-            
-        if cancel_name !='' or confirm_name !='':
-            self.append(hlay)
+            self.cancel.css_margin = '3px'
+            self.cancel.style['float'] = 'right'   #new
+            hlay.append(self.cancel, "cancel_button")
+            self.cancel.onclick.connect(self.cancel_dialog)
 
         self.inputs = {}
 
-        
+
+    #@decorate_set_on_listener("(self,emitter)")
+    @gui.decorate_event
+    def confirm_dialog(self, emitter):
+        """Event generated by the OK button click.
+        """
+        self.hide()
+        return ()
+
+    #@decorate_set_on_listener("(self,emitter)")
+    @gui.decorate_event
+    def cancel_dialog(self, emitter):
+        """Event generated by the Cancel button click."""
+        self.hide()
+        return ()
+
+
+
     def append_field_with_label(self,text,field,button=None,width=300,key=''):
         key = field.identifier if key == '' else key
         self.inputs[key] = field
         label = gui.Label(text)
         label.style['margin'] = '0px 5px'
         label.style['min-width'] = '30%'
+        label.css_font_weight='bold'
         _row = gui.HBox()
         _row.style['justify-content'] = 'space-between'
         _row.style['overflow'] = 'auto'
@@ -154,9 +153,7 @@ class AdaptableDialog(Dialog):
         self._container.append(_row,key=key)
 
 
-
-
-    def append_field(self,field,key=''):
+    def append_field(self,field,key='',bold=False):
 
         key = field.identifier if key == '' else key
         self.inputs[key] = field
@@ -166,6 +163,21 @@ class AdaptableDialog(Dialog):
         _row.style['padding'] = '3px'
         _row.append(self.inputs[key], key=key)
         self._container.append(_row, key=key)
+        
+    def append_label(self,label,bold=True):
+        label.style['margin'] = '0px 5px'
+        label.style['min-width'] = '30%'
+        if bold:
+            label.css_font_weight='bold'
+            label.css_font_size = '18px'
+        _row = gui.HBox()
+        _row.style['justify-content'] = 'space-between'
+        _row.style['overflow'] = 'auto'
+        _row.style['padding'] = '3px'
+        _row.append(label)
+        self._container.append(_row)
+        
+        
         
 
     def get_field(self, key):
@@ -178,47 +190,15 @@ class AdaptableDialog(Dialog):
             GenericDialog.add_field_with_label.
         """
         return self.inputs[key]
-    
-
-    # override these in a subclass if there is a need for a conditional self.hide() or to get the input value
-
-    def confirm_dialog(self):
-        """Event generated by the OK button click.
-        """
-        # print '\nAdaptable Dialog OK - hide'
-        self.hide()
-        return self.eventManager.propagate(self.EVENT_ONCONFIRM, ())
 
 
-    def cancel_dialog(self):
-        """Event generated by the Cancel button click."""
-        # print '\nAdaptable Dialog Cancel - hide'
-        self.hide()
-        return self.eventManager.propagate(self.EVENT_ONCANCEL, ())
-    
-
-    @gui.decorate_set_on_listener("confirm_dialog", "(self,emitter)")
+    @gui.decorate_explicit_alias_for_listener_registration
     def set_on_confirm_dialog_listener(self, callback, *userdata):
-        """Registers the listener for the GenericDialog.confirm_dialog event.
+        self.confirm_dialog.connect(callback, *userdata)
 
-        Note: The prototype of the listener have to be like my_on_confirm_dialog(self, widget).
-
-        Args:
-            callback (function): Callback function pointer.
-        """
-        self.eventManager.register_listener(self.EVENT_ONCONFIRM, callback, *userdata)
-
-
-    @gui.decorate_set_on_listener("cancel_dialog", "(self,emitter)")
+    @gui.decorate_explicit_alias_for_listener_registration
     def set_on_cancel_dialog_listener(self, callback, *userdata):
-        """Registers the listener for the GenericDialog.cancel_dialog event.
-
-        Note: The prototype of the listener have to be like my_on_cancel_dialog(self, widget).
-
-        Args:
-            callback (function): Callback function pointer.
-        """
-        self.eventManager.register_listener(self.EVENT_ONCANCEL, callback, *userdata)
+        self.cancel_dialog.connect(callback, *userdata)
 
 
 class InputDialog(AdaptableDialog):
@@ -242,8 +222,8 @@ class InputDialog(AdaptableDialog):
         self.append_field(self.input_text,'textinput')
         self.input_text.set_text(initial_value)
 
-
-    def confirm_dialog(self):
+    @gui.decorate_event
+    def confirm_dialog(self,emitter):
         """Event called pressing on OK button.
             overrides confirm_dialog of Adaptable Dialog
         """ 
@@ -272,8 +252,8 @@ class FileSelectionDialog(AdaptableDialog):
                                                       allow_folder_selection)
         self.append_field(self.fileFolderNavigator,'fileFolderNavigator')
 
-
-    def confirm_dialog(self):
+    @gui.decorate_event
+    def confirm_dialog(self,emitter):
         #overides Adaptable Dialog
         # print 'file dialog - hide'
         params = self.fileFolderNavigator.get_selection_list()
@@ -290,16 +270,16 @@ class OKCancelDialog(AdaptableDialog):
 
     def __init__(self, title, text,callback,width=500, height=200):
         self.ok_cancel_callback=callback
-        super(OKCancelDialog, self).__init__(width=width, height=height, title='<b>'+title+'</b>', message=text,confirm_name='OK',cancel_name='Cancel')
-        self.set_on_confirm_dialog_listener(self.confirm_it)
-        self.set_on_cancel_dialog_listener(self.cancel_it)
-
+        super(OKCancelDialog, self).__init__(width=width, height=height, title=title, message=text,confirm_name='OK',cancel_name='Cancel')
         
-    def confirm_it(self,widget):
+    @gui.decorate_event
+    def confirm_dialog(self,emitter):
+        self.hide()
         self.ok_cancel_callback(True)
 
-
-    def cancel_it(self,widget):
+    @gui.decorate_event
+    def cancel_dialog(self,emitter):
+        self.hide()
         self.ok_cancel_callback(False)
 
         
@@ -307,9 +287,21 @@ class OKCancelDialog(AdaptableDialog):
 class OKDialog(AdaptableDialog):
 
     def __init__(self, title, message,width=500, height=200):
-        super(OKDialog, self).__init__(width=width, height=height, frame_height=height-300,title='<b>'+title+'</b>',
+        super(OKDialog, self).__init__(width=width, height=height, frame_height=height-300,title=title,
                                        message=message,confirm_name='OK')
 
+class LinkDialog(AdaptableDialog):
+
+    def __init__(self, title, message,link_url,link_text,width=500, height=200):
+        super(LinkDialog, self).__init__(width=width, height=height, frame_height=height-300,title=title,
+                                       message=message,confirm_name='Done')
+
+        self.link = gui.Link(link_url, link_text, width=200, height=30, margin='10px')
+
+        self.append_label(self.link,bold=False)
+  
+
+                                        
 
 class ReportDialog(AdaptableDialog):
 
@@ -318,10 +310,10 @@ class ReportDialog(AdaptableDialog):
         super(ReportDialog, self).__init__(title,'',width=600,height=500,confirm_name='Done')
         self.textb = gui.TextInput(width=550,height=400,single_line=False)
         self.append_field(self.textb,'text')
-        # self.set_on_confirm_dialog_listener(self.confirm)
 
 
-    def confirm_dialog(self):
+    @gui.decorate_event
+    def confirm_dialog(self,emitter):
         # print 'report dialog - hide'
         self.hide()
 
@@ -329,6 +321,7 @@ class ReportDialog(AdaptableDialog):
     def append_line(self,text):
         self.text +=text+'\n'
         self.textb.set_value(self.text)  
+
 
 #  ****************************************************
 # TabView - a framework for a Tabbed Editor
@@ -342,7 +335,7 @@ add_tab adds a button to the tab bar, and creates and returns a panel
 
 """
 
-class TabView(gui.Widget):
+class TabView(gui.Container):
     def __init__(self, frame_width,frame_height,bar_height,**kwargs):
         super(TabView, self).__init__(**kwargs)
         
@@ -351,7 +344,7 @@ class TabView(gui.Widget):
         self.frame_width=frame_width
         self.frame_height=frame_height
         
-        self.set_layout_orientation(gui.Widget.LAYOUT_VERTICAL)
+        self.set_layout_orientation(gui.Container.LAYOUT_VERTICAL)
 
         
         #dictionary to  lookup panel object given key
@@ -359,8 +352,8 @@ class TabView(gui.Widget):
         self.tab_titles=dict()
         
         #tab bar
-        self.tab_bar=gui.Widget(width=self.bar_width,height=self.bar_height)
-        self.tab_bar.set_layout_orientation(gui.Widget.LAYOUT_HORIZONTAL)
+        self.tab_bar=gui.Container(width=self.bar_width,height=self.bar_height)
+        self.tab_bar.set_layout_orientation(gui.Container.LAYOUT_HORIZONTAL)
 
 
         # frame to which the panel overwriting the previous. needed to make formatting work?
@@ -370,8 +363,8 @@ class TabView(gui.Widget):
         tab_button = self._tab_button(w, self.bar_height, title,'button',key)
         self.bar_width+=w
         self.tab_bar.append(tab_button,key=key)
-        panel_obj=gui.Widget(width=self.frame_width,height=self.frame_height) #0
-        panel_obj.set_layout_orientation(gui.Widget.LAYOUT_VERTICAL)
+        panel_obj=gui.Container(width=self.frame_width,height=self.frame_height) #0
+        panel_obj.set_layout_orientation(gui.Container.LAYOUT_VERTICAL)
         self.panel_obj[key]=panel_obj
         self.tab_titles[key]=title
         # print 'add tab',title,key,panel_obj
@@ -390,8 +383,8 @@ class TabView(gui.Widget):
         self.tab_title.style['margin']='2px'
         
         # frame for the tab panel, different tabs are switched into this frame.
-        self.tab_frame=gui.Widget(width=self.frame_width,height=self.frame_height) #0
-        self.tab_frame.set_layout_orientation(gui.Widget.LAYOUT_VERTICAL)
+        self.tab_frame=gui.Container(width=self.frame_width,height=self.frame_height) #0
+        self.tab_frame.set_layout_orientation(gui.Container.LAYOUT_VERTICAL)
         
         # add the bar, panels and title to the subclassed Widget
         self.append(self.tab_bar,key='tab_bar')
@@ -421,19 +414,17 @@ class TabView(gui.Widget):
         panel_obj=self.panel_obj[key]
         # print 'switch tab',key,panel_obj
         self.tab_frame.append(panel_obj,key='tab_frame')
-        self.tab_title.set_text('<b>'+self.tab_titles[key]+'</b>')
+        self.tab_title.set_text(self.tab_titles[key])
         
 
 
 
-# *****************************************
-# Test App to show a TabView in a dialog
-# *****************************************
 
-class Tabbed(App):
+
+class Test(App):
 
     def __init__(self, *args):
-        super(Tabbed, self).__init__(*args)
+        super(Test, self).__init__(*args)
 
 
     def main(self):
@@ -443,73 +434,29 @@ class Tabbed(App):
         root = gui.VBox(width=600,height=200) #1
 
         # button 
-        button_tabbed_dialog = gui.Button( 'Open Tabbed Editor',width=250, height=30)
-        button_tabbed_dialog.set_on_click_listener(self.on_tabbed_dialog_button_clicked)
-        root.append(button_tabbed_dialog)
-
-        # and fields in main page    
-        self.t1f1_field=gui.Label('Tab1 Field 1: ',width=400,height=30)
-        root.append(self.t1f1_field)
-        
-        self.t2f1_field=gui.Label('Tab2 Field 1: ',width=400,height=30)
-        root.append(self.t2f1_field)
-
-
-        # dialog to contain the TabView
-        # ***********************************
-        self.tabbed_dialog=AdaptableDialog(width=450,height=300,title='<b>Tabbed Editor</b>',
-                                             message='',autohide_ok=False)
-        self.tabbed_dialog.set_on_confirm_dialog_listener(self.tabbed_dialog_confirm)
-
-        # construct a Tabview - frame_width,frame_height,bar height
-        frame_width=400
-        self.tabview=TabView(frame_width,100,30)
-
-        # add tabs - tab width,key,title
-        self.panel1=self.tabview.add_tab(100,'tab1','Tab 1')
-        self.panel2=self.tabview.add_tab(100,'tab2','Tab 2')
-
-        # and finish building the tabview
-        self.tabview.construct_tabview()
-
-        # add some fields to the tab panels
-        self.t1field1=gui.TextInput(width=300, height=35)
-        self.t1field1.set_text('Content of Tab 1 field 1')
-        append_with_label(self.panel1,'Field 1',self.t1field1,None,width=frame_width)
- 
-        self.t2field1=gui.TextInput(width=250, height=30)
-        self.t2field1.set_text('Content of Tab 2 field 1')
-        self.panel2.append(self.t2field1)
-
-        # add the tabview to the dialog
-        self.tabbed_dialog.append_field(self.tabview,'tab_view')
-        
+        dialog_button= gui.Button( 'Open Diaplog',width=250, height=30)
+        root.append(dialog_button)
+        dialog_button.onclick.connect(self.dialog_button_clicked)
         return root
 
 
-    def on_tabbed_dialog_button_clicked(self,widget):
-        self.tabbed_dialog.show(self)
-        self.tabview.show('tab1')
+    def dialog_button_clicked(self,widget):
+        self.dialog = AdaptableDialog(title='Adaptable Dialog',
+             message='Click Ok to transfer content to main page',
+             confirm_name='OKK',cancel_name='CAA', frame_height='500px')
+        self.dialog.confirm_dialog.do(self.dialog_confirm)
+        self.dialog.cancel_dialog.do(self.dialog_cancel)
+        self.dialog.show(self)
 
+    def dialog_cancel(self,widget):
+        print ('CANCEL button pressed')
+        #self.dialog.hide()
+        
+    def dialog_confirm(self,widget):
+        print ('OK button pressed')
+        #self.dialog.hide()
 
-    def tabbed_dialog_confirm(self,widget):
-        OKCancelDialog('Tabbed Editor','Really  save the changes',self.conf_continue).show(self)
-
-    def conf_continue(self,result):
-        if result is True:
-            # print 'dialog confirm'
-            result=self.t1field1.get_value()
-            self.t1f1_field.set_text('Tab1 Field1: '+result)
-            
-            result=self.t2field1.get_value()
-            self.t2f1_field.set_text('Tab2 Field1: '+result)
-            self.tabbed_dialog.hide()
-            OKDialog('Tabbed Editor','Saved').show(self)
-        else:
-            OKDialog('Tabbed Editor','Not Saved').show(self)
-           
-
-
+    
 #
 # ***************************************
 # MAIN
@@ -522,6 +469,6 @@ if __name__  ==  "__main__":
     remi.server.DEBUG_MODE = 2
 
     # start the web server to serve the App
-    start(Tabbed,address='127.0.0.1', port=8082,
+    start(Test,address='127.0.0.1', port=8081,
           multiple_instance=False,enable_file_cache=True,
           update_interval=0.1, start_browser=True)
