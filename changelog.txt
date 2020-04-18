@@ -1,3 +1,7 @@
+CHANGES FOR 1.4.4d 18/4/2020
+============================
+fixed - Display setup for Composite output (A/V) now works for Pi4 in addition to Pi3 and below
+
 CHANGES FOR 1.4.4c 2/4/2020
 ============================
 

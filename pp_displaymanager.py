@@ -349,9 +349,11 @@ class DisplayManager(object):
             but HDMI-1 and HDMI-2 translation depends on the number of HDMI monitors
 
         DSI-1 only:  > [0]
+        * Composite-1 only > [3]
         HDMI-1 only: >  [2]  (plugged into HDMI0 port)
         HDMI-2 > [] does not happen because 7 not in randr list - report error
         
+        * DSI-1 + Composite-1 > [0 + 3] not tested
         DSI-1 + HDMI-1: [0 + 2]
         DSI-1 + HDMI-2: [0] only because  HDMI-2 cannot be the only HDMI monitor
         HDMI-1 + HDMI-2: [2,7]   assume HDMI0 port is always first in the list
@@ -375,6 +377,10 @@ class DisplayManager(object):
                 DisplayManager.displays.append(DisplayManager.display_map['DSI0'])
             elif DisplayManager.randr_displays[0] == 'HDMI-1':
                 DisplayManager.displays.append(DisplayManager.display_map['HDMI0'])
+            elif DisplayManager.randr_displays[0] == 'Composite-1':
+                DisplayManager.displays.append(DisplayManager.display_map['A/V'])
+            else:
+                return 'error','xrand r display not recognised '+ DisplayManager.randr_displays[0]
         else:
             if 'DSI-1' in DisplayManager.randr_displays and 'HDMI-1' in DisplayManager.randr_displays:
                 DisplayManager.displays.append(DisplayManager.display_map['DSI0'])              
