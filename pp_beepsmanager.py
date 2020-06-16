@@ -81,7 +81,7 @@ class BeepsManager(object):
                     os.system("amixer -q -c 0 cset numid=3 2")
                 elif device == 'hdmi1':
                     os.system("amixer -q -c 0 cset numid=3 3")                    
-                else:
+                elif device in ('local','A/V'):
                     os.system("amixer -q -c 0 cset numid=3 1")
             fields = path.split('.')
             if fields[1] == 'mp3':

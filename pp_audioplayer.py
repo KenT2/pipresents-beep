@@ -338,15 +338,17 @@ class AudioPlayer(Player):
             #audio_sys='pi'
             
             if audio_sys=='pi':
+                driver_option=''
                 #print ('old audio',self.mplayer_audio)
                 if self.mplayer_audio != "":
                     if self.mplayer_audio in ('hdmi','hdmi0'):
                         os.system("amixer -q -c 0 cset numid=3 2")
                     elif self.mplayer_audio == 'hdmi1':
-                        os.system("amixer -q -c 0 cset numid=3 3")                    
+                        os.system("amixer -q -c 0 cset numid=3 3")
+                    elif self.mplayer_audio in ('local','A/V'):
+                        os.system("amixer -q -c 0 cset numid=3 1")
                     else:
-                        os.system("amixer -q -c 0 cset numid=3 1") 
-                driver_option=''
+                        pass
             else:
                 if self.mplayer_audio != "":
                     if self.mplayer_audio in ('hdmi','hdmi0'):
@@ -355,7 +357,7 @@ class AudioPlayer(Player):
                         driver_option=' -ao alsa:device=plughw=b2.0 '
                     elif self.mplayer_audio in ('alsa','USB'):
                         driver_option=' -ao alsa:device=plughw=Device.0 '
-                    elif self.mplayer_audio == 'local':
+                    elif self.mplayer_audio in ('local','A/V'):
                         driver_option=' -ao alsa:device=plughw=Headphones.0 '
                     else:
                         driver_option=''
