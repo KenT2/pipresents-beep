@@ -4,6 +4,7 @@ import copy
 import os
 import configparser
 import time
+from pp_beepsmanager import BeepsManager
 
 
 class pp_aplaydriver(object):
@@ -24,6 +25,7 @@ class pp_aplaydriver(object):
 
     # executed by main program and by each object using the driver
     def __init__(self):
+        self.bm=BeepsManager()
         pass
 
      # executed once from main program   
@@ -61,7 +63,7 @@ class pp_aplaydriver(object):
             entry[pp_aplaydriver.DEVICE]=self.config.get(section,'device')
 
             if entry[pp_aplaydriver.DIRECTION] == 'out':
-                if entry[pp_aplaydriver.DEVICE] not in ('','hdmi','local','alsa'):
+                if entry[pp_aplaydriver.DEVICE] not in ('','hdmi','local','alsa','USB','A/V','hdmi0','hdmi1'):
                     return 'error',pp_aplaydriver.title + ' unknown device for '+ entry[pp_aplaydriver.NAME] +' - ' +entry[pp_aplaydriver.DEVICE]
                 pp_aplaydriver.out_names.append(copy.deepcopy(entry))
 
@@ -118,7 +120,7 @@ class pp_aplaydriver(object):
                 device=entry[pp_aplaydriver.DEVICE]
                 location=self.complete_path(entry[pp_aplaydriver.FILE])
                 if os.path.exists(location):
-                    self.play_beep(name,location,device)
+                    self.bm.do_beep(location,device)
                     return 'normal','beep played from: '+location+ ' on device: '+ device
                 else:
                     return 'error','beep file not found: '+ location
@@ -132,20 +134,6 @@ class pp_aplaydriver(object):
             track_file=self.pp_profile+track_file[1:]
         return track_file      
 
-
-    def play_beep(self,name,location,device):
-        # print name,location,device
-        if device != '':
-            if device == 'hdmi':
-                os.system("amixer -q -c 0 cset numid=3 2")
-            else:
-                os.system("amixer -q -c 0 cset numid=3 1")
-
-        fields = location.split('.')
-        if fields[1] == 'mp3':
-            os.system("mpg123 -q " + location)
-        else:
-            os.system("aplay -q " + location)
 
                     
 # ***********************************

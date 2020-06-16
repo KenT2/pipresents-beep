@@ -188,7 +188,7 @@ class VideoPlayer(Player):
                 self.loaded_callback('error',message)
                 return
 
-        if not (track[0:3] in ('udp','tcp') or track[0:4] in ('rtsp',)):
+        if not (track[0:3] in ('udp','tcp') or track[0:4] in ('rtsp','rtmp')):
         
             if not os.path.exists(track):
                     self.mon.err(self,"Track file not found: "+ track)

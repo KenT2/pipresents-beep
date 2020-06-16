@@ -1,3 +1,10 @@
+CHANGES FOR 1.4.4e 16/6/2020
+============================
+fixed - audio track and beeps now work with the Raspbian release of May 2020, in addition to earlier releases.(see release notes)
+modified - audio device names now match the physical labels on the board and (nearly) the new names on the task bar selector.
+enhanced - beep show control command now has an optional device parameter.
+enhanced - rtmp added to the list of acceptable streams for video track.
+
 CHANGES FOR 1.4.4d 18/4/2020
 ============================
 fixed - Display setup for Composite output (A/V) now works for Pi4 in addition to Pi3 and below

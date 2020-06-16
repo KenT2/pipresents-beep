@@ -55,7 +55,7 @@ class PiPresents(object):
         # gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_INSTANCES|gc.DEBUG_OBJECTS|gc.DEBUG_SAVEALL)
         gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_SAVEALL)
         self.pipresents_issue="1.4.4"
-        self.pipresents_minorissue = '1.4.4d'
+        self.pipresents_minorissue = '1.4.4e'
         # position and size of window without -f command line option
         self.nonfull_window_width = 0.45 # proportion of width
         self.nonfull_window_height= 0.7 # proportion of height
@@ -479,7 +479,7 @@ class PiPresents(object):
 
             
         elif symbol == 'pp-shutdownnow':
-            # need root.after to grt out of st thread
+            # need root.after to get out of st thread
             self.root.after(1,self.shutdownnow_pressed)
             return
         
@@ -540,13 +540,17 @@ class PiPresents(object):
                 self.end('error',message)
                 return
             location=self.beepsmanager.complete_path(fields[1])
+            if len(fields)==3:
+                device = fields[2]
+            else:
+                device = ''
             if not os.path.exists(location):
                 message = 'Beep file does not exist: '+ location
                 self.mon.err(self,message)
                 self.end('error',message)
                 return
             else:
-                self.beepsmanager.do_beep(location)
+                self.beepsmanager.do_beep(location,device)
             return
             
         if fields[0]=='backlight':
