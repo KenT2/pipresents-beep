@@ -203,6 +203,11 @@ class DisplayManager(object):
             
         # Have now got all the required information
 
+        # setup backlight for toucscreen if connected
+        status,message=self.init_backlight()
+        if status=='error':
+            return status,message,None
+            
         # setup the touch input for touchscreens
         status,message=self.init_touch()
         if status=='error':
@@ -214,7 +219,9 @@ class DisplayManager(object):
             return status,message,None
 
         return status,message,root
-        
+
+    def terminate(self):
+        self.terminate_backlight()
 
 # ***********************************************
 # Get information about displays
@@ -1014,15 +1021,35 @@ class DisplayManager(object):
 
 # ***********************************************
 # Touchscreen Backlight Commands
-# ************************************************    
+# ************************************************ 
+   
+    def init_backlight(self):
+        self.backlight=None
+        self.orig_brightness=20
+        if 0 in DisplayManager.displays:
+            try:
+                from rpi_backlight import Backlight
+            except:
+                return 'error','touchscreen connected but rpi-backlight is not installed'
+            try:
+                self.backlight=Backlight()
+            except:
+                return 'error','Official Touchscreen, problem with rpi-backlight'
+            try:
+                self.orig_brightness=self.backlight.brightness
+            except:
+                return 'error','Official Touchscreen,  problem with rpi-backlight'
+        print ('BACKLIGHT',self.backlight,self.orig_brightness)
+        return 'normal',''
+
+    def terminate_backlight(self):
+        if self.backlight is not None:
+            self.backlight.power=True
+            self.backlight.brightness=self.orig_brightness
+
     def do_backlight_command(self,text):
-        """
-        try:
-            from rpi_backlight import Backlight
-        except:
-            return 'error','rpi-backlight not installed'
-        """
-        backlight=Backlight()
+        if self.backlight is None:
+            return 'normal','no touchscreen'
         fields=text.split()
         # print (fields)
         if len(fields)<2:
@@ -1030,10 +1057,10 @@ class DisplayManager(object):
         # on, off, inc val, dec val, set val fade val duration
         #                                      1   2    3
         if fields[1]=='on':
-            backlight.power = True
+            self.backlight.power = True
             return 'normal',''      
         if fields[1]=='off':
-            backlight.power = False
+            self.backlight.power = False
             return 'normal',''
         if fields[1] in ('inc','dec','set'):
             if len(fields)<3:
@@ -1047,21 +1074,21 @@ class DisplayManager(object):
                 elif val<0:
                     val=0
                 # print (val)
-                backlight.brightness = val
+                self.backlight.brightness = val
                 return 'normal',''            
             if fields[1]=='inc':
-                val = backlight.brightness + int(fields[2])
+                val = self.backlight.brightness + int(fields[2])
                 if val>100:
                     val = 100
                 # print (val)
-                backlight.brightness= val
+                self.backlight.brightness= val
                 return 'normal',''
             if fields[1]=='dec':
-                val = backlight.brightness - int(fields[2])
+                val = self.backlight.brightness - int(fields[2])
                 if val<0:
                     val = 0
                 # print (val)
-                backlight.brightness= val
+                self.backlight.brightness= val
                 return 'normal',''
         if fields[1] =='fade':
             if len(fields)<4:
@@ -1075,18 +1102,19 @@ class DisplayManager(object):
                 val = 100
             elif val<0:
                 val=0
-            with backlight.fade(duration=fields[3]):
-                backlight.brightness=val
+            with selfbacklight.fade(duration=fields[3]):
+                self.backlight.brightness=val
                 return 'normal',''
         return 'error','unknown backlight command: '+text
 
 
-
-class Backlight():
+# used to test on a machine without a backlight
+class FakeBacklight():
     
     def __init__(self):
         self._brightness=100
         self._power = True
+        # print ('USING FAKE BACKLIGHT')
         
 
     def get_power(self):
@@ -1094,7 +1122,7 @@ class Backlight():
 
     def set_power(self, power):
         self._power=power
-        # print (self._power)
+        print ('POWER',self._power)
 
     power = property(get_power, set_power)
 
@@ -1103,10 +1131,9 @@ class Backlight():
 
     def set_brightness(self, brightness):
         self._brightness=brightness
-        # print (self._brightness)
+        print ('BRIGHTNESS',self._brightness)
 
     brightness = property(get_brightness, set_brightness)    
-
 
 
     

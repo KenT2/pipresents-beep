@@ -1,3 +1,9 @@
+CHANGES FOR 1.4.4f 27/9/2020
+============================
+enhanced - official touchscreen backlight can now be controlled by Show Control Commands
+modified  - touchscreen driver changed from FT506 to raspberrypi-ts to reflect its mainlining in Debian
+
+
 CHANGES FOR 1.4.4e 16/6/2020
 ============================
 fixed - audio track and beeps now work with the Raspbian release of May 2020, in addition to earlier releases.(see release notes)

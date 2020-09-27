@@ -55,7 +55,7 @@ class PiPresents(object):
         # gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_INSTANCES|gc.DEBUG_OBJECTS|gc.DEBUG_SAVEALL)
         gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_SAVEALL)
         self.pipresents_issue="1.4.4"
-        self.pipresents_minorissue = '1.4.4e'
+        self.pipresents_minorissue = '1.4.4f'
         # position and size of window without -f command line option
         self.nonfull_window_width = 0.45 # proportion of width
         self.nonfull_window_height= 0.7 # proportion of height
@@ -707,7 +707,7 @@ class PiPresents(object):
                           
             # close logging files
             self.mon.finish()
-            print('Uncollectable Garbage',gc.collect())
+            #print('Uncollectable Garbage',gc.collect())
             # objgraph.show_backrefs(objgraph.by_type('Canvas'),filename='backrefs.png')
             sys.exit(101)
                           
@@ -721,7 +721,7 @@ class PiPresents(object):
                           
             # close logging files 
             self.mon.finish()
-            print('uncollectable garbage',gc.collect())
+            #print('uncollectable garbage',gc.collect())
             sys.exit(102)
 
         else:           
@@ -736,15 +736,16 @@ class PiPresents(object):
             if self.shutdown_required is True:
                 # print 'SHUTDOWN'
                 call (['sudo','shutdown','now','SHUTTING DOWN'])
-            print('uncollectable garbage',gc.collect())
+            #print('uncollectable garbage',gc.collect())
             sys.exit(100)
 
 
     # tidy up all the peripheral bits of Pi Presents
     def tidy_up(self):
         self.mon.log(self, "Tidying Up")
+        # backlight
         if self.dm != None:
-            self.dm.handle_monitor_command(['reset'])
+            self.dm.terminate()
         # turn screen blanking back on
         if self.options['noblank'] is True:
             call(["xset","s", "on"])
