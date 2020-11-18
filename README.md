@@ -3,6 +3,9 @@ PI PRESENTS  - Version 1.4.4
 
 This repository contains the latest and greatest version Pi Presents. Use if you are happy with bleeding edge software that is under development.
 
+Diese Readme-Datei hat Peter Vasen ins Deutsche übersetzt. Klicken Sie hier 
+http://www.web-echo.de/4.html
+
 VERSION 1.4.3 ONWARDS IS PYTHON 3 ONLY
 
 
