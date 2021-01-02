@@ -367,7 +367,7 @@ class PPdefinitions(object):
                     'message-justify':{'shape':'option-menu','text':'Justification','must':'no','read-only':'no',
                                        'values':['left','center','right']},
                     'mplayer-audio':{'shape':'option-menu','text':'Audio Player Audio','must':'no','read-only':'no',
-                                       'values':['hdmi','hdmi0','hdmi1','USB','A/V','']},
+                                       'values':['hdmi','hdmi0','hdmi1','USB','A/V','bluetooth','USB2','']},
                     'mplayer-other-options':{'shape':'entry','text':'Audio Player Options','must':'no','read-only':'no'},
                     'mplayer-volume':{'shape':'entry','text':'Audio Volume','must':'no','read-only':'no'},
                     'omx-audio':{'shape':'option-menu','text':'Video Player Audio','must':'no','read-only':'no',
@@ -725,7 +725,7 @@ class PPdefinitions(object):
                             'message-html-background-colour':{'shape':'colour','text':'HTML Background Colour','must':'no','read-only':'no'},           
  
                             'mplayer-audio':{'shape':'option-menu','text':'Audio Player Audio','must':'no','read-only':'no',
-                                       'values':['hdmi','hdmi0','hdmi1','A/V','USB','']},
+                                       'values':['hdmi','hdmi0','hdmi1','A/V','USB','bluetooth','USB2','']},
                             'mplayer-other-options':{'shape':'entry','text':'Audio Player Options','must':'no','read-only':'no'},
                             'mplayer-volume':{'shape':'entry','text':'Audio Player Volume','must':'no','read-only':'no'},
                             'omx-audio':{'shape':'option-menu','text':'Video Player Audio','must':'no','read-only':'no',

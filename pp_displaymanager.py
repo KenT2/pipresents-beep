@@ -22,7 +22,7 @@ class DisplayManager(object):
     #         8 - 
     
     debug = False
-    debug = True
+    #debug = True
     
     display_map = {'DSI0':0,'HDMI0':2,'HDMI':2,'A/V':3,'HDMI1':7 }    # lookup display Id by display name e.g. HDMI1>7
     display_reverse_map = {0:'DSI0',2:'HDMI0',3:'A/V',7:'HDMI1' }  # lookup display name by Id  e.g. 2>HDMI0
@@ -158,8 +158,8 @@ class DisplayManager(object):
 # ************************************************
 
     # called by pipresents.py  only when PP starts
-    def init(self,options,close_callback,pp_dir):
-        
+    def init(self,options,close_callback,pp_dir,debug):
+        DisplayManager.debug=debug
         # read display.cfg
         self.read_config(pp_dir)
 
@@ -1039,7 +1039,7 @@ class DisplayManager(object):
                 self.orig_brightness=self.backlight.brightness
             except:
                 return 'error','Official Touchscreen,  problem with rpi-backlight'
-        print ('BACKLIGHT',self.backlight,self.orig_brightness)
+        #print ('BACKLIGHT',self.backlight,self.orig_brightness)
         return 'normal',''
 
     def terminate_backlight(self):
@@ -1153,7 +1153,8 @@ class Mon(object):
     def warn(self,inst,message):
         print ('WARN: ',message)
         
-        
+
+"""
 
 class PiPresents(object):
 
@@ -1292,7 +1293,7 @@ class PiPresents(object):
 
 
     def chunks(self,lst, n):
-        """Yield successive n-sized chunks from lst."""
+        #Yield successive n-sized chunks from lst
         for i in range(0, len(lst), n):
             yield lst[i:i + n]
 
@@ -1306,9 +1307,27 @@ class PiPresents(object):
 
         self.mon.log(self,"Pi Presents  exiting normally, bye")
         sys.exit(100)
-
-
+"""
+class Display(object):
+    
+    def __init__(self):
+        self.mon=Mon()
+    
+    def init(self):
+        self.options={'fullscreen':True}
+        
+        # set up the displays and create a canvas for each display
+        self.dm=DisplayManager()
+        self.pp_dir='/home/pi/pipresents'
+        status,message,self.root=self.dm.init(self.options,self.end,self.pp_dir,True)
+        if status !='normal':
+            print ('Error',message)
+    
+    def end(self):
+        print ('end')
 
 if __name__ == '__main__':
-    pp=PiPresents()
+    disp=Display()
+    disp.init()
+    #pp=PiPresents()
     

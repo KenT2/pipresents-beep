@@ -4,7 +4,7 @@ import copy
 import os
 import configparser
 import time
-from pp_beepsmanager import BeepsManager
+from pp_beepplayer import BeepPlayer
 
 
 class pp_aplaydriver(object):
@@ -25,7 +25,7 @@ class pp_aplaydriver(object):
 
     # executed by main program and by each object using the driver
     def __init__(self):
-        self.bm=BeepsManager()
+        self.bp=BeepPlayer()
         pass
 
      # executed once from main program   
@@ -63,7 +63,7 @@ class pp_aplaydriver(object):
             entry[pp_aplaydriver.DEVICE]=self.config.get(section,'device')
 
             if entry[pp_aplaydriver.DIRECTION] == 'out':
-                if entry[pp_aplaydriver.DEVICE] not in ('','hdmi','local','alsa','USB','A/V','hdmi0','hdmi1'):
+                if entry[pp_aplaydriver.DEVICE] not in ('','hdmi','local','USB','A/V','hdmi0','hdmi1','USB2','bluetooth'):
                     return 'error',pp_aplaydriver.title + ' unknown device for '+ entry[pp_aplaydriver.NAME] +' - ' +entry[pp_aplaydriver.DEVICE]
                 pp_aplaydriver.out_names.append(copy.deepcopy(entry))
 
@@ -118,21 +118,16 @@ class pp_aplaydriver(object):
             # does the symbolic name and type match value in the configuration (type is fixed at beep)
             if name == entry[pp_aplaydriver.NAME] and param_type == 'beep':
                 device=entry[pp_aplaydriver.DEVICE]
-                location=self.complete_path(entry[pp_aplaydriver.FILE])
-                if os.path.exists(location):
-                    self.bm.do_beep(location,device)
-                    return 'normal','beep played from: '+location+ ' on device: '+ device
+                location=entry[pp_aplaydriver.FILE]
+                status,message=self.bp.play_animate_beep(location,device)
+                if status=='error':
+                    return status,message
                 else:
-                    return 'error','beep file not found: '+ location
+                    return 'normal',''
         return 'normal','no match for ' + name + ' ' + param_type
 
-    def complete_path(self,track_file):
-        #  complete path of the filename of the selected entry
-        if track_file != '' and track_file[0]=="+":
-            track_file=self.pp_home+track_file[1:]
-        elif track_file[0] == "@":
-            track_file=self.pp_profile+track_file[1:]
-        return track_file      
+
+   
 
 
                     

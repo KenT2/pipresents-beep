@@ -1,6 +1,8 @@
 import os
 from pp_mplayerdriver import MplayerDriver
 from pp_player import Player
+from pp_audiomanager import AudioManager
+
 
 class AudioPlayer(Player):
     """       
@@ -30,6 +32,9 @@ class AudioPlayer(Player):
                  end_callback,
                  command_callback):
 
+        # use AudioManager
+        self.am=AudioManager()
+        
         # initialise items common to all players   
         Player.__init__( self,
                          show_id,
@@ -113,6 +118,24 @@ class AudioPlayer(Player):
         self.loaded_callback=loaded_callback   #callback when loaded
 
         self.mon.trace(self,'')
+        
+        #for pulse get sink name and check device is connected 
+        self.audio_sys=self.am.get_audio_sys()
+        if self.audio_sys == 'pulse':
+            status,message,self.mplayer_sink = self.am.get_sink(self.mplayer_audio)
+            if status == 'error':
+                self.mon.err(self,message)
+                self.play_state='load-failed'
+                if self.loaded_callback is not  None:
+                    self.loaded_callback('error',message)
+                    return
+                    
+            if not self.am.sink_connected(self.mplayer_sink):
+                self.mon.err(self,'audio device not connected - '+self.mplayer_audio + '/n sink: '+self.mplayer_sink)
+                self.play_state='load-failed'
+                if self.loaded_callback is not  None:
+                    self.loaded_callback('error','audio device not connected')
+                    return            
 
         # do common bits of  load
         Player.pre_load(self)
@@ -327,19 +350,11 @@ class AudioPlayer(Player):
             # initialise all the state machine variables
             self.duration_count = 0
 
-            # determine which audio system is in use, linux system was introduced in May 2020
-            # The test of .asoundrc does not work if there is a USB sound card plugged in
-            if os.path.exists ('/home/pi/.asoundrc'):        
-                audio_sys='linux'
-            else:
-                audio_sys='pi'
-                
-            #uncomment to force old audio system
-            #audio_sys='pi'
             
-            if audio_sys=='pi':
+            #print (self.am.get_audio_sys(),self.mplayer_audio)
+            if self.audio_sys=='cset':
                 driver_option=''
-                #print ('old audio',self.mplayer_audio)
+                #print ('cset audio',self.mplayer_audio)
                 if self.mplayer_audio != "":
                     if self.mplayer_audio in ('hdmi','hdmi0'):
                         os.system("amixer -q -c 0 cset numid=3 2")
@@ -349,21 +364,29 @@ class AudioPlayer(Player):
                         os.system("amixer -q -c 0 cset numid=3 1")
                     else:
                         pass
-            else:
-                if self.mplayer_audio != "":
-                    if self.mplayer_audio in ('hdmi','hdmi0'):
-                        driver_option=' -ao alsa:device=plughw=b1.0 '
-                    elif self.mplayer_audio == 'hdmi1':
-                        driver_option=' -ao alsa:device=plughw=b2.0 '
-                    elif self.mplayer_audio in ('alsa','USB'):
-                        driver_option=' -ao alsa:device=plughw=Device.0 '
-                    elif self.mplayer_audio in ('local','A/V'):
-                        driver_option=' -ao alsa:device=plughw=Headphones.0 '
-                    else:
-                        driver_option=''
-                    #print ('new audio',driver_option) 
+            elif self.audio_sys == "alsa":
+                if self.mplayer_audio in ('hdmi','hdmi0'):
+                    driver_option=' -ao alsa:device=plughw=b1.0 '
+                elif self.mplayer_audio == 'hdmi1':
+                    driver_option=' -ao alsa:device=plughw=b2.0 '
+                elif self.mplayer_audio in ('alsa','USB'):
+                    driver_option=' -ao alsa:device=plughw=Device.0 '
+                elif self.mplayer_audio in ('local','A/V'):
+                    driver_option=' -ao alsa:device=plughw=Headphones.0 '
                 else:
                     driver_option=''
+                #print ('alsa audio',driver_option)
+                
+            elif self.audio_sys == "pulse":
+                if self.mplayer_sink != '':
+                    driver_option=' -ao pulse::'+self.mplayer_sink
+                else:
+                    driver_option=''
+                #print ('pulse audio',self.mplayer_audio,driver_option) 
+            else:
+                driver_option=''
+                #print ('bad audio system',self.audio_sys)
+                    
             # play the track               
             options = ' '+ self.mplayer_other_options + ' '+ driver_option + ' ' +  self.volume_option + ' -af '+ self.speaker_option + ' '
             if self.track != '':

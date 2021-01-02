@@ -6,7 +6,7 @@ It is aimed at primarily at  musems, exhibitions and galleries
 but has many other applications including digital signage
 
 Version 1.4 [pipresents-beep]
-Copyright 2012/2013/2014/2015/2016/2017/2018/2019/2020, Ken Thompson
+Copyright 2012/2013/2014/2015/2016/2017/2018/2019/2020/2021, Ken Thompson
 See github for licence conditions
 See readme.md and manual.pdf for instructions.
 """
@@ -38,7 +38,8 @@ from pp_oscdriver import OSCDriver
 from pp_network import Mailer, Network
 from pp_iopluginmanager import IOPluginManager
 from pp_countermanager import CounterManager
-from pp_beepsmanager import BeepsManager
+from pp_beepplayer import BeepPlayer
+from pp_audiomanager import AudioManager
 
 class PiPresents(object):
 
@@ -55,13 +56,7 @@ class PiPresents(object):
         # gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_INSTANCES|gc.DEBUG_OBJECTS|gc.DEBUG_SAVEALL)
         gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_SAVEALL)
         self.pipresents_issue="1.4.4"
-        self.pipresents_minorissue = '1.4.4f'
-        # position and size of window without -f command line option
-        self.nonfull_window_width = 0.45 # proportion of width
-        self.nonfull_window_height= 0.7 # proportion of height
-        self.nonfull_window_x = 0 # position of top left corner
-        self.nonfull_window_y=0   # position of top left corner
-
+        self.pipresents_minorissue = '1.4.4g'
 
         StopWatch.global_enable=False
 
@@ -273,7 +268,7 @@ class PiPresents(object):
 
         # find connected displays and create a canvas for each display
         self.dm=DisplayManager()
-        status,message,self.root=self.dm.init(self.options,self.handle_user_abort,self.pp_dir)
+        status,message,self.root=self.dm.init(self.options,self.handle_user_abort,self.pp_dir,False)
         if status != 'normal':
             self.mon.err(self,message)
             self.end('error',message)
@@ -332,16 +327,23 @@ class PiPresents(object):
         self.reboot_required=False
         self.terminate_required=False
         self.exitpipresents_required=False
+        
+        #initialise the Audio manager
+        self.audiomanager=AudioManager()
+        status,message=self.audiomanager.init(self.pp_dir)
+        if status == 'error':
+            self.mon.err(self,message)
+            self.end('error',message)        
 
-        # initialise the Beeps Manager
-        self.beepsmanager=BeepsManager()
-        self.beepsmanager.init(self.pp_home,self.pp_profile)
+        # initialise the Beeps Player
+        self.bp=BeepPlayer()
+        self.bp.init(self.pp_home,self.pp_profile)
 
         # initialise the I/O plugins by importing their drivers
         self.ioplugin_manager=IOPluginManager()
         reason,message=self.ioplugin_manager.init(self.pp_dir,self.pp_profile,self.root,self.handle_input_event,self.pp_home)
         if reason == 'error':
-            # self.mon.err(self,message)
+            self.mon.err(self,message)
             self.end('error',message)
 
         
@@ -533,25 +535,13 @@ class PiPresents(object):
             return
 
         if fields[0]=='beep':
-            # cheat, field 0 will always be beep
-            message,fields=self.beepsmanager.parse_beep(command_text)
-            if message != '':
+            status,message=self.bp.play_show_beep(command_text)
+            if status == 'error':
                 self.mon.err(self,message)
                 self.end('error',message)
                 return
-            location=self.beepsmanager.complete_path(fields[1])
-            if len(fields)==3:
-                device = fields[2]
-            else:
-                device = ''
-            if not os.path.exists(location):
-                message = 'Beep file does not exist: '+ location
-                self.mon.err(self,message)
-                self.end('error',message)
-                return
-            else:
-                self.beepsmanager.do_beep(location,device)
             return
+            
             
         if fields[0]=='backlight':
             # on, off, inc val, dec val, set val fade val duration
@@ -619,6 +609,7 @@ class PiPresents(object):
         if reason=='error':
             self.mon.err(self,message)
         return
+
 
 
     def handle_cec_command(self,command):

@@ -1,3 +1,11 @@
+CHANGES FOR 1.4.4g 1/1/2021
+============================
+fixed - audio tracks and beeps now work with the Raspberry Pi OS release of Dec 2020 which uses pulseaudio instead of alsa. It can  also be made to work with earlier releases which use a different audio system.(see release notes)
+enhanced - added bluetooth and 2nd USB audio device to the set of audio devices
+enhanced - Information about PP's interpretation of pp_audio.cfg and connected devices obtained by 'python3 pp_audiomanager.py'
+modified - use paplay to play non .mp3 beeps instead of aplay
+modified - Information about PP's interpretation of displays removed from PP and can be obtained by 'python3 pp_displaymanager.py'
+
 CHANGES FOR 1.4.4f 27/9/2020
 ============================
 enhanced - official touchscreen backlight can now be controlled by Show Control Commands

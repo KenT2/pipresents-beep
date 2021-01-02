@@ -1,3 +1,24 @@
+Version 1.4.4g 1/1/2021
+========================
+The Dec 2020 version of Raspberry Pi OS has changed the system for selecting the audio device, this time from alsa to pulseaudio. This has yet again disabled the control of audio device by Pi Presents.
+
+This version implements the pulseaudio method of control and also retains the old methods for people using earlier versions of Raspbian.
+
+There is a new configuration file  /pipresents/pp_config/pp_audio.cfg. If you are using the Dec 2020 version of RPi OS and only 1 or 2 hdmi and the A/V port then the configuration set in this file does not require change.
+
+If you want to add USB or bluetooth devices then pp_audio.cfg will need to be changed to add the sink name of the device, details in the file.
+
+If you want to use an older version of Raspbian then you must edit pp_audio.cfg. The previous method of detecting .asoundrc does not now work to detect the audio system in use. 
+
+As of writing there are a few bugs in the RPi OS:
+
+ - The sound can lock up if there are two hdmi monitors connected to a Model 4 Pi.
+ - On my new install using 2 hdmi monitors stopped A/V sound.
+ - People have had problems upgrading from the previous version of RPi OS, mainly audio not playing on some devices. A fresh install works better.
+ - It is not a good idea to change the default audio device from the task bar while PP is running.
+ - short tracks do not play reliably on bluetooth devices.
+ 
+
 Version 1.4.4e 16/6/2020
 ========================
 The May 2020 version of Raspbian (now Raspberry Pi OS) has changed the system for selecting the audio device. This has disabled the control of audio device by Pi Presents. However it is still possible to control it from the Task Bar.
