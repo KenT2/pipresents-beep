@@ -40,6 +40,7 @@ from pp_iopluginmanager import IOPluginManager
 from pp_countermanager import CounterManager
 from pp_beepplayer import BeepPlayer
 from pp_audiomanager import AudioManager
+from pp_vlcdriver import Logger
 
 class PiPresents(object):
 
@@ -55,11 +56,11 @@ class PiPresents(object):
     def __init__(self):
         # gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_INSTANCES|gc.DEBUG_OBJECTS|gc.DEBUG_SAVEALL)
         gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_SAVEALL)
-        self.pipresents_issue="1.4.4"
-        self.pipresents_minorissue = '1.4.4g'
+        self.pipresents_issue="1.4.5"
+        self.pipresents_minorissue = '1.4.5a'
 
         StopWatch.global_enable=False
-
+        
         # set up the handler for SIGTERM
         signal.signal(signal.SIGTERM,self.handle_sigterm)
         
@@ -82,6 +83,14 @@ class PiPresents(object):
 
         
         # Initialise logging and tracing
+        
+        # initlize VLCDriver logger
+        self.logger=Logger(enabled=True)
+        self.logger.init()
+        # TURN OFF REST OF LOGGING IN pp_vlcdriver.py
+
+        
+        # Init main monitor
         Monitor.log_path=pp_dir
         self.mon=Monitor()
         # Init in PiPresents only
@@ -96,7 +105,7 @@ class PiPresents(object):
                             
                             'HyperlinkShow','RadioButtonShow','ArtLiveShow','ArtMediaShow','MediaShow','LiveShow','MenuShow',
                             'GapShow','Show','ArtShow',
-                            'AudioPlayer','BrowserPlayer','ImagePlayer','MenuPlayer','MessagePlayer','VideoPlayer','Player',
+                            'AudioPlayer','BrowserPlayer','ImagePlayer','MenuPlayer','MessagePlayer','VideoPlayer','Player','VLCPlayer','ChromePlayer',
                             'MediaList','LiveList','ShowList',
                             'PathManager','ControlsManager','ShowManager','TrackPluginManager','IOPluginManager',
                             'MplayerDriver','OMXDriver','UZBLDriver',
@@ -268,7 +277,7 @@ class PiPresents(object):
 
         # find connected displays and create a canvas for each display
         self.dm=DisplayManager()
-        status,message,self.root=self.dm.init(self.options,self.handle_user_abort,self.pp_dir,False)
+        status,message,self.root=self.dm.init(self.options,self.handle_user_abort,self.pp_dir,True)
         if status != 'normal':
             self.mon.err(self,message)
             self.end('error',message)

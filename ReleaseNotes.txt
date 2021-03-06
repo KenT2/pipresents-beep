@@ -1,3 +1,27 @@
+Version 1.4.5a 6/3/2021
+========================
+This release adds new players for web and video tracks based on modern applications, Chromium and VLC.
+
+The old players based on omxplayer and UZBL have been retained but are deprecated and could be removed in a future release.
+
+omxplayer is deprecated by Pi Towers, VLC is their recognized replacement. UZBL is an old browser not updated since 2017, Chromium is now the Pi Towers default browser.
+
+Templates, Add Track button, New Show all use the new players. If you want to use the old players then use the Track>New>OMX Video or Track>New>Chrome Web menu options.
+
+All the examples have been updated to use the new players. If you want to use these download them from the examples Github repository.
+
+New dependencies need to be installed. Refer to the README.md file or Github.
+
+It will be necessary to update the profiles to version 1.4.5. The update will happen automatically if you edit the profile. I recommend making a backup of all profiles before editing them.
+
+It is not possible to automatically convert old omx or UZBL tracks into VLC or chrome tracks as the fields in the profile are different, particularly the way in which the Video and Web Windows work. Details are in the manual. As always the default values should produce something useable.
+
+Two changes are worth noting:
+  - For VLC volume is now 0 -> 100
+  - For Chrome Web the Browser command functionality is different. LOOP can have a value and the exit command has gone.
+
+Please use the Issues tab on Github https://github.com/KenT2/pipresents-beep/issues to report any problems
+
 Version 1.4.4g 1/1/2021
 ========================
 The Dec 2020 version of Raspberry Pi OS has changed the system for selecting the audio device, this time from alsa to pulseaudio. This has yet again disabled the control of audio device by Pi Presents.

@@ -23,8 +23,8 @@ class WebEditItem(AdaptableDialog):
         self.frame_width=800   # frame for 2 columns
         self.col_width=400     # width of a column
         self.field_width= 200  # width of data field, label must fit in col_width-field_width- 15
-        self.fields_height=300
-        self.rows_in_col=15
+        self.fields_height=380
+        self.rows_in_col=18
         self.tab_height=100
         self.okcancel_height=100
 

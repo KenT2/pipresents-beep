@@ -298,11 +298,11 @@ class LiveList(object):
         if ext.lower() in PPdefinitions.IMAGE_FILES:
             self.livelist_new_track(PPdefinitions.new_tracks['image'],{'title':title,'track-ref':'','location':afile})
         if ext.lower() in PPdefinitions.VIDEO_FILES:
-            self.livelist_new_track(PPdefinitions.new_tracks['video'],{'title':title,'track-ref':'','location':afile})
+            self.livelist_new_track(PPdefinitions.new_tracks['vlc'],{'title':title,'track-ref':'','location':afile})
         if ext.lower() in PPdefinitions.AUDIO_FILES:
             self.livelist_new_track(PPdefinitions.new_tracks['audio'],{'title':title,'track-ref':'','location':afile})
         if ext.lower() in PPdefinitions.WEB_FILES:
-            self.livelist_new_track(PPdefinitions.new_tracks['web'],{'title':title,'track-ref':'','location':afile})
+            self.livelist_new_track(PPdefinitions.new_tracks['chrome'],{'title':title,'track-ref':'','location':afile})
         if ext.lower()=='.cfg':
             self.livelist_new_plugin(afile,title)
            

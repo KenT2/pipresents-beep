@@ -1,5 +1,5 @@
 class PPdefinitions(object):
-    DEFINITIONS_VERSION_STRING='1.4.4'
+    DEFINITIONS_VERSION_STRING='1.4.5'
     IMAGE_FILES=('Image files', '.gif','.jpg','.jpeg','.bmp','.png','.tif')
     VIDEO_FILES= ('Video Files','.asf','.avi','.mpg','.mp4','.mpeg','.m2v','.m1v','.vob','.divx','.xvid','.mov','.m4v','.m2p','.mkv','.m2ts','.ts','.mts','.wmv','.webm')
     AUDIO_FILES=('Audio files','.mp3','.wav','.ogg','.ogm','.wma','.asf','.mp2')
@@ -26,8 +26,13 @@ class PPdefinitions(object):
             'tab-tracks','sep',
                  'duration','pause-timeout','image-window','image-rotate','transition','sep',
                 'audio-speaker','mplayer-audio','mplayer-volume','mplayer-other-options','sep',
-                'omx-audio','omx-volume','omx-window','freeze-at-start','freeze-at-end','omx-other-options',
-                'track-text-font','track-text-colour','track-text-x','track-text-y','track-text-justify',
+                
+                'vlc-layer','vlc-audio','vlc-volume','vlc-window','vlc-aspect-mode','vlc-freeze-at-start','vlc-freeze-at-end','vlc-image-duration','vlc-other-options','sep',
+
+                 'track-text-font','track-text-colour','track-text-x','track-text-y','track-text-justify','sep',
+            'tab-omx','sep',    
+                'omx-audio','omx-volume','omx-window','omx-other-options','freeze-at-start','freeze-at-end','sep',
+            
             'tab-controls','sep',  
                 'disable-controls','controls',
             'tab-show-control','sep',
@@ -50,8 +55,13 @@ class PPdefinitions(object):
             'tab-tracks','sep',  
                  'duration','pause-timeout','image-window','image-rotate','transition','sep',
                 'audio-speaker','mplayer-audio','mplayer-volume','mplayer-other-options','sep',
-                'omx-audio','omx-volume','omx-window','freeze-at-start','freeze-at-end','omx-other-options',
-                'track-text-font','track-text-colour','track-text-x','track-text-y','track-text-justify',
+
+                'vlc-layer','vlc-audio','vlc-volume','vlc-window','vlc-aspect-mode','vlc-freeze-at-start','vlc-freeze-at-end','vlc-image-duration','vlc-other-options','sep',
+
+                 'track-text-font','track-text-colour','track-text-x','track-text-y','track-text-justify','sep',
+            'tab-omx','sep',    
+                'omx-audio','omx-volume','omx-window','omx-other-options','freeze-at-start','freeze-at-end','sep',
+
             'tab-controls','sep',  
                 'disable-controls','controls',
             'tab-show-control','sep',
@@ -62,7 +72,7 @@ class PPdefinitions(object):
     
         'mediashow':[
             'tab-show','sep',  
-                     'type','title','show-ref', 'display-name', 'medialist','show-timeout','sep',
+                     'type','title','show-ref', 'display-name', 'medialist','show-timeout',
             'trigger-start-type','trigger-start-param','trigger-next-type','trigger-next-param','sequence','track-count-limit','repeat','interval','trigger-end-type','trigger-end-param',
             'empty-track-ref','escape-track-ref','sep','show-canvas',
             'tab-child','sep',  
@@ -77,9 +87,16 @@ class PPdefinitions(object):
             'tab-tracks','sep',
                  'duration','pause-timeout','image-window','image-rotate','transition','sep',
                 'audio-speaker','mplayer-audio','mplayer-volume','mplayer-other-options','sep',
-                'omx-audio','omx-volume','omx-window','freeze-at-start','freeze-at-end','omx-other-options','sep',
+                
+                'vlc-layer','vlc-audio','vlc-volume','vlc-window','vlc-aspect-mode','vlc-freeze-at-start','vlc-freeze-at-end','vlc-image-duration','vlc-other-options','sep',
+
                  'track-text-font','track-text-colour','track-text-x','track-text-y','track-text-justify','sep',
-                'web-window',
+                 
+                 'chrome-window','chrome-zoom','chrome-freeze-at-end','chrome-other-options',
+                
+            'tab-omx','sep',    
+                'omx-audio','omx-volume','omx-window','omx-other-options','freeze-at-start','freeze-at-end','sep','web-window',
+            
             'tab-controls','sep',  
                     'disable-controls', 'controls',
             'tab-show-control','sep',
@@ -99,9 +116,17 @@ class PPdefinitions(object):
             'tab-tracks','sep',
                  'duration','pause-timeout','image-window','image-rotate','transition','sep',
                 'audio-speaker','mplayer-audio','mplayer-volume','mplayer-other-options','sep',
-                'omx-audio','omx-volume','omx-window','freeze-at-start','freeze-at-end','omx-other-options','sep',
+
+                'vlc-layer','vlc-audio','vlc-volume','vlc-window','vlc-aspect-mode','vlc-freeze-at-start','vlc-freeze-at-end','vlc-image-duration','vlc-other-options','sep',
+
                  'track-text-font','track-text-colour','track-text-x','track-text-y','track-text-justify','sep',
-                'web-window',
+                 'chrome-window','chrome-zoom','chrome-freeze-at-end','chrome-other-options',
+
+            'tab-omx','sep',    
+                'omx-audio','omx-volume','omx-window','omx-other-options','freeze-at-start','freeze-at-end','sep','web-window',
+            
+                
+                
             'tab-controls','sep',  
                'disable-controls','controls',
             'tab-show-control','sep',
@@ -128,9 +153,16 @@ class PPdefinitions(object):
             'tab-tracks','sep',
                  'duration','pause-timeout','image-window','image-rotate','transition','sep',
                 'audio-speaker','mplayer-audio','mplayer-volume','mplayer-other-options','sep',
-                'omx-audio','omx-volume','omx-window','freeze-at-start','freeze-at-end','omx-other-options','sep',
+
+                'vlc-layer','vlc-audio','vlc-volume','vlc-window','vlc-aspect-mode','vlc-freeze-at-start','vlc-freeze-at-end','vlc-image-duration','vlc-other-options','sep',
+
                  'track-text-font','track-text-colour','track-text-x','track-text-y','track-text-justify','sep',
-                'web-window',
+                 'chrome-window','chrome-zoom','chrome-freeze-at-end','chrome-other-options',
+                
+            'tab-omx','sep',    
+                'omx-audio','omx-volume','omx-window','omx-other-options','freeze-at-start','freeze-at-end','sep','web-window',
+            
+                
             'tab-controls','sep',  
                 'disable-controls','controls',
             'tab-show-control','sep',
@@ -152,9 +184,15 @@ class PPdefinitions(object):
             'tab-tracks','sep', 
                  'duration','pause-timeout','image-window','image-rotate','transition','sep',
                 'audio-speaker','mplayer-audio','mplayer-volume','mplayer-other-options','sep',
-                'omx-audio','omx-volume','omx-window','freeze-at-start','freeze-at-end','omx-other-options','sep',
+                
+                'vlc-layer','vlc-audio','vlc-volume','vlc-window','vlc-aspect-mode','vlc-freeze-at-start','vlc-freeze-at-end','vlc-image-duration','vlc-other-options','sep',
+
                  'track-text-font','track-text-colour','track-text-x','track-text-y','track-text-justify','sep',
-                'web-window',
+                 'chrome-window','chrome-zoom','chrome-freeze-at-end','chrome-other-options',
+
+            'tab-omx','sep',    
+                'omx-audio','omx-volume','omx-window','omx-other-options','freeze-at-start','freeze-at-end','sep','web-window',
+            
             'tab-links','sep',
                 'disable-controls','links',
             'tab-show-control','sep',
@@ -175,9 +213,15 @@ class PPdefinitions(object):
             'tab-tracks','sep',  
                  'duration','pause-timeout','image-window','image-rotate','transition','sep',
                 'audio-speaker','mplayer-audio','mplayer-volume','mplayer-other-options','sep',
-                'omx-audio','omx-volume','omx-window','freeze-at-start','freeze-at-end','omx-other-options','sep',
-                'track-text-font','track-text-colour','track-text-x','track-text-y','track-text-justify','sep',
-                'web-window',
+
+                'vlc-layer','vlc-audio','vlc-volume','vlc-window','vlc-aspect-mode','vlc-freeze-at-start','vlc-freeze-at-end','vlc-image-duration','vlc-other-options','sep',
+
+                 'track-text-font','track-text-colour','track-text-x','track-text-y','track-text-justify','sep',
+                 'chrome-window','chrome-zoom','chrome-freeze-at-end','chrome-other-options',
+               
+            'tab-omx','sep',    
+                'omx-audio','omx-volume','omx-window','omx-other-options','freeze-at-start','freeze-at-end','sep', 'web-window',
+            
             'tab-links','sep',
                 'disable-controls','links',
             'tab-show-control','sep',
@@ -185,6 +229,8 @@ class PPdefinitions(object):
             'tab-sched','sep',
                 'sched-everyday','sched-weekday','sched-monthday','sched-specialday','enable-catchup',
                     ],
+
+
               
             'start':[
             'tab-sched','sep',
@@ -213,6 +259,9 @@ class PPdefinitions(object):
                                'empty-text':'Nothing to show','admin-font':'Helvetica 10 bold','admin-colour':'white','admin-x':'100','admin-y':'200','admin-justify':'left',
                          'transition': 'cut', 'duration': '5','pause-timeout':'','image-window':'original','image-rotate':'0','audio-speaker':'stereo','mplayer-audio':'hdmi','mplayer-volume':'0','mplayer-other-options':'',
                             'omx-audio': 'hdmi','omx-volume':'0','omx-window':'warp 300 300 655 500','omx-other-options': '','freeze-at-start':'no','freeze-at-end':'yes',
+                             'vlc-layer':'1','vlc-audio': 'default','vlc-volume':'100','vlc-window':'showcanvas 200+200+400*300','vlc-other-options':'','vlc-aspect-mode':'stretch','vlc-image-duration':'5',
+                             'vlc-freeze-at-start':'no','vlc-freeze-at-end':'yes',
+
                             'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                             'live-tracks-dir1':'','live-tracks-dir2':'',
                                'controls':'pp-down down\npp-stop stop\npp-pause pause\n',
@@ -226,6 +275,9 @@ class PPdefinitions(object):
                         'empty-text':'Nothing to show','admin-font':'Helvetica 10 bold','admin-colour':'white','admin-x':'100','admin-y':'200','admin-justify':'left',
                          'transition': 'cut', 'duration': '5','pause-timeout':'','image-window':'original','image-rotate':'0','audio-speaker':'stereo','mplayer-audio':'hdmi','mplayer-volume':'0','mplayer-other-options':'',
                             'omx-audio': 'hdmi','omx-volume':'0','omx-window':'warp 300 300 655 500','omx-other-options': '','freeze-at-start':'no','freeze-at-end':'yes',
+                             'vlc-layer':'1','vlc-audio': 'default','vlc-volume':'100','vlc-window':'showcanvas 200+200+400*300','vlc-other-options':'','vlc-aspect-mode':'stretch','vlc-image-duration':'5',
+                             'vlc-freeze-at-start':'no','vlc-freeze-at-end':'yes',
+
                                 'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                             'controls':'pp-down down\npp-stop stop\npp-pause pause\n',
                                 'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no',
@@ -239,6 +291,11 @@ class PPdefinitions(object):
                             'transition': 'cut', 'duration': '0','pause-timeout':'','image-window':'original','image-rotate':'0',
                              'audio-speaker':'stereo','mplayer-audio':'hdmi','mplayer-volume':'0','mplayer-other-options':'',
                                  'omx-audio': 'hdmi','omx-volume':'0','omx-window':'warp 300 300 655 500','omx-other-options': '','web-window':'warp 300 300 700 700','freeze-at-start':'no','freeze-at-end':'yes',
+
+                             'vlc-layer':'1','vlc-audio': 'default','vlc-volume':'100','vlc-window':'showcanvas 200+200+400*300','vlc-other-options':'','vlc-aspect-mode':'stretch','vlc-image-duration':'5',
+                             'vlc-freeze-at-start':'no','vlc-freeze-at-end':'yes',
+                            'chrome-window':'showcanvas 200+200+600*400','chrome-zoom':'1.0','chrome-freeze-at-end':'yes','chrome-other-options':'',
+
                                  'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                                  'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no',
                                  'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'
@@ -253,6 +310,10 @@ class PPdefinitions(object):
                             'transition': 'cut', 'duration': '0','pause-timeout':'','image-window':'original','image-rotate':'0',
                              'audio-speaker':'stereo','mplayer-audio':'hdmi','mplayer-volume':'0','mplayer-other-options':'',
                                    'omx-audio': 'hdmi','omx-volume':'0','omx-window':'warp 300 300 655 500','omx-other-options': '','web-window':'warp 300 300 700 700','freeze-at-start':'no','freeze-at-end':'yes',
+                             'vlc-layer':'1','vlc-audio': 'default','vlc-volume':'100','vlc-window':'showcanvas 200+200+400*300','vlc-other-options':'','vlc-aspect-mode':'stretch','vlc-image-duration':'5',
+                             'vlc-freeze-at-start':'no','vlc-freeze-at-end':'yes',
+                            'chrome-window':'showcanvas 200+200+600*400','chrome-zoom':'1.0','chrome-freeze-at-end':'yes','chrome-other-options':'',
+
                                    'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                                    'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no','controls-in-subshows':'no',
                                    'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'
@@ -267,6 +328,12 @@ class PPdefinitions(object):
                        'show-text-type':'text','show-html-width':'300','show-html-height':'300','show-html-background-colour':'white','show-text-location':'',
                             'transition': 'cut', 'duration': '5','pause-timeout':'','image-window':'original','image-rotate':'0','audio-speaker':'stereo','mplayer-audio':'hdmi','mplayer-volume':'0','mplayer-other-options':'','web-window':'warp 300 300 700 700',
                              'omx-audio': 'hdmi','omx-volume':'0','omx-window':'warp 300 300 655 500','omx-other-options': '','freeze-at-start':'no','freeze-at-end':'yes',
+                             
+                             'vlc-layer':'1','vlc-audio': 'default','vlc-volume':'100','vlc-window':'showcanvas 200+200+400*300','vlc-other-options':'','vlc-aspect-mode':'stretch','vlc-image-duration':'5',
+                             'vlc-freeze-at-start':'no','vlc-freeze-at-end':'yes',
+                             
+                            'chrome-window':'showcanvas 200+200+600*400','chrome-zoom':'1.0','chrome-freeze-at-end':'yes','chrome-other-options':'',
+                             
                              'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                              'controls':'pp-down down\npp-up up\npp-play play\npp-stop stop\npp-pause pause\n',
                              'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no',
@@ -281,6 +348,11 @@ class PPdefinitions(object):
                         'eggtimer-text':'Loading....','eggtimer-x':'100','eggtimer-y':'100','eggtimer-justify':'left','eggtimer-font':'Helvetica 10 bold','eggtimer-colour':'white',
                          'transition': 'cut', 'duration': '5','pause-timeout':'','image-window':'original','image-rotate':'0','audio-speaker':'stereo','mplayer-audio':'hdmi','mplayer-volume':'0','mplayer-other-options':'',
                             'omx-audio': 'hdmi','omx-volume':'0','omx-window':'warp 300 300 655 500','omx-other-options': '','web-window':'warp 300 300 700 700','freeze-at-start':'no','freeze-at-end':'yes',
+
+                             'vlc-layer':'1','vlc-audio': 'default','vlc-volume':'100','vlc-window':'showcanvas 200+200+400*300','vlc-other-options':'','vlc-aspect-mode':'stretch','vlc-image-duration':'5',
+                             'vlc-freeze-at-start':'no','vlc-freeze-at-end':'yes',
+                            'chrome-window':'showcanvas 200+200+600*400','chrome-zoom':'1.0','chrome-freeze-at-end':'yes','chrome-other-options':'',
+                             
                             'live-tracks-dir1':'','live-tracks-dir2':'',
                             'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                             'controls':'pp-down down\npp-up up\npp-play play\npp-stop stop\npp-pause pause\n',
@@ -293,12 +365,18 @@ class PPdefinitions(object):
                          'eggtimer-text':'Loading....','eggtimer-x':'100','eggtimer-y':'100','eggtimer-justify':'left','eggtimer-font':'Helvetica 10 bold','eggtimer-colour':'white',                       
                         'show-text':'','show-text-font':'Helvetica 20 bold','show-text-colour':'white','show-text-x':'100','show-text-y':'50','show-text-justify':'left','background-image':'','background-colour':'',
                        'show-text-type':'text','show-html-width':'300','show-html-height':'300','show-html-background-colour':'white','show-text-location':'',
-                'transition': 'cut',  'duration': '5','pause-timeout':'','image-window':'original','image-rotate':'0','audio-speaker':'stereo','mplayer-audio':'hdmi','mplayer-volume':'0', 'mplayer-other-options':'',
+                       'transition': 'cut',  'duration': '5','pause-timeout':'','image-window':'original','image-rotate':'0','audio-speaker':'stereo','mplayer-audio':'hdmi','mplayer-volume':'0', 'mplayer-other-options':'',
                         'omx-audio': 'hdmi','omx-volume':'0','omx-window':'warp 300 300 655 500','omx-other-options': '','web-window':'warp 300 300 700 700','freeze-at-start':'no','freeze-at-end':'yes',
+
+                    'vlc-layer':'1','vlc-audio': 'default','vlc-volume':'100','vlc-window':'showcanvas 200+200+400*300','vlc-other-options':'','vlc-aspect-mode':'stretch','vlc-image-duration':'5',
+                             'vlc-freeze-at-start':'no','vlc-freeze-at-end':'yes',
+                            'chrome-window':'showcanvas 200+200+600*400','chrome-zoom':'1.0','chrome-freeze-at-end':'yes','chrome-other-options':'',
                       'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                         'disable-controls':'no','controls':'pp-down down\npp-up up\npp-play play\npp-stop stop\npp-pause pause\n',
                       'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no',
-                      'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'},    
+                      'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'},   
+                      
+                       
             
                 'start':{'title': 'Start','start-show-ref':'start', 'type': 'start','background-colour':'#000000','start-show':'','show-ref':'start',
                          'sched-enable':'no','simulate-time':'no','sim-year':'','sim-month':'','sim-day':'','sim-hour':'','sim-minute':'','sim-second':'',
@@ -370,15 +448,32 @@ class PPdefinitions(object):
                                        'values':['hdmi','hdmi0','hdmi1','USB','A/V','bluetooth','USB2','']},
                     'mplayer-other-options':{'shape':'entry','text':'Audio Player Options','must':'no','read-only':'no'},
                     'mplayer-volume':{'shape':'entry','text':'Audio Volume','must':'no','read-only':'no'},
-                    'omx-audio':{'shape':'option-menu','text':'Video Player Audio','must':'no','read-only':'no',
+                    
+                    'omx-audio':{'shape':'option-menu','text':'OMX Player Audio','must':'no','read-only':'no',
                                        'values':['hdmi','local','both','alsa','']},
-                    'omx-other-options':{'shape':'entry','text':'Video Player Options','must':'no','read-only':'no'},
-                    'omx-volume':{'shape':'entry','text':'Video Player Volume','must':'no','read-only':'no'},
-                    'omx-window':{'shape':'entry','text':'Video Window','must':'no','read-only':'no'},
-                    'pause-timeout':{'shape':'entry','text':'Pause Timeout','must':'no','read-only':'no'},
-                    'freeze-at-start':{'shape':'option-menu','text':'Freeze at Start','must':'no','read-only':'no',
+                    'omx-other-options':{'shape':'entry','text':'OMX Player Options','must':'no','read-only':'no'},
+                    'omx-volume':{'shape':'entry','text':'OMX Player Volume','must':'no','read-only':'no'},
+                    'omx-window':{'shape':'entry','text':'OMX Window','must':'no','read-only':'no'},
+                    
+                    'vlc-audio':{'shape':'option-menu','text':'VLC Player Audio','must':'no','read-only':'no',
+                                       'values':['default']},
+                    'vlc-other-options':{'shape':'entry','text':'VLC Player Options','must':'no','read-only':'no'},
+                    'vlc-volume':{'shape':'entry','text':'VLC Player Volume','must':'no','read-only':'no'},
+                    'vlc-window':{'shape':'entry','text':'VLC Window','must':'no','read-only':'no'},
+                    'vlc-layer':{'shape':'entry','text':'VLC Display layer','must':'no','read-only':'no'}, 
+                    'vlc-aspect-mode':{'shape':'option-menu','text':'VLC Aspect Mode','must':'no','read-only':'no',
+                                       'values':['stretch','fill','letterbox']},
+                    'vlc-image-duration':{'shape':'entry','text':'VLC Image Duration','must':'no','read-only':'no'},
+                    'vlc-freeze-at-start':{'shape':'option-menu','text':'VLC Freeze at Start','must':'no','read-only':'no',
                                        'values':['no','before-first-frame','after-first-frame']},
-                    'freeze-at-end':{'shape':'option-menu','text':'Freeze at End','must':'no','read-only':'no',
+                    'vlc-freeze-at-end':{'shape':'option-menu','text':'VLC Freeze at End','must':'no','read-only':'no',
+                                       'values':['yes','no']},                    
+                    
+                                       
+                    'pause-timeout':{'shape':'entry','text':'Pause Timeout','must':'no','read-only':'no'},
+                    'freeze-at-start':{'shape':'option-menu','text':'OMX Freeze at Start','must':'no','read-only':'no',
+                                       'values':['no','before-first-frame','after-first-frame']},
+                    'freeze-at-end':{'shape':'option-menu','text':'OMX Freeze at End','must':'no','read-only':'no',
                                        'values':['yes','no']},
 
                     'repeat':{'shape':'option-menu','text':'Repeat/Single','must':'no','read-only':'no',
@@ -438,6 +533,7 @@ class PPdefinitions(object):
                     'tab-menu-text':{'shape':'tab','name':'menu-text','text':'Menu Text'},
                     'tab-track':{'shape':'tab','name':'track','text':'Track'},
                     'tab-tracks':{'shape':'tab','name':'tracks','text':'Track Defaults'},
+                    'tab-omx':{'shape':'tab','name':'omx','text':'Trk Def.+'},                    
                     'text':{'shape':'text','text':'Message Text','must':'no','read-only':'no'},
                     'timeout-track-ref':{'shape':'entry','text':'Timeout Track','must':'no','read-only':'no'},
                     'title':{'shape':'entry','text':'Title','must':'no','read-only':'no'},
@@ -461,10 +557,38 @@ class PPdefinitions(object):
                     'trigger-wait-text':{'shape':'text','text':'Trigger Wait Text','must':'no','read-only':'no'},
 
                     'type':{'shape':'entry','text':'Type','must':'no','read-only':'yes'},
-                    'web-window':{'shape':'entry','text':'Web Window','must':'no','read-only':'no'},
+                    'web-window':{'shape':'entry','text':'UZBL Web Window','must':'no','read-only':'no'},
+                    'chrome-window':{'shape':'entry','text':'Chrome Web Window','must':'no','read-only':'no'},
+
+                    'chrome-freeze-at-end':{'shape':'option-menu','text':'Chrome Freeze at End','must':'no','read-only':'no',
+                                       'values':['yes','no']},
+
+                    'chrome-zoom':{'shape':'entry','text':'Chrome Zoom','must':'no','read-only':'no'},
+                    'chrome-other-options':{'shape':'entry','text':'Chrome Options','must':'no','read-only':'no'},
+
+
                           }
 
     track_types={
+    
+            'vlc':[
+            'tab-track','sep',  
+                    'type','title','display-name','track-ref','location','thumbnail','vlc-audio','vlc-volume','vlc-max-volume',
+                    'vlc-window','vlc-aspect-mode','vlc-subtitles','vlc-layer','vlc-freeze-at-start','vlc-freeze-at-end','vlc-image-duration','vlc-other-options','vlc-aspect-ratio','vlc-crop',
+                    'background-colour','background-image','display-show-background','plugin','pause-timeout',
+            'tab-track-text','sep',
+                'track-text','track-text-location','track-text-x','track-text-y','track-text-type','sep',
+                'track-text-font','track-text-colour','track-text-justify','sep',
+                'track-html-height','track-html-width','track-html-background-colour','sep',
+                'display-show-text',
+            'tab-links','sep',
+                'links',
+            'tab-show-control','sep',
+                'show-control-begin','show-control-end',
+            'tab-animate','sep',
+                'animate-begin','animate-clear','animate-end'
+            ],
+            
         'video':[
             'tab-track','sep',  
                     'type','title','display-name','track-ref','location','thumbnail','freeze-at-start','freeze-at-end','omx-audio','omx-volume','omx-max-volume','omx-window','omx-other-options',
@@ -583,13 +707,43 @@ class PPdefinitions(object):
                  'show-control-begin','show-control-end',
             'tab-animate','sep',
                  'animate-begin','animate-clear','animate-end'
+                 ],
+                 
+         'chrome':[
+            'tab-track','sep',  
+                'type','title','track-ref','location','thumbnail','duration','chrome-window','chrome-freeze-at-end','chrome-zoom','chrome-other-options',
+                       'background-colour','background-image','display-show-background','plugin',
+            'tab-track-text','sep',
+                'track-text','track-text-location','track-text-x','track-text-y','track-text-type','sep',
+                'track-text-font','track-text-colour','track-text-justify','sep',
+                'track-html-height','track-html-width','track-html-background-colour','sep',
+                'display-show-text','sep',
+            'tab-browser-commands','sep',
+                 'browser-commands',
+            'tab-links','sep',
+                 'links',
+            'tab-show-control','sep',
+                 'show-control-begin','show-control-end',
+            'tab-animate','sep',
+                 'animate-begin','animate-clear','animate-end'
                  ]
-
                          }                   
 
     new_tracks={
 
-                'video':{'title':'New Video','track-ref':'','display-name':'','type':'video','location':'','thumbnail':'','freeze-at-start':'','freeze-at-end':'','seamless-loop':'no',
+                'vlc':{'title':'New VLC Video','track-ref':'','display-name':'','type':'vlc','location':'','thumbnail':'',
+                         'vlc-audio':'','vlc-volume':'','vlc-max-volume':'','vlc-window':'','vlc-other-options': '','vlc-aspect-mode':'',
+                         'vlc-subtitles':'no','vlc-aspect-ratio':'','vlc-crop':'','vlc-layer':'1','vlc-image-duration':'',
+                         'vlc-freeze-at-start':'','vlc-freeze-at-end':'',
+                         
+                         'background-colour':'','background-image':'','display-show-background':'yes','display-show-text':'yes',
+                         'track-text':'','track-text-font':'',
+                       'track-text-colour':'','track-text-x':'','track-text-y':'','track-text-justify':'',
+                       'track-text-type':'plain','track-html-width':'300','track-html-height':'300','track-html-background-colour':'white','track-text-location':'',
+                       'links':'','show-control-begin':'','show-control-end':'','animate-begin':'','animate-clear':'no','animate-end':'','plugin':'','pause-timeout':''},
+
+
+                'video':{'title':'New OMX Video','track-ref':'','display-name':'','type':'video','location':'','thumbnail':'','freeze-at-start':'','freeze-at-end':'','seamless-loop':'no',
                          'omx-audio':'','omx-volume':'','omx-max-volume':'','omx-window':'','omx-other-options': '','background-colour':'','background-image':'','display-show-background':'yes','display-show-text':'yes',
                          'track-text':'','track-text-font':'',
                        'track-text-colour':'','track-text-x':'','track-text-y':'','track-text-justify':'',
@@ -618,12 +772,22 @@ class PPdefinitions(object):
                        'track-text-type':'plain','track-html-width':'300','track-html-height':'300','track-html-background-colour':'white','track-text-location':'',
                          'links':'','show-control-begin':'','show-control-end':'','animate-begin':'','animate-clear':'no','animate-end':'','plugin':'','pause-timeout':''},
 
-                'web':{'title':'New Web','track-ref':'','type':'web','location':'', 'thumbnail':'','duration':'','web-window':'','display-show-text':'yes',
+                'web':{'title':'New UZBL Web','track-ref':'','type':'web','location':'', 'thumbnail':'','duration':'','web-window':'','display-show-text':'yes',
                           'background-colour':'','background-image':'','display-show-background':'yes',
                        'track-text':'','track-text-font':'','track-text-colour':'','track-text-x':'','track-text-y':'','track-text-justify':'',
                        'track-text-type':'plain','track-html-width':'300','track-html-height':'300','track-html-background-colour':'white','track-text-location':'',
                        'links':'',
                        'show-control-begin':'','show-control-end':'','animate-begin':'','animate-clear':'no','animate-end':'','browser-commands':'','plugin':''},
+
+                'chrome':{'title':'New Chrome Web','track-ref':'','type':'chrome','location':'', 'thumbnail':'','duration':'',
+                        'chrome-window':'','chrome-freeze-at-end':'','chrome-zoom':'','chrome-other-options':'',
+                        'display-show-text':'yes','background-colour':'','background-image':'','display-show-background':'yes',
+                       'track-text':'','track-text-font':'','track-text-colour':'','track-text-x':'','track-text-y':'','track-text-justify':'',
+                       'track-text-type':'plain','track-html-width':'300','track-html-height':'300','track-html-background-colour':'white','track-text-location':'',
+                       'links':'',
+                       'show-control-begin':'','show-control-end':'','animate-begin':'','animate-clear':'no','animate-end':'','browser-commands':'','plugin':''},
+
+
 
                 'menu':{'type':'menu','title':'Menu Track','track-ref':'menu-track','background-colour':'','background-image':'','display-show-background':'yes','plugin':'',
                         'entry-font': 'Helvetica 30 bold','entry-colour': 'white', 'entry-select-colour': 'red',
@@ -728,12 +892,33 @@ class PPdefinitions(object):
                                        'values':['hdmi','hdmi0','hdmi1','A/V','USB','bluetooth','USB2','']},
                             'mplayer-other-options':{'shape':'entry','text':'Audio Player Options','must':'no','read-only':'no'},
                             'mplayer-volume':{'shape':'entry','text':'Audio Player Volume','must':'no','read-only':'no'},
-                            'omx-audio':{'shape':'option-menu','text':'Video Player Audio','must':'no','read-only':'no',
+                            
+                            
+                            'omx-audio':{'shape':'option-menu','text':'OMX Player Audio','must':'no','read-only':'no',
                                        'values':['hdmi','local','both','alsa','']},
-                            'omx-other-options':{'shape':'entry','text':'Video Player Options','must':'no','read-only':'no'},
-                            'omx-volume':{'shape':'entry','text':'Video Player Volume','must':'no','read-only':'no'},
-                            'omx-max-volume':{'shape':'entry','text':'Video Player Max Volume','must':'no','read-only':'no'},
-                            'omx-window':{'shape':'entry','text':'Video Window','must':'no','read-only':'no'},
+                            'omx-other-options':{'shape':'entry','text':'OMX Player Options','must':'no','read-only':'no'},
+                            'omx-volume':{'shape':'entry','text':'OMX Player Volume','must':'no','read-only':'no'},
+                            'omx-max-volume':{'shape':'entry','text':'OMX Player Max Volume','must':'no','read-only':'no'},
+                            'omx-window':{'shape':'entry','text':'OMX Window','must':'no','read-only':'no'},
+                            
+                            'vlc-audio':{'shape':'option-menu','text':'VLC Player Audio','must':'no','read-only':'no',
+                                       'values':['default','']},
+                            'vlc-other-options':{'shape':'entry','text':'VLC Player Options','must':'no','read-only':'no'},
+                        'vlc-volume':{'shape':'entry','text':'VLC Player Volume','must':'no','read-only':'no'},
+                        'vlc-max-volume':{'shape':'entry','text':'VLC Player Max Volume','must':'no','read-only':'no'},
+                        'vlc-window':{'shape':'entry','text':'VLC Window','must':'no','read-only':'no'},
+                            'vlc-aspect-mode':{'shape':'option-menu','text':'VLC Aspect Mode','must':'no','read-only':'no',
+                                       'values':['stretch','fill','letterbox','vlc','']},  
+                             'vlc-subtitles':{'shape':'option-menu','text':'VLC Subtitles','must':'no','read-only':'no',
+                                       'values':['yes','no']},
+                            'vlc-freeze-at-start':{'shape':'option-menu','text':'VLC Freeze at Start','must':'no','read-only':'no',
+                                       'values':['no','before-first-frame','after-first-frame','']},
+                            'vlc-freeze-at-end':{'shape':'option-menu','text':'VLC Freeze at End','must':'no','read-only':'no',
+                                       'values':['yes','no','']},
+                            'vlc-aspect-ratio':{'shape':'entry','text':'VLC Aspect Ratio','must':'no','read-only':'no'},
+                            'vlc-crop':{'shape':'entry','text':'VLC Crop','must':'no','read-only':'no'},
+                            'vlc-layer':{'shape':'entry','text':'VLC Display layer','must':'no','read-only':'no'},
+                            'vlc-image-duration':{'shape':'entry','text':'VLC Image Duration','must':'no','read-only':'no'},
                             'pause-text':{'shape':'text','text':'Pause Text','must':'no','read-only':'no'},
                        
                             'pause-text-font':{'shape':'font','text':'Pause Text Font','must':'no','read-only':'no'},
@@ -745,11 +930,11 @@ class PPdefinitions(object):
                             'pause-timeout':{'shape':'entry','text':'Pause Timeout','must':'no','read-only':'no'},
 
                             'plugin':{'shape':'browse','text':'Plugin Config File','must':'no','read-only':'no'},
-                            'freeze-at-start':{'shape':'option-menu','text':'Freeze at Start','must':'no','read-only':'no',
+                            'freeze-at-start':{'shape':'option-menu','text':'OMX Freeze at Start','must':'no','read-only':'no',
                                        'values':['no','before-first-frame','after-first-frame','']},
-                            'freeze-at-end':{'shape':'option-menu','text':'Freeze at End','must':'no','read-only':'no',
+                            'freeze-at-end':{'shape':'option-menu','text':'OMX Freeze at End','must':'no','read-only':'no',
                                        'values':['yes','no','']},
-                            'seamless-loop':{'shape':'option-menu','text':'Seamless Loop','must':'no','read-only':'no',
+                            'seamless-loop':{'shape':'option-menu','text':'OMX Seamless Loop','must':'no','read-only':'no',
                                        'values':['yes','no']},
                             'show-ref':{'shape':'entry','text':'Show Reference','must':'no','read-only':'no'},
                             'show-control-begin':{'shape':'text','text':'Show Control at Beginning','must':'no','read-only':'no'},
@@ -782,7 +967,14 @@ class PPdefinitions(object):
                             'track-text-y':{'shape':'entry','text':'Track Text y Position','must':'no','read-only':'no'},
                             'transition':{'shape':'option-menu','text':'Transition','must':'no','read-only':'no','values':['cut','']},
                             'type':{'shape':'entry','text':'Type','must':'no','read-only':'yes'},
-                            'web-window':{'shape':'entry','text':'Web Window','must':'no','read-only':'no'},
+                            'web-window':{'shape':'entry','text':'UZBL Window','must':'no','read-only':'no'},
+                            'chrome-window':{'shape':'entry','text':'Chrome Window','must':'no','read-only':'no'},
+                            'chrome-freeze-at-end':{'shape':'option-menu','text':'Chrome Freeze at End','must':'no','read-only':'no',
+                                       'values':['yes','no','']},
+                            'chrome-zoom':{'shape':'entry','text':'Chrome Zoom','must':'no','read-only':'no'},
+                            'chrome-other-options':{'shape':'entry','text':'Chrome Options','must':'no','read-only':'no'},
+
+
                           }
         
 

@@ -1,3 +1,17 @@
+CHANGES FOR 1.4.5a 6/3/2021
+============================
+enhanced - added a new web track based on the chromium browser
+           web window parameters have changed
+           browser commands are functionalty is redeigned ot allow a limit to the number of loops
+           
+enhanced - added a new video track based on VLC
+           subtitle switch has been brought into the profile
+           display layer has been brought into the profile
+           VLC's Crop and Aspect Ratio can be accessed from the Profile as advanced options
+           Support for VLC's ability to play audio tracks and still images. The latter would allow an image to appear above a video
+           VLC does not support seamless loop
+           Audio device cannot be selected, except by use of the task bar. (Could be a bug in VLC not a limitation)
+
 CHANGES FOR 1.4.4g 1/1/2021
 ============================
 fixed - audio tracks and beeps now work with the Raspberry Pi OS release of Dec 2020 which uses pulseaudio instead of alsa. It can  also be made to work with earlier releases which use a different audio system.(see release notes)

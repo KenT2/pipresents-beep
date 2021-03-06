@@ -70,21 +70,26 @@ Ensure Raspbian is up to date.
 -------------------------------
 Pi Presents MUST have the latest version of omxplayer and of Raspbian, get this by
 
-		sudo apt-get update
-		sudo apt-get upgrade
+		sudo apt update
+		sudo apt upgrade
 
 Install required packages 
 -----------------------------
-         sudo apt-get install python3-pil.imagetk
-         sudo apt-get install unclutter
-         sudo apt-get install mplayer
-         sudo apt-get install uzbl
-         sudo apt-get install python3-pexpect
+         sudo apt install python3-pil.imagetk
+         sudo apt install unclutter
+         sudo apt install mplayer
+         sudo apt install python3-pexpect
+	 
+	 sudo apt install selenium
+	 sudo apt install chromium-chromedriver
+	 sudo pip3 install python-vlc
+	 
 		 
 Install optional packages
 ------------------------------
          sudo pip3 install evdev  (if you are using the input device I/O plugin)
-         sudo apt-get install mpg123 (for .mp3 beeps)
+         sudo apt install mpg123 (for .mp3 beeps)
+	 sudo apt install uzbl   (for legacy uzbl browser)
 
 	   
 Download Pi Presents Beep
@@ -138,7 +143,8 @@ Install Python 3 version of some packages:
       sudo apt-get install python3-pil.imagetk
       sudo apt-get install python3-pexpect
       sudo pip3 install evdev
-
+      sudo pip3 install python-vlc
+      
 The Python 2 versions of these packages can be left installed
 
 Open a terminal window in the /home/pi and type:

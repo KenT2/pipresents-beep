@@ -22,11 +22,10 @@ class DisplayManager(object):
     #         8 - 
     
     debug = False
-    #debug = True
     
     display_map = {'DSI0':0,'HDMI0':2,'HDMI':2,'A/V':3,'HDMI1':7 }    # lookup display Id by display name e.g. HDMI1>7
     display_reverse_map = {0:'DSI0',2:'HDMI0',3:'A/V',7:'HDMI1' }  # lookup display name by Id  e.g. 2>HDMI0
-
+    vlc_display_name_map =  {'DSI0':'DSI-1','HDMI':'HDMI-1','HDMI0':'HDMI-1','A/V':'A/V','HDMI1':'HDMI-2' }
     
     # Class Variables
     
@@ -166,7 +165,6 @@ class DisplayManager(object):
         # get model of Pi. Only interested if it is 4 or less
         self.model=self.pi_model()
         DisplayManager.pi_model=self.model
-
         self.print_info()
 
         if self.model == 4:

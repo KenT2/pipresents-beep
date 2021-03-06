@@ -207,7 +207,7 @@ class OMXDriver(object):
         # unpause to start playing
         if self.pause_before_play_required =='no':
             unpause_show_success=self.unpause(' to start showing')
-            # print 'unpause for show',self.paused
+            print ('unpause for show',self.paused)
             if unpause_show_success is True:
                 pass
                 # print self.id,' unpause for show success', self.video_position

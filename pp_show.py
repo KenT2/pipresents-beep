@@ -10,8 +10,10 @@ from pp_showmanager import ShowManager
 from pp_timeofday import TimeOfDay
 from pp_imageplayer import ImagePlayer
 from pp_videoplayer import VideoPlayer
+from pp_vlcplayer import VLCPlayer
 from pp_audioplayer import AudioPlayer
 from pp_browserplayer import BrowserPlayer
+from pp_chromeplayer import ChromePlayer
 from pp_messageplayer import MessagePlayer
 from pp_menuplayer import MenuPlayer
 from pp_utils import Monitor,calculate_text_position
@@ -265,6 +267,12 @@ class Show(object):
                                self.show_params,selected_track,self.pp_dir,self.pp_home,
                                self.pp_profile,self.end,self.command_callback)
 
+        elif track_type == "vlc":
+            return VLCPlayer(self.show_id,self.showlist,self.root,self.show_canvas,
+                               self.show_params,selected_track,self.pp_dir,self.pp_home,
+                               self.pp_profile,self.end,self.command_callback)
+
+
         elif track_type == "audio":
             return AudioPlayer(self.show_id,self.showlist,self.root,self.show_canvas,
                                self.show_params,selected_track,self.pp_dir,self.pp_home,
@@ -272,6 +280,11 @@ class Show(object):
 
         elif track_type == "web" and self.show_params['type'] not in ('artmediashow','artliveshow'):
             return BrowserPlayer(self.show_id,self.showlist,self.root,self.show_canvas,
+                                 self.show_params,selected_track,self.pp_dir,self.pp_home,
+                                 self.pp_profile,self.end,self.command_callback)
+                                 
+        elif track_type == "chrome" and self.show_params['type'] not in ('artmediashow','artliveshow'):
+            return ChromePlayer(self.show_id,self.showlist,self.root,self.show_canvas,
                                  self.show_params,selected_track,self.pp_dir,self.pp_home,
                                  self.pp_profile,self.end,self.command_callback)
   
@@ -317,7 +330,7 @@ class Show(object):
             self.previous_player.hide()
             # print 'Not None  - previous state is',self.previous_player.get_play_state()
             if self.previous_player.get_play_state() == 'showing':
-                # print 'showing so closing previous'
+                #print ('showing so closing previous')
                 # showing or frozen
                 self.mon.trace(self,' - closing previous: ' + self.mon.pretty_inst(self.previous_player))
                 self.previous_player.close(self._base_closed_callback_previous)

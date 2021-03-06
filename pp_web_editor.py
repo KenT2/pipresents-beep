@@ -37,7 +37,7 @@ class PPWebEditor(App):
         # ***************************************
         # INIT
         # ***************************************
-        self.editor_issue="1.4.4"
+        self.editor_issue="1.4.5"
         self.force_update= False
 
         # get directory holding the code
@@ -209,14 +209,18 @@ class PPWebEditor(App):
         track_add_from_file_menu.set_on_click_listener(self.add_track_from_file)
         track_new_menu = gui.MenuItem('New',width=120, height=30)
 
-        track_new_video_menu = gui.MenuItem('Video',width=120, height=30)
+        track_new_video_menu = gui.MenuItem('OMX Video',width=120, height=30)
         track_new_video_menu.set_on_click_listener(self.new_video_track)
+        track_new_vlc_menu = gui.MenuItem('VLC Video',width=120, height=30)
+        track_new_vlc_menu.set_on_click_listener(self.new_vlc_track)
         track_new_audio_menu = gui.MenuItem('Audio',width=120,height=30)
         track_new_audio_menu.set_on_click_listener(self.new_audio_track)
         track_new_image_menu = gui.MenuItem( 'Image',width=120, height=30)
         track_new_image_menu.set_on_click_listener(self.new_image_track)
-        track_new_web_menu = gui.MenuItem( 'Web',width=120, height=30)
+        track_new_web_menu = gui.MenuItem( 'UZBL Web',width=120, height=30)
         track_new_web_menu.set_on_click_listener(self.new_web_track)
+        track_new_chrome_menu = gui.MenuItem( 'Chrome Web',width=120, height=30)
+        track_new_chrome_menu.set_on_click_listener(self.new_chrome_track)
         track_new_message_menu = gui.MenuItem('Message',width=120, height=30)
         track_new_message_menu.set_on_click_listener(self.new_message_track)
         track_new_show_menu = gui.MenuItem('Show',width=120, height=30)
@@ -224,13 +228,16 @@ class PPWebEditor(App):
         track_new_menu_menu = gui.MenuItem('Menu',width=120, height=30)
         track_new_menu_menu.set_on_click_listener(self.new_menu_track)
 
-        track_new_menu.append(track_new_video_menu)
+
+        track_new_menu.append(track_new_vlc_menu)
         track_new_menu.append(track_new_audio_menu)
         track_new_menu.append(track_new_image_menu)
-        track_new_menu.append(track_new_web_menu)        
+        track_new_menu.append(track_new_chrome_menu)        
         track_new_menu.append(track_new_message_menu)
         track_new_menu.append(track_new_show_menu)
         track_new_menu.append(track_new_menu_menu)
+        track_new_menu.append(track_new_video_menu)
+        track_new_menu.append(track_new_web_menu)
         
         track_menu.append(track_delete_menu)
         track_menu.append(track_copy_menu)
@@ -1042,12 +1049,18 @@ class PPWebEditor(App):
             
     def new_video_track(self,widget):
         self.new_track(PPdefinitions.new_tracks['video'],None)
+
+    def new_vlc_track(self,widget):
+        self.new_track(PPdefinitions.new_tracks['vlc'],None)
   
     def new_audio_track(self,widget):
         self.new_track(PPdefinitions.new_tracks['audio'],None)
 
     def new_web_track(self,widget):
         self.new_track(PPdefinitions.new_tracks['web'],None)
+        
+    def new_chrome_track(self,widget):
+        self.new_track(PPdefinitions.new_tracks['chrome'],None)
         
     def new_image_track(self,widget):
         self.new_track(PPdefinitions.new_tracks['image'],None)
@@ -1135,11 +1148,11 @@ class PPWebEditor(App):
         if ext.lower() in PPdefinitions.IMAGE_FILES:
             self.new_track(PPdefinitions.new_tracks['image'],{'title':title,'track-ref':'','location':location})
         elif ext.lower() in PPdefinitions.VIDEO_FILES:
-            self.new_track(PPdefinitions.new_tracks['video'],{'title':title,'track-ref':'','location':location})
+            self.new_track(PPdefinitions.new_tracks['vlc'],{'title':title,'track-ref':'','location':location})
         elif ext.lower() in PPdefinitions.AUDIO_FILES:
             self.new_track(PPdefinitions.new_tracks['audio'],{'title':title,'track-ref':'','location':location})
         elif ext.lower() in PPdefinitions.WEB_FILES:
-            self.new_track(PPdefinitions.new_tracks['web'],{'title':title,'track-ref':'','location':location})
+            self.new_track(PPdefinitions.new_tracks['chrome'],{'title':title,'track-ref':'','location':location})
         else:
             OKDialog('Add Track',file_path + " - cannot determine track type, use menu track>new").show(self)
 
