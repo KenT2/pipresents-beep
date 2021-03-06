@@ -109,7 +109,7 @@ class PiPresents(object):
                             'MediaList','LiveList','ShowList',
                             'PathManager','ControlsManager','ShowManager','TrackPluginManager','IOPluginManager',
                             'MplayerDriver','OMXDriver','UZBLDriver',
-                            'TimeOfDay','ScreenDriver','Animate','OSCDriver','CounterManager','BeepsManager',
+                            'TimeOfDay','ScreenDriver','Animate','OSCDriver','CounterManager',
                             'Network','Mailer'
                             ]
         
@@ -277,7 +277,7 @@ class PiPresents(object):
 
         # find connected displays and create a canvas for each display
         self.dm=DisplayManager()
-        status,message,self.root=self.dm.init(self.options,self.handle_user_abort,self.pp_dir,True)
+        status,message,self.root=self.dm.init(self.options,self.handle_user_abort,self.pp_dir,False)
         if status != 'normal':
             self.mon.err(self,message)
             self.end('error',message)

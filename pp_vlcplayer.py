@@ -509,7 +509,7 @@ class VLCPlayer(Player):
             return False
 
     def set_volume(self,vol):
-        print ('SET VOLUME',vol)
+        # print ('SET VOLUME',vol)
         self.vlcdriver.sendline('vol '+ str(vol))
 
     def mute(self):
@@ -889,7 +889,8 @@ class CLI(object):
         self.vlcdrive = pexpect.spawn('/bin/bash', ['-c', cmd],encoding='utf-8')
         
         # print the start message read from the driver
-        print('Start Message: '+self.vlcdrive.readline())
+        sm=self.vlcdrive.readline()
+        print('Start Message: ' + sm)
         #stop pexpect echoing the command
         self.vlcdrive.setecho(False) 
 

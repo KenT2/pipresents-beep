@@ -2,7 +2,7 @@ CHANGES FOR 1.4.5a 6/3/2021
 ============================
 enhanced - added a new web track based on the chromium browser
            web window parameters have changed
-           browser commands are functionalty is redeigned ot allow a limit to the number of loops
+           browser commands and functionalty redesigned to allow a limit to the number of loops
            
 enhanced - added a new video track based on VLC
            subtitle switch has been brought into the profile

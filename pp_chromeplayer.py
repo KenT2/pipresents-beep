@@ -1,4 +1,4 @@
-#sudo apt install selenium
+#sudo pip3 install selenium
 #sudo apt install chromium-chromedriver
 
 import os
@@ -119,7 +119,6 @@ class ChromePlayer(Player):
             self.current_url=track
         else:
             self.current_url='file://'+track
-        print ('start',self.current_url)
         # do common bits of  load
         Player.pre_load(self)
         
@@ -132,7 +131,6 @@ class ChromePlayer(Player):
                 self.loaded_callback('error',message)
                 return
                 
-        print ('after options',self.current_url)
                      
         # parse browser commands to self.command_list
         reason,message=self.parse_commands(self.track_params['browser-commands'])
@@ -156,7 +154,6 @@ class ChromePlayer(Player):
 
         # start loading the browser
         self.play_state='loading'
-        print ('loading',self.current_url,self.app_mode)
 
 
         # load the images and text
@@ -225,6 +222,9 @@ class ChromePlayer(Player):
             # service any queued stop signals and test duration count
             if self.quit_signal is True or (self.duration_limit != 0 and self.duration_count == 0):
                 self.mon.log(self,"      Service stop required signal or timeout")
+                if self.command_timer != None:
+                    self.canvas.after_cancel(self.command_timer)
+                    self.command_timer=None
                 if self.quit_signal is True:
                     self.quit_signal=False
                 if self.freeze_at_end =='yes':
@@ -256,7 +256,6 @@ class ChromePlayer(Player):
 
     def input_pressed(self,symbol):
         self.mon.trace(self,symbol)
-        # print symbol
         if symbol == 'pause':
             self.pause()
         elif symbol == 'pause-on':
@@ -324,7 +323,7 @@ class ChromePlayer(Player):
             return
             
     def driver_get(self,url):
-        print ('get',url)
+        self.mon.log(self,'get: '+url)
         try:
             self.driver.get(url)
         except WebDriverException as e:
@@ -452,7 +451,7 @@ class ChromePlayer(Player):
         entry=self.command_list[self.command_index]
         command=entry[0]
         arg=entry[1]
-        self.mon.log (self,str(self.command_index) + ' Play '+command+' '+arg + '  Next: '+str(self.next_command_index))        
+        self.mon.log (self,str(self.command_index) + ' Do '+command+' '+arg + '  Next: '+str(self.next_command_index))        
                     
         # and execute command
         if command == 'load':
@@ -475,13 +474,14 @@ class ChromePlayer(Player):
                 self.command_timer=self.canvas.after(10,self.execute_command)
             else:
                 self.loop_count+=1
+                self.mon.log (self,'Inc loop count: '+ '  Count: '+str(self.loop_count))
                 # hit loop command after the requied number of loops
                 if self.loop_count==self.max_loops:   #max loops is -1 for continuous
                     self.mon.log (self,'end of loop: '+ '  Count: '+str(self.loop_count))
                     self.quit_signal=True
                     return
                 else:
-                    self.mon.log (self,'Looping to: '+str(self.loop_index) + ' Count: '+str(self.loop_index))
+                    self.mon.log (self,'Looping to: '+str(self.loop_index) + ' Count: '+str(self.loop_count))
                     self.command_timer=self.canvas.after(10,self.execute_command)
                     
         elif  command=='exit':
@@ -592,7 +592,7 @@ class ChromePlayer(Player):
         self.chrome_window_y=y
         self.chrome_window_width=width
         self.chrome_window_height=height
-        print ('app',self.app_mode,x,y,width,height)
+        #print ('app',self.app_mode,x,y,width,height)
         self.add_option('--app='+self.current_url)
         self.add_option('--window-size='+str(width)+','+str(height))
         self.add_option('--window-position='+str(x)+','+str(y))
