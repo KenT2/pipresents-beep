@@ -1,3 +1,9 @@
+Version 1.4.5b 13/3/2021
+========================
+Selection of the VLC Video track audio device is now from the profile. The set of audio devices are the same as those for audio tracks and beeps and are set up in pp_audio.cfg (See manual)
+
+'default' audio device has been deprecated and replaced with a blank entry in the Show; this is the same as the audio track. Templates, and examples have been updated to accomodate this change. If you do not download the new set of examples the deprecated audio device setting of 'default' will now result in use of the hdmi device and will show red in the profile editor until the field is edited.
+
 Version 1.4.5a 6/3/2021
 ========================
 This release adds new players for web and video tracks based on modern applications, Chromium and VLC.

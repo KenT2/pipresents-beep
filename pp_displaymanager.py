@@ -90,10 +90,10 @@ class DisplayManager(object):
 
     def id_of_display(self,display_name):
         if display_name not in DisplayManager.display_map:
-            return 'error','Display Name not known '+ display_name,-1
+            return 'error','Display Name not known: '+ display_name,-1
         display_id = DisplayManager.display_map[display_name]
         if display_id not in DisplayManager.displays:
-            return 'error','Display not connected '+ display_name,-1
+            return 'error','Display not connected: '+ display_name,-1
         return 'normal','',display_id
         
     def id_of_canvas(self,display_name):
@@ -101,7 +101,7 @@ class DisplayManager(object):
             return 'error','Display Name not known '+ display_name,-1,-1
         display_id = DisplayManager.display_map[display_name]
         if display_id not in DisplayManager.canvas_obj:
-            return 'error','Display has no canvas '+ display_name,-1,-1
+            return 'error','Display not connected (no canvas): '+ display_name,-1,-1
         return 'normal','',display_id,DisplayManager.canvas_obj[display_id]
         
     def name_of_display(self,display_id):
@@ -201,7 +201,7 @@ class DisplayManager(object):
             
         # Have now got all the required information
 
-        # setup backlight for toucscreen if connected
+        # setup backlight for touchscreen if connected
         status,message=self.init_backlight()
         if status=='error':
             return status,message,None

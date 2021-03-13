@@ -5,6 +5,7 @@ from pp_player import Player
 #sudo pip3 install python-vlc
 
 from pp_displaymanager import DisplayManager
+from pp_audiomanager import AudioManager
 import pexpect
 from tkinter import *
 
@@ -47,10 +48,10 @@ class VLCPlayer(Player):
                          pp_profile,
                          end_callback,
                          command_callback)
-        # print ' !!!!!!!!!!!videoplayer init'
         self.mon.trace(self,'')
         
         self.dm=DisplayManager()
+        self.am=AudioManager()
 
         # get player parameters from show/track
         if self.track_params['vlc-audio'] != "":
@@ -135,7 +136,6 @@ class VLCPlayer(Player):
         # instantiate arguments
         self.track=track
         self.loaded_callback=loaded_callback   #callback when loaded
-        # print '!!!!!!!!!!! videoplayer load',self.track
         self.mon.log(self,"Load track received from show Id: "+ str(self.show_id) + ' ' +self.track)
         self.mon.trace(self,'')
         
@@ -147,6 +147,25 @@ class VLCPlayer(Player):
             if self.loaded_callback is not  None:
                 self.loaded_callback('error',message)
                 return 
+
+        #for pulse get sink name and check device is connected 
+        self.audio_sys=self.am.get_audio_sys()
+        if self.audio_sys == 'pulse':
+            status,message,self.vlc_sink = self.am.get_sink(self.vlc_audio)
+            if status == 'error':
+                self.mon.err(self,message)
+                self.play_state='load-failed'
+                if self.loaded_callback is not  None:
+                    self.loaded_callback('error',message)
+                    return
+                    
+            if not self.am.sink_connected(self.vlc_sink):
+                self.mon.err(self,self.vlc_audio +' audio device not connected\n\n    sink: '+ self.vlc_sink)
+                self.play_state='load-failed'
+                if self.loaded_callback is not  None:
+                    self.loaded_callback('error','audio device not connected')
+                    return 
+
 
         # do common bits of  load
         Player.pre_load(self) 
@@ -316,6 +335,7 @@ class VLCPlayer(Player):
     def start_state_machine_load(self):
         # initialise all the state machine variables
         self.play_state='loading'
+        #self.set_volume(self.volume)
         self.tick_timer=self.canvas.after(1, self.load_state_machine) #50
         
     def load_state_machine(self):
@@ -342,6 +362,7 @@ class VLCPlayer(Player):
                 return            
             elif resp=='load-ok':
                 self.play_state = 'loaded'
+                #self.set_volume(self.volume)
                 self.mon.log(self,"      Entering state : " + self.play_state + ' from show Id: '+ str(self.show_id))
                 if self.loaded_callback is not  None:
                     self.loaded_callback('normal','loaded')
@@ -381,6 +402,8 @@ class VLCPlayer(Player):
             # show the track and content
             self.vlcdriver.sendline('show')
             self.mon.log (self,'>showing track from show Id: '+ str(self.show_id))
+            if self.vlc_sink!='':
+                self.set_device(self.vlc_sink)
             self.set_volume(self.volume)
             # and start polling for state changes
             # print 'start show state machine show'
@@ -511,6 +534,9 @@ class VLCPlayer(Player):
     def set_volume(self,vol):
         # print ('SET VOLUME',vol)
         self.vlcdriver.sendline('vol '+ str(vol))
+        
+    def set_device(self,device):
+        self.vlcdriver.sendline('device '+ device)
 
     def mute(self):
         self.mon.log(self,">mute received from show Id: "+ str(self.show_id))
@@ -921,7 +947,7 @@ class CLI(object):
         else:
             cmd_bit, parameters = cmd.split(' ', 1)
             #print (cmd_bit,parameters)
-            if cmd_bit in ('iopts','pauseopts','track','vol','ratio','crop'):
+            if cmd_bit in ('iopts','pauseopts','track','vol','ratio','crop','device'):
                 self.vlcdrive.sendline(cmd) 
             else:
                 print ('bad command')

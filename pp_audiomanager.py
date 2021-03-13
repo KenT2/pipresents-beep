@@ -5,7 +5,7 @@ import subprocess
 class AudioManager(object):
 
     config=None
-    profile_names=('hdmi','hdmi0','hdmi1','A/V','local','USB','USB2','bluetooth')
+    profile_names=('hdmi','hdmi0','hdmi1','A/V','local','USB','USB2','bluetooth','default')
     sink_map={}
     audio_sys= ''
     
@@ -45,7 +45,7 @@ class AudioManager(object):
         if name in AudioManager.sink_map:
             return 'normal','',AudioManager.sink_map[name]
         else:
-            return 'error',name+'not in audio.cfg',''
+            return 'error',name+' not in audio.cfg',''
             
     def sink_connected(self,sink):
         if sink=='':
@@ -113,8 +113,12 @@ class AudioManager(object):
 class PiPresents(object):
     def init(self):
         self.am=AudioManager()
-        status,message=self.am.init('/home/pi/pipresents')
-        #print (status,message)
+        path='/home/pi/pipresents'
+        status,message=self.am.init(path)
+        if status=='error':
+            print (message)
+            exit(0)
+        return
         #print (self.am.sink_connected('alsa_output.platform-bcm2835_audio.digital-stereo'))
 
     def info(self):

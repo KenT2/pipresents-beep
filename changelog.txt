@@ -1,3 +1,8 @@
+CHANGES FOR 1.4.5b 13/3/2021
+============================
+enhanced - VLC Video Track audio device can now be selected from a profile
+
+
 CHANGES FOR 1.4.5a 6/3/2021
 ============================
 enhanced - added a new web track based on the chromium browser

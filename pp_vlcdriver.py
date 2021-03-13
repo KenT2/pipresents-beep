@@ -43,7 +43,7 @@ close - exits vlc and exits pp_vlcdriver.py
 t - get the current state of loading/showing. Returns a single line wit hone of the above values
 
 vol - set the volume between 0 and 100. Use only when showing  vol <volume>
-      Volume is set to 0 in load so need to send aafter s command to hear anything
+      
 
 pause/ unpause - pauses the track
 mute/unmute - mute without changing volume
@@ -119,6 +119,7 @@ class VLCDriver(object):
         if ratio !='':
             self.player.video_set_aspect_ratio(ratio)
 
+
     # between load and play you can read the dimensions of the media (get_size())
         
     def play(self):
@@ -131,7 +132,7 @@ class VLCDriver(object):
         if self.freeze_at_start in ('no','before-first-frame'):
             # before first frame, pause when first 0 get_time() report followed by n zeros is received
             self.load_pause_position=-1
-            self.zero_count= 2
+            self.zero_count= 2         #2 was released
             
         if self.freeze_at_start=='after-first-frame':
             # after first frame, when get_time() > 0 allowing for sampling rate.
@@ -163,7 +164,7 @@ class VLCDriver(object):
             if position > self.load_pause_position and self.zero_count<0: #milliseconds
                 self.player.set_pause(True)
                 self.frozen_at_start=True
-                self.logger.log ('track frozen at start at: ',position)
+                self.logger.log ('track frozen at start at: ',position,self.zero_count)
                 self.state='load-ok'
                 return
                 
@@ -335,7 +336,9 @@ class VLCDriver(object):
     def set_volume(self,volume):
         self.player.audio_set_volume(volume)        
 
-     
+    def set_device(self,device_id):
+        self.player.audio_output_device_set(None,device_id)
+        
 class  Logger(object): 
 
 # -------------------------------
@@ -450,6 +453,9 @@ class CLI(object):
                 elif cmd_bit=='vol':
                     self.vv.set_volume(int(parameters))
                     self.logger.log ('vol: ',parameters)
+                elif cmd_bit=='device':
+                    self.vv.set_device(parameters)
+                    self.logger.log ('device: ',parameters)
                 else:
                     self.logger.log('bad-command',cmd)
 

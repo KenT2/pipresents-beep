@@ -89,7 +89,7 @@
    "trigger-wait-text": "Waiting for Trigger....",
    "type": "mediashow",
    "vlc-aspect-mode": "stretch",
-   "vlc-audio": "default",
+   "vlc-audio": "hdmi",
    "vlc-freeze-at-end": "yes",
    "vlc-freeze-at-start": "no",
    "vlc-image-duration": "5",
