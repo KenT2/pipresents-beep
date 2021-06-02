@@ -43,7 +43,7 @@ For a detailed list of applications and features see here:
 Licence
 =======
 
-See the licence.md file. Pi Presents is Careware to help support a small museum charity of which I am a Trustee http://www.museumoftechnology.org.uk  Particularly if you are using Pi Presents in a profit making situation a donation would be appreciated.
+See the licence.md file. Pi Presents is Careware to help support a small museum charity http://www.museumoftechnology.org.uk  Particularly if you are using Pi Presents in a profit making situation a donation would be appreciated.
 
 
 Installing Pi Presents Beep
@@ -59,11 +59,12 @@ Requirements
 	* must be run from the PIXEL desktop.
 	* must be installed and run from user Pi
 	* must have Python 3 installed (which Raspbian does)
+	* should use a clean install of Raspberry Pi OS, particularly if you intend to use GPIO
 
 
 Set the GPU Memory size to 256MB
 ---------------------------------
-Using the Raspbian menu preferences>raspberry pi configuration>performance, increase the GPU Memory to 256.
+Using the Raspbian menu preferences>raspberry pi configuration>performance, increase the GPU Memory to 256. On a Pi Zero this may not be possible due to the small amount of RAM.
 
 
 Ensure Raspbian is up to date.

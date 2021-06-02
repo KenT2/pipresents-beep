@@ -11,6 +11,8 @@ from pp_livelistfetcher import LiveListFetcher
 
 class LiveList(object):
 
+    video_player='vlc'
+    # video_player='video'  #uncomment to use omxplayer in liveshow or artliveshow
 
     def __init__(self,sequence):
         self.mon=Monitor()
@@ -19,7 +21,7 @@ class LiveList(object):
         self._num_tracks=0
         self.last_num_tracks=-1
         self.llf = LiveListFetcher()  # start livelist fetcher
-        
+
 
 # ***************************
 # Medialist Tracks
@@ -298,7 +300,7 @@ class LiveList(object):
         if ext.lower() in PPdefinitions.IMAGE_FILES:
             self.livelist_new_track(PPdefinitions.new_tracks['image'],{'title':title,'track-ref':'','location':afile})
         if ext.lower() in PPdefinitions.VIDEO_FILES:
-            self.livelist_new_track(PPdefinitions.new_tracks['vlc'],{'title':title,'track-ref':'','location':afile})
+            self.livelist_new_track(PPdefinitions.new_tracks[LiveList.video_player],{'title':title,'track-ref':'','location':afile})
         if ext.lower() in PPdefinitions.AUDIO_FILES:
             self.livelist_new_track(PPdefinitions.new_tracks['audio'],{'title':title,'track-ref':'','location':afile})
         if ext.lower() in PPdefinitions.WEB_FILES:

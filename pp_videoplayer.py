@@ -18,7 +18,7 @@ class VideoPlayer(Player):
     """
     
     debug = False
-    debug = True
+    #debug = True
     
     def __init__(self,
                  show_id,

@@ -45,7 +45,7 @@ class LiveListFetcher():
     """
     
     mode = 'async'
-    #mode = 'sync'
+    # mode = 'sync'
     cache_dir = '/home/pi/PPCache/' 
 
     def __init__(self):
@@ -59,10 +59,14 @@ class LiveListFetcher():
         # if the path does not exist then do not use it
         self.pp_live_dir = dir2
         
-        # init lock
-        # Assumes cache is not being updated when liveshow starts ! 
+        # initial population of livelist from cache
         if os.path.exists(LiveListFetcher.cache_dir):
-            self.send_signal(LiveListFetcher.cache_dir,'lock',False)
+            if LiveListFetcher.mode == 'sync':
+                if self.detect_signal(LiveListFetcher.cache_dir,'lock') is True:
+                    self.update_tracks()
+                    self.send_signal(LiveListFetcher.cache_dir,'lock',False)
+                    return
+            # self.send_signal(LiveListFetcher.cache_dir,'lock',False)
 
 
     def fetch_livelist(self):
@@ -70,7 +74,7 @@ class LiveListFetcher():
         # called after each track by create_new_livelist()
         if LiveListFetcher.mode == 'async':
             # no lock protocol so just return
-            #print ('async')
+            # print ('async')
             return
 
         if not os.path.exists(LiveListFetcher.cache_dir):
@@ -91,14 +95,14 @@ class LiveListFetcher():
         #time.sleep(5)         # see what happens if the update takes a long time
         paths = glob.glob(self.pp_live_dir +'/*')
         for f in paths:
-            #print ('deleting',f)
+            # print ('deleting',f)
             os.remove(f)
         source_dir = LiveListFetcher.cache_dir 
         dest = self.pp_live_dir +'/'  
         files = os.listdir(source_dir)
         for f in files:
             if f[0] != '.':
-                #print ('MOVING', f)
+                # print ('MOVING', f)
                 shutil.move(source_dir+f, dest)
 
         
@@ -106,25 +110,25 @@ class LiveListFetcher():
         if state == True:
             try:
                 f = open(directory+'.'+signal,'x').close()
-                #print ('sent ',directory,signal,state)
+                # print ('sent ',directory,signal,state)
             except:
-                #print(directory + '.'+ signal+ ' already exists')
+                # print(directory + '.'+ signal+ ' already exists')
                 pass
         else:
             if os.path.exists(directory +'.'+signal):
                 os.remove(directory + '.'+signal)
-                #print ('sent ',directory,signal,state)
+                # print ('sent ',directory,signal,state)
             else:
-                #print( directory+'.'+signal+ ' already deleted')
+                # print( directory+'.'+signal+ ' already deleted')
                 pass
         
 
     def detect_signal(self,directory,signal):
         if os.path.exists(directory+'.'+signal):
-            #print (signal, 'is True')
+            # print (signal, 'is True')
             return True
         else:
-            #print (signal, 'is False')
+            # print (signal, 'is False')
             return False
 
                 

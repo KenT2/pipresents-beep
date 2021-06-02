@@ -1,3 +1,19 @@
+CHANGES FOR 1.4.5c 2/6/2021
+============================
+
+enhanced - CEC commands can now include an optional device number
+enhanced - added the CEC 'as' command to make the Pi the active source
+enhanced - nounclutter command line option to disable unclutter
+fixed - updated comments in all I/O plugin config files in /pipresents/pp_resources/pp_templates
+fixed - all I/O plugin files in example profiles have comments removed
+fixed - pp_inputdevicedriver.py I/O plugin which handles linux generic input devices now responds correctly to buttons that produce more than one code 
+fixed - play command added to the test CLI of pp_vlcpayer,py
+fixed - vlc is shutdown properly when closing Pi Presents with a video track running. check terminate in vlcpalyer
+fixed - pp_livelistfetcher.py syncing liveshow now moves files from cache on startup if .loxk is set
+fixed - removed extraneous debug statement in video track player
+fixed - crash when radiobuttonshow is a track of a radiobuttonshow and 'Controls in Subshows' is no (a pointless configuration!)
+
+
 CHANGES FOR 1.4.5b 13/3/2021
 ============================
 enhanced - VLC Video Track audio device can now be selected from a profile

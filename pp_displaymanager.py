@@ -563,7 +563,9 @@ class DisplayManager(object):
                 window_x=DisplayManager.real_display_x[this_id]
                 window_y=DisplayManager.real_display_y[this_id]
                 tk_window.attributes('-fullscreen', True)
-                os.system('unclutter > /dev/null 2>&1 &')
+                if options['nounclutter'] is False:
+                    # print ('set unclutter')
+                    os.system('unclutter > /dev/null 2>&1 &')
                 
                 # print ('Window Position FS', this_id, window_x,window_y,window_width,window_height)
                 tk_window.geometry("%dx%d%+d%+d"  % (window_width,window_height,window_x,window_y))

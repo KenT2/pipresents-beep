@@ -146,10 +146,12 @@ class RadioButtonShow(Show):
 
         # show control events
         self.handle_show_control_event(symbol,self.show_control_controls)
-
+        self.do_operation(symbol)
+        
+    def do_operation(self,symbol):
         # print 'radiobuttonshow ',symbol
         found,link_op,link_arg=self.path.find_link(symbol,self.links)
-        # print 'input event',symbol,link_op
+        # print ('input event',symbol,link_op,link_arg)
         if found is True:
             if link_op == 'play':
                 self.do_play(link_arg)
@@ -208,15 +210,15 @@ class RadioButtonShow(Show):
         if self.show_timeout_timer is not None:
             self.canvas.after_cancel(self.show_timeout_timer)
             self.show_timeout_timer=None
-        # print '\n NEED NEXT TRACK'
+        # print ('\n NEED NEXT TRACK')
         self.next_track_signal=True
         self.next_track_op='play'
         self.next_track_arg=track_ref
         if self.shower is not None:
-            # print 'current_shower not none so stopping',self.mon.id(self.current_shower)
+            # print ('current_shower not none so stopping ',self.shower)
             self.shower.do_operation('stop')
         elif self.current_player is not None:
-            # print 'current_player not none so stopping',self.mon.id(self.current_player), ' for' ,track_ref
+            # print ('current_player not none so stopping', ' for' ,track_ref)
             self.current_player.input_pressed('stop')
         else:
             return
@@ -378,7 +380,7 @@ class RadioButtonShow(Show):
         elif self.next_track_signal is True:
             self.next_track_signal=False
             self.current_track_ref=self.next_track_arg
-            # print 'what next - next track signal is True so load ', self.current_track_ref
+            # print ('what next - next track signal is True so load ', self.current_track_ref)
             index = self.medialist.index_of_track(self.current_track_ref)
             if index >=0:
                 # don't use select the track as not using selected_track in radiobuttonshow

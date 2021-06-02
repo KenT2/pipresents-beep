@@ -131,7 +131,7 @@ class VLCPlayer(Player):
 
 
 
-    # LOAD - creates and omxplayer instance, loads a track and then pause
+    # LOAD - creates a VLC instance, loads a track and then pause
     def load(self,track,loaded_callback,enable_menu):  
         # instantiate arguments
         self.track=track
@@ -454,11 +454,13 @@ class VLCPlayer(Player):
                     self.tick_timer=self.canvas.after(10,self.show_state_machine)
                     
         elif self.play_state=='closing':
-                    self.play_state='closed'
-                    # state change needed for wait for end
-                    self.mon.log(self,"      Entering state : " + self.play_state + ' from show Id: '+ str(self.show_id))
-                    if self.closed_callback is not  None:
-                        self.closed_callback('normal','vlcdriver closed')             
+            # close the pexpect process
+            self.vlcdriver.close()
+            self.play_state='closed'
+            # state change needed for wait for end
+            self.mon.log(self,"      Entering state : " + self.play_state + ' from show Id: '+ str(self.show_id))
+            if self.closed_callback is not  None:
+                self.closed_callback('normal','vlcdriver closed')             
 
     # respond to normal stop
     def stop(self):
@@ -932,7 +934,7 @@ class CLI(object):
                 self.vlcdrive.sendline('t')
                 print(self.vlcdrive.readline(),end="")
                 
-            elif cmd in ('load','show','unload','stop'):
+            elif cmd in ('load','play','show','unload','stop'):
                 self.vlcdrive.sendline(cmd)
                 
             elif cmd==('get-size','pause','pause-on','pause-off','go'):

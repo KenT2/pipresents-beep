@@ -21,7 +21,11 @@ track - path of track to play track <full track path>
 
 Initial state is idle, this is altered by the commands
 
-load - load a track and then run to start as in popts. Load is non-blocking and returns immeadiately. To determine load is complete poll using the t command to obtain the state
+load - start VLC and obtain the media. Returns when the media is obtained.
+
+get-size - optionally use this command between load and play to obtain the dimensions of the media 
+
+play - complete loading a track and then run to start as in popts. Load is non-blocking and returns immeadiately. To determine load is complete poll using the t command to obtain the state
     load-loading - load in progress
     load-ok - loading complete and ok
     load-fail
@@ -40,13 +44,16 @@ unload - stops loading. To determine if complete poll state for:
 
 close - exits vlc and exits pp_vlcdriver.py
     
-t - get the current state of loading/showing. Returns a single line wit hone of the above values
+t - get the current state of loading/showing. Returns a single line with one of the above values
 
 vol - set the volume between 0 and 100. Use only when showing  vol <volume>
       
-
+ratio - set video ratio
+crop - set video crop
+set-device - set audio device
 pause/ unpause - pauses the track
 mute/unmute - mute without changing volume
+
 """
 
 import time
@@ -77,6 +84,8 @@ class VLCDriver(object):
         self.user_pause=False
         self.frozen_at_start=False
         self.frozen_at_end=False
+        self.player=None
+        self.vlc_instance=None
 
 
     def load(self):
@@ -149,7 +158,7 @@ class VLCDriver(object):
     def load_status_loop(self):
         # wait until the load is complete
         #need a timeout as sometimes a load will fail 
-        timeout= 500   #5 seconds
+        timeout= 500   #5 seconds released 500
 
         while True:
             if self.quit_load_signal is True:
@@ -314,12 +323,17 @@ class VLCDriver(object):
             return
 
     def close(self):
+        self.player.stop()
         if self.load_status_thread != None:
             self.load_status_thread.join()
         if self.show_status_thread != None:
             self.show_status_thread.join()
-        self.player=None
-        self.vlc_instance=None        
+        if self.player != None:
+            self.player.release()
+            self.player=None
+        if self.vlc_instance !=None:
+            self.vlc_instance.release()
+            self.vlc_instance=None        
         
     def unload(self):
         if self.state=='load-loading':

@@ -230,8 +230,13 @@ class pp_inputdevicedriver(object):
                 if event.type == evdev.ecodes.EV_KEY:
                     # print 'Key Event Rxd: ',event
                     key_event = evdev.categorize(event)
-                    self.process_event(key_event.keycode,key_event.keystate)
-
+                    #key_event.keycode=[key_event.keycode,'fred']
+                    #print (key_event)
+                    if type(key_event.keycode) is list:
+                        for kc in key_event.keycode:
+                            self.process_event(kc,key_event.keystate)
+                    else:
+                        self.process_event(key_event.keycode,key_event.keystate)
 
 
     def process_event(self,event_code,button_state):              
