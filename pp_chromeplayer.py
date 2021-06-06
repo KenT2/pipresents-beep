@@ -304,7 +304,7 @@ class ChromePlayer(Player):
 
     def driver_close(self):
         try:
-            self.driver.close()
+            self.driver.quit()
         except WebDriverException as e:
             self.mon.warn(self,'Browser Closed in Close !!!!!!\n'+str(e))
         except Exception as e:

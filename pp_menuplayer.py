@@ -796,10 +796,12 @@ class MenuPlayer(Player):
                 self.canvas.itemconfig(self.menu_entry_id[index][self.icon_id_index],
                                        outline=self.track_params['entry-select-colour'],
                                        width=4)
+                self.canvas.update_idletasks( )
             else:
                 self.canvas.itemconfig(self.menu_entry_id[index][self.icon_id_index],
                                        outline='',
                                        width=1)
+                self.canvas.update_idletasks( )
         else:
             if state is True:
                 self.canvas.itemconfig(self.menu_entry_id[index][self.text_id_index],
@@ -808,7 +810,7 @@ class MenuPlayer(Player):
             else:
                 self.canvas.itemconfig(self.menu_entry_id[index][self.text_id_index],
                                        fill=self.track_params['entry-colour'])
-                
+                self.canvas.update_idletasks( )                
 
     
     def parse_menu_window(self,line):

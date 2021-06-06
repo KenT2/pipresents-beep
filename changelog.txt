@@ -1,3 +1,8 @@
+CHANGES FOR 1.4.5d 6/6/2021
+============================
+fixed - chrome browser now shutdown properly
+fixed - menu highlight moves after up or down commands when under heavy load
+
 CHANGES FOR 1.4.5c 2/6/2021
 ============================
 
