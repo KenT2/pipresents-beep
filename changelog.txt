@@ -1,3 +1,7 @@
+CHANGES FOR 1.4.5e 10/6/2021
+============================
+fixed - reduced PP's load on VLC during showing a track
+
 CHANGES FOR 1.4.5d 6/6/2021
 ============================
 fixed - chrome browser now shutdown properly

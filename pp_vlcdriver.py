@@ -74,6 +74,7 @@ class VLCDriver(object):
         self.instance_options=' --mmal-layer=1 --mmal-vout-window 400x300+100+100 --mmal-vout-transparent --aout=pulse --mmal-display=HDMI-1 '         # obtained from iopts command, just a test set
         self.player_options=''            #options for mediaplayer, none required
         self.instance_mandatory=' --quiet --no-xlib --vout mmal_vout --mmal-vout-transparent '   #mandatory set of options
+
         self.track_path= '/home/pi/pp_home/media/5sec.mp4'   #test track to play
         self.freeze_at_start='no'       #test value, normally obtained from pauseopts command
         self.freeze_at_end='yes'           #test value, normally obtained from pauseopts command
@@ -236,29 +237,32 @@ class VLCDriver(object):
             if self.length==0:
                 time.sleep(0.1)
             else:
-                position=self.player.get_time()
+                #position=self.player.get_time()
                 #self.logger.log('track time',self.freeze_at_end,self.length,position,self.player.get_state())
 
                 # when using --play-and-pause option VLC pauses on the last frame into a funny state.
                 if self.freeze_at_end == 'yes':
+                    #self.logger.log('before',self.state)
                     if self.user_pause is False and self.player.get_state() == vlc.State.Paused:
                         # in this state VLC does not respond to stop or unpause, only close
                         self.frozen_at_end=True
-                        self.logger.log ('paused at end at: ',position)
+                        #self.logger.log ('paused at end at')
                         self.state='show-pauseatend'
-                        return                   
+                        return
                     else:
-                        time.sleep(0.01)
+                        #self.logger.log('after',self.state)
+                        time.sleep(0.03)
                 else:
+                    #self.logger.log('before',self.state)
                     if self.freeze_at_end == 'no':
                         if self.player.get_state() == vlc.State.Ended:
                             self.player.stop()
-                            self.logger.log ('ended with no pause at: ',position)
-                            #nice-day
+                            self.logger.log ('ended with no pause')
                             self.state='show-niceday'
                             return
                         else:
-                            time.sleep(0.01)
+                            #self.logger.log('after',self.state)
+                            time.sleep(0.03)
                     else:
                         self.logger.log( 'illegal freeze at end')
                     

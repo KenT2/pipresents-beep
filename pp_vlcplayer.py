@@ -451,7 +451,7 @@ class VLCPlayer(Player):
                     if self.finished_callback is not None:
                         self.finished_callback('error','pp_vlcdriver says show failed: '+ self.play_state)
                 else:
-                    self.tick_timer=self.canvas.after(10,self.show_state_machine)
+                    self.tick_timer=self.canvas.after(30,self.show_state_machine)
                     
         elif self.play_state=='closing':
             # close the pexpect process
