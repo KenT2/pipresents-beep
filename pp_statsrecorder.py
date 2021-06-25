@@ -56,3 +56,5 @@ class Statsrecorder(object):
     def close(self):
         # called when Pi Presents exits for any reason.
         Statsrecorder.stats_file.close()
+        # krt
+        Statsrecorder.stats_file = None

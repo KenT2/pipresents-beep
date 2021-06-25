@@ -57,7 +57,7 @@ class PiPresents(object):
         # gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_INSTANCES|gc.DEBUG_OBJECTS|gc.DEBUG_SAVEALL)
         gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_SAVEALL)
         self.pipresents_issue="1.4.5"
-        self.pipresents_minorissue = '1.4.5e'
+        self.pipresents_minorissue = '1.4.5f'
 
         StopWatch.global_enable=False
         
@@ -81,7 +81,6 @@ class PiPresents(object):
                 tkinter.messagebox.showwarning("Pi Presents","Bad Application Directory")
             exit(102)
 
-        
         # Initialise logging and tracing
         
         # initlize VLCDriver logger
@@ -448,7 +447,8 @@ class PiPresents(object):
             reason,message=self.show_manager.control_a_show(show_ref,'open')
             if reason == 'error':
                 self.mon.err(self,message)
-                self.end(reason,message)
+                self.terminate()
+                #self.end(reason,message)
 
 
 # *********************
@@ -770,6 +770,7 @@ class PiPresents(object):
                 call (['sudo','shutdown','now','SHUTTING DOWN'])
             #print('uncollectable garbage',gc.collect())
             sys.exit(100)
+
 
 
     # tidy up all the peripheral bits of Pi Presents

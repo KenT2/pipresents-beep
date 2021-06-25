@@ -850,29 +850,29 @@ class VLCPlayer(Player):
             # x+y+width*height
             fields=dim_text.split('+')
             if len(fields) != 3:
-                return 'error','bad vlc video window form '+line,'',0,0,0,0
+                return 'error','bad vlc video window form '+dim_text,0,0,0,0
 
             if not fields[0].isdigit():
-                return 'error','x is not a positive decimal in vlc video window '+line,'',0,0,0,0
+                return 'error','x value is not a positive decimal in vlc video window '+dim_text,0,0,0,0
             else:
                 x=int(fields[0])
             
             if not fields[1].isdigit():
-                return 'error','y is not a positive decimal in vlc video window '+line,'',0,0,0,0
+                return 'error','y value is not a positive decimal in vlc video window '+dim_text,0,0,0,0
             else:
                 y=int(fields[1])
 
             dimensions=fields[2].split('*')
             if len(dimensions)!=2:
-                return 'error','bad vlc video window dimensions '+line,'',0,0,0,0
+                return 'error','bad vlc video window dimensions '+dim_text,0,0,0,0
                 
             if not dimensions[0].isdigit():
-                return 'error','width is not a positive decimal in vlc video window '+line,'',0,0,0,0
+                return 'error','width is not a positive decimal in vlc video window '+dim_text,0,0,0,0
             else:
                 width=int(dimensions[0])
                 
             if not dimensions[1].isdigit():
-                return 'error','height is not a positive decimal in vlc video window '+line,'',0,0,0,0
+                return 'error','height is not a positive decimal in vlc video window '+dim_text,0,0,0,0
             else:
                 height=int(dimensions[1])
 
@@ -880,15 +880,15 @@ class VLCPlayer(Player):
         else:
             dimensions=dim_text.split('*')
             if len(dimensions)!=2:
-                return 'error','bad vlc video window dimensions '+line,'',0,0,0,0
+                return 'error','bad vlc video window dimensions '+dim_text,0,0,0,0
                 
             if not dimensions[0].isdigit():
-                return 'error','width is not a positive decimal in vlc video window '+line,'',0,0,0,0
+                return 'error','width is not a positive decimal in vlc video window '+dim_text,0,0,0,0
             else:
                 window_width=int(dimensions[0])
                 
             if not dimensions[1].isdigit():
-                return 'error','height is not a positive decimal in vlc video window '+line,'',0,0,0,0
+                return 'error','height is not a positive decimal in vlc video window '+dim_text,0,0,0,0
             else:
                 window_height=int(dimensions[1])
                 

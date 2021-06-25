@@ -1,3 +1,10 @@
+CHANGES FOR 1.4.5f 25/6/2021
+============================
+enhanced - pigpio I/O plugin. Based on pigpio by Joan. More responsve especially when many VLV tracks are playing
+fixed - crash if VLC window value is not correct
+fixed - all shows shutdown if a required monitor is not connected
+
+
 CHANGES FOR 1.4.5e 10/6/2021
 ============================
 fixed - reduced PP's load on VLC during showing a track

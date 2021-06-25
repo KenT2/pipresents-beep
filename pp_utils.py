@@ -329,6 +329,8 @@ class Monitor(object):
     def finish(self):
         Monitor.ofile.close()
         Monitor.sr.close()
+        # krt
+        Monitor.ofile=None
 
 ##    def id(self,caller):
 ##        return self.pretty_inst(caller)
