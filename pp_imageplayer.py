@@ -56,9 +56,10 @@ class ImagePlayer(Player):
         # print 'imageplayer init'
         # get duration from profile
         if self.track_params['duration'] != '':
-            self.duration= int(self.track_params['duration'])
+            self.duration_text= self.track_params['duration']
         else:
-            self.duration= int(self.show_params['duration'])
+            self.duration_text= self.show_params['duration']
+            
             
         # get  image window from profile
         if self.track_params['image-window'].strip() != '':
@@ -94,7 +95,8 @@ class ImagePlayer(Player):
 
         # initialise the state machine
         self.play_state='initialised'    
-            
+
+
             
     # LOAD - loads the images and text
     def load(self,track,loaded_callback,enable_menu):  
@@ -123,6 +125,14 @@ class ImagePlayer(Player):
                 self.play_state='load-failed'
                 self.loaded_callback('error',message)
                 return
+
+        # parse the duration
+        status,message,self.duration=Player.parse_duration(self.duration_text)
+        if status  == 'error':
+            self.mon.err(self, message)
+            self.play_state='load-failed'
+            self.loaded_callback('error',message)
+            return
 
 
         # load the images and text
@@ -159,7 +169,7 @@ class ImagePlayer(Player):
         
         # init state and signals  
         self.tick = 100 # tick time for image display (milliseconds)
-        self.dwell = 10*self.duration
+        self.dwell = self.duration
         self.dwell_counter=0
         self.quit_signal=False
         self.paused=False
@@ -259,7 +269,9 @@ class ImagePlayer(Player):
                 # use finish so that the show will call close
         else:
             if self.paused is False:
-                self.dwell_counter=self.dwell_counter+1
+                #print (self.dwell_counter,self.dwell)
+                if self.dwell !=0:
+                    self.dwell_counter=self.dwell_counter+1
 
             # one time flipping of pause text
             pause_text= self.track_params['pause-text']
@@ -421,7 +433,7 @@ class ImagePlayer(Player):
         self.canvas.delete(self.track_image_obj)
         self.tk_img=None
             
-        
+      
 
     def parse_window(self,line):
         

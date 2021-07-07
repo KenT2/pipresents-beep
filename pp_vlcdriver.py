@@ -355,7 +355,10 @@ class VLCDriver(object):
         self.player.audio_set_volume(volume)        
 
     def set_device(self,device_id):
-        self.player.audio_output_device_set(None,device_id)
+        if device_id=='':
+            self.player.audio_output_device_set(None,None) 
+        else:           
+            self.player.audio_output_device_set(None,device_id)
         
 class  Logger(object): 
 

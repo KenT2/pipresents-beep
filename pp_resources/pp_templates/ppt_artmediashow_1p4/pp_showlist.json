@@ -1,5 +1,5 @@
 {
- "issue": "1.4.5",
+ "issue": "1.4.6",
  "shows": [
   {
    "admin-colour": "#ffffff",
@@ -10,6 +10,10 @@
    "audio-speaker": "stereo",
    "background-colour": "",
    "background-image": "",
+   "chrome-freeze-at-end": "yes",
+   "chrome-other-options": "",
+   "chrome-window": "showcanvas 200+200+600*400",
+   "chrome-zoom": "1.0",
    "controls": "pp-down down\npp-stop stop\npp-pause pause",
    "disable-controls": "no",
    "disable-show-control-events": "no",
@@ -67,7 +71,7 @@
    "transition": "cut",
    "type": "artmediashow",
    "vlc-aspect-mode": "stretch",
-   "vlc-audio": "hdmi",
+   "vlc-audio": "default",
    "vlc-freeze-at-end": "yes",
    "vlc-freeze-at-start": "no",
    "vlc-image-duration": "5",

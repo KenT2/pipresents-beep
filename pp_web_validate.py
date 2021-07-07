@@ -14,8 +14,8 @@ class Validator(AdaptableDialog):
         self.errors=0
         self.warnings=0
 
-        super(Validator, self).__init__('Validation Result','',width=600,height=500,confirm_name='Done')
-        self.textb = gui.TextInput(width=550,height=400,single_line=False)
+        super(Validator, self).__init__('Validation Result','',width=600,height=700,confirm_name='Done')
+        self.textb = gui.TextInput(width=550,height=600,single_line=False)
         self.append_field(self.textb,'text')
 
     @gui.decorate_event
@@ -29,19 +29,23 @@ class Validator(AdaptableDialog):
         if priority == 't':
             self.insert(text+"\n")
         if priority == 'f':
-            self.insert("    ** Error:   "+text+"\n\n")
+            self.insert("       ** Error:  "+text+"\n")
         if priority == 'w':
-            self.insert("    ** Warning:   "+text+"\n\n")           
+            self.insert("       ** Warning:  "+text+"\n")           
 
     def insert(self,text):
         self.text +=text
         self.textb.set_value(self.text)
 
-    def stats(self):
+
+
+    def stats(self,pp_profile):
         if self.display_it is False: return
-        self.insert("\nErrors: "+str(self.errors)+"\nWarnings: "+str(self.warnings)+"\n\n\n")
+        self.text="\nERRORS: "+str(self.errors)+"\nWARNINGS: "+str(self.warnings)+"\n\n"+self.text
+        self.text="\nVALIDATING PROFILE '"+ pp_profile + "'\n"+self.text
 
-
+        self.textb.set_value(self.text)
+        
     def num_errors(self):
         return self.errors
 
@@ -59,7 +63,7 @@ class Validator(AdaptableDialog):
         # v_medialist_refs - list of references to medialist files in the showlist
 
         # open results display
-        self.display('t',"\nVALIDATING PROFILE '"+ pp_profile + "'")
+
 
         if not  os.path.exists(pp_profile+os.sep+"pp_showlist.json"):
             self.display('f',"pp_showlist.json not in profile")
@@ -79,10 +83,7 @@ class Validator(AdaptableDialog):
             self.display('t', "Validation Aborted")
             return False                                            
         
-        # read the gpio config
-        # gpio_cfg_ok=read_gpio_cfg(pp_dir,pp_home,pp_profile)
-            
-            
+
         # MAKE LIST OF SHOW LABELS
         v_show_labels=[]
         for show in v_shows:
@@ -144,7 +145,7 @@ class Validator(AdaptableDialog):
                             track_file=pp_profile+track_file[1:]
                             if not os.path.exists(track_file): self.display('f',"location "+track['location']+ " Media File not Found")
 
-                    if track['type'] in ('video','audio','message','image','web','menu'):
+                    if track['type'] in ('video','vlc','audio','message','image','web','chrome','menu'):
                         
                         # check common fields
                         self.check_animate('animate-begin',track['animate-begin'])
@@ -175,9 +176,10 @@ class Validator(AdaptableDialog):
                             self.display('f',"'Pause Timeout' is not blank or a positive integer")
                         else:
                             if track['pause-timeout'] != "" and int(track['pause-timeout']) < 1: self.display('f',"'Pause Timeout' is less than 1")
-                        if track['duration'] != "" and not track['duration'].isdigit(): self.display('f',"'Duration' is not blank, 0 or a positive integer")
+                        self.check_float_duration('track','Image Duration',track['duration'])
                         if track['image-rotate'] != "" and not track['image-rotate'].isdigit(): self.display('f',"'Image Rotation' is not blank, 0 or a positive integer")
                         self.check_image_window('track','image-window',track['image-window'])
+
 
                     if track['type'] == "video":
                         if track['pause-timeout'] != "" and not track['pause-timeout'].isdigit():
@@ -187,29 +189,52 @@ class Validator(AdaptableDialog):
 
                         self.check_omx_window('track','omx-window',track['omx-window'])
                         self.check_volume('track','omxplayer-volume',track['omx-volume'])
-                            
-                    if track['type'] == "audio":
+
+                        
+                    if track['type'] == "vlc":
                         if track['pause-timeout'] != "" and not track['pause-timeout'].isdigit():
                             self.display('f',"'Pause Timeout' is not blank or a positive integer")
                         else:
                             if track['pause-timeout'] != "" and int(track['pause-timeout']) < 1: self.display('f',"'Pause Timeout' is less than 1")
 
-                        if track['duration'] != '' and not track['duration'].isdigit(): self.display('f',"'Duration' is not 0 or a positive integer")
+                        self.check_vlc_video_window('track','VLC Window',track['vlc-window'])
+                        self.check_vlc_volume('track','VLC Volume',track['vlc-volume'])
+                        self.check_vlc_max_volume('track','VLC Max Volume',track['vlc-max-volume'])                        
+                        self.check_vlc_layer('track','VLC Display Layer',track['vlc-layer'])
+                        self.check_vlc_image_duration('track','VLC Image Duration',track['vlc-image-duration'])                        
+
+                                               
+                    if track['type'] == "audio":
+                        if track['pause-timeout'] != "" and not track['pause-timeout'].isdigit():
+                            self.display('f',"'Pause Timeout' is not blank or a positive integer")
+                        else:
+                            if track['pause-timeout'] != "" and int(track['pause-timeout']) < 1: self.display('f',"'Pause Timeout' is less than 1")
+                        self.check_float_duration('track','Audio Duration',track['duration'])
                         if track['duration'] == '0' : self.display('w',"'Duration' of an audio track is zero")
                         self.check_volume('track','mplayer-volume',track['mplayer-volume'])
                         
+
                     if track['type'] == "message":
-                        if track['duration'] != '' and not track['duration'].isdigit(): self.display('f',"'Duration' is not 0 or a positive integer")
+                        self.check_float_duration('track','Message Duration',track['duration'])
                         if track['text'] != "":
                             if track['message-x'] != '' and not track['message-x'].isdigit(): self.display('f',"'Message x Position' is not blank, a positive integer")
                             if track['message-y'] != '' and not track['message-y'].isdigit(): self.display('f',"'Message y Position' is not blank, a positive integer")
                             if track['message-colour']=='': self.display('f',"'Message Text Colour' is blank")
                             if track['message-font']=='': self.display('f',"Message Text Font' is blank")                        
                             
+
                     if track['type'] == 'web':
-                        self.check_browser_commands(track['browser-commands'])
+                        self.check_float_duration('track','Web Duration',track['duration'])
+                        self.check_browser_commands(track['browser-commands'],'web')
                         self.check_web_window('track','web-window',track['web-window'])
 
+
+                    if track['type'] == 'chrome':
+                        self.check_float_duration('track','Chrome Web Duration',track['duration'])
+                        self.check_browser_commands(track['browser-commands'],'chrome')
+                        self.check_chrome_window('track','Chrome Web Window',track['chrome-window'])
+                        self.check_chrome_zoom('track','Chrome Zoom',track['chrome-zoom'])
+                        
                   
                     # SHOW TRACK - CHECK CROSS REF TRACK TO SHOW
                     if track['type'] == 'show':
@@ -233,7 +258,7 @@ class Validator(AdaptableDialog):
                 found+=1
                 if show['show-ref'] !=  'start': self.display('f',"start show has incorrect label")
             else:
-                self.display('t',"Checking show '"+show['title'] + "' first pass")
+                self.display('t',"\nChecking show '"+show['title'] + "' first pass")
                 if show['show-ref'] == '': self.display('f',"Show Reference is blank")
                 if ' ' in show['show-ref']: self.display('f',"Spaces not allowed in Show Reference: " + show['show-ref']) 
         if found == 0:self.display('f',"There is no start show")
@@ -254,7 +279,7 @@ class Validator(AdaptableDialog):
                 self.display('t',"\nChecking show '"+show['title']+ "' second pass" )
                 self.check_start_shows(show,v_show_labels)               
             else:
-                self.display('t',"Checking show '"+show['title']+ "' second pass" )
+                self.display('t',"\nChecking show '"+show['title']+ "' second pass" )
 
                 if show['medialist']=='': self.display('f', show['show-ref']+ " show has blank medialist")
                 
@@ -316,8 +341,7 @@ class Validator(AdaptableDialog):
                 if show['track-text-font']=='': self.display('f',"'Track Text Font' is blank")
                 if show['track-text-justify'] not in ('left','right','center'): self.display('f',"'Track Text Justify' has illegal value")
                 
-                
-                if not show['duration'].isdigit(): self.display('f',"'Duration' is not 0 or a positive integer")
+                self.check_float_duration('show','Duration',show['duration'])
                 if show['pause-timeout'] != "" and not show['pause-timeout'].isdigit():
                     self.display('f',"'Pause Timeout' is not blank or a positive integer")
                 else:
@@ -327,7 +351,12 @@ class Validator(AdaptableDialog):
                 self.check_volume('show','Video Player Volume',show['omx-volume'])
                 self.check_volume('show','Audio Volume',show['mplayer-volume'])
                 self.check_omx_window('show','Video Window',show['omx-window'])
+                self.check_vlc_video_window('show','VLC Window',show['vlc-window'])
+                self.check_vlc_layer('show','VLC Display Layer',show['vlc-layer'])
+                self.check_vlc_volume('show','VLC Volume',show['vlc-volume'])
+                self.check_vlc_image_duration('show','VLC Image Duration',show['vlc-image-duration'])  
                 self.check_image_window('show','Image Window',show['image-window'])
+                self.check_chrome_zoom('show','Chrome Zoom',show['chrome-zoom'])
 
                 #eggtimer
                 if show['eggtimer-text'] != "":
@@ -366,7 +395,8 @@ class Validator(AdaptableDialog):
                         self.check_triggers('End Trigger Parameters',show['trigger-end-param']) 
                         
                     self.check_web_window('show','web-window',show['web-window'])
-                    
+                    self.check_chrome_window('show','Chrome Web Window',show['chrome-window']) 
+                                       
                     self.check_controls('controls',show['controls'])
 
                     #notices
@@ -445,41 +475,18 @@ class Validator(AdaptableDialog):
                     self.check_hh_mm_ss('Track Timeout',show['track-timeout'])
                     self.check_web_window('show','web-window',show['web-window'])
 
-        self.display('t', "\nValidation Complete")
-        self.stats()
+        self.display('t', "\nVALIDATION COMPLETE")
+        self.stats(pp_profile)
         if self.num_errors() == 0:
             return True
         else:
             return False
+            
+# END END END
 
-    def check_hh_mm_ss(self,name,item):          
-        fields=item.split(':')
-        if len(fields) == 0:
-            return
-        if len(fields)>3:
-            self.display('f','Too many fields in '+ name + ': '  + item)
-            return
-        if len(fields) == 1:
-            seconds=fields[0]
-            minutes='0'
-            hours='0'
-        if len(fields) == 2:
-            seconds=fields[1]
-            minutes=fields[0]
-            hours='0'
-        if len(fields) == 3:
-            seconds=fields[2]
-            minutes=fields[1]
-            hours=fields[0]
-        if not seconds.isdigit() or not  minutes.isdigit() or  not hours.isdigit():
-            self.display('f','Fields of  '+ name + ' are not positive integers: ' + item)
-            return        
-        if int(minutes)>59 or int(seconds)>59:
-            if len(fields)!=1:
-                self.display('f','Fields of  '+ name + ' are out of range: ' + item)
-            else:
-                self.display('w','Seconds or Minutes is greater then 59 in '+ name + ': ' + item)          
-            return    
+# ***********************************
+# START SHOWS
+# ************************************
  
     def check_start_shows(self,show,v_show_labels):
         text=show['start-show']
@@ -497,17 +504,18 @@ class Validator(AdaptableDialog):
 
 
 # ***********************************
-# triggers
+# TRIGGERS
 # ************************************ 
 
     def check_triggers(self,field,line):
         words=line.split()
         if len(words)!=1: self.display('f','Wrong number of fields in: ' + field + ", " + line)
 
-# ***********************************
-# volume
-# ************************************ 
 
+# ***********************************
+# VIDEO
+# ************************************ 
+    # omx
     def check_volume(self,track_type,field,line):
         if track_type == 'show' and line.strip() == '':
             self.display('f','Wrong number of fields: ' + field + ", " + line)
@@ -536,11 +544,66 @@ class Validator(AdaptableDialog):
             return
         
         else:
-            self.display('f','help, do not understaand!: ' + field + ", " + line)
+            self.display('f','help, do not understand!: ' + field + ", " + line)
             return        
+
+    
+    def check_vlc_volume(self,track_type,field,line):
+        if track_type == 'show' and line.strip() == '':
+            self.display('f','Show must specify VLC volume: ' + field + ", " + line)
+            return
+        if track_type == 'track' and line.strip() == '':
+            return
+        if not line.isdigit():
+            self.display('f','VLC Volume must be a positive integer: ' + field + ", " + line)
+            return
+        vlc_volume= int(line)
+        if vlc_volume>100:
+            self.display('f','VLC Volume must be <= 100: ' + field + ", " + line)
+            return
+        return
+
+
+    def check_vlc_max_volume(self,track_type,field,line):
+        if track_type == 'track' and line.strip() == '':
+            return
+        if not line.isdigit():
+            self.display('f','VLC Max Volume must be a positive integer: ' + field + ", " + line)
+            return
+        vlc_max_volume= int(line)
+        if vlc_max_volume>100:
+            self.display('f','VLC Max Volume must be <= 100: ' + field + ", " + line)
+            return
+        return
+
         
+    def check_vlc_layer(self,track_type,field,line):
+        if track_type == 'show' and line.strip() == '':
+            self.display('f','Show must specify VLC Layer: ' + field + ", " + line)
+            return
+        if line=='hidden':
+            return
+        if not line.isdigit():
+            self.display('f','VLC Display Layer is not a positive number: ' + field + ", " + line)
+            return
+        return
+    
+
+    def check_vlc_image_duration(self,track_type,field,line):
+        if track_type == 'show' and line.strip() == '':
+            self.display('f','Show must specify VLC Image Duration ' + field + ", " + line)
+            return
+        if track_type == 'track' and line.strip() == '':
+            return
+        if not line.isdigit():
+            self.display('f','VLC Image Duration must be a positive integer: ' + field + ", " + line)
+            return
+        return
+
+
+
 # ***********************************
-# time of day schedule
+# TIME SCHEDULER
 # ************************************ 
 
     def check_schedule_for_show(self,show,v_show_labels):
@@ -787,11 +850,10 @@ class Validator(AdaptableDialog):
             self.display('f','End Trigger, ' + field + ' Fields are out of range: ' + line)
             return
 
+
 # *******************   
-# Check menu
+# MENU
 # ***********************               
-# window
-# consistencty of modes
         
     def check_menu(self,track):
 
@@ -846,13 +908,9 @@ class Validator(AdaptableDialog):
                     return
 
 
-
-
-             
-             
 # *******************   
-# Check track plugin
-# ***********************             
+# TRACK PLUGIN
+# *******************             
              
     def check_plugin(self,plugin_cfg,pp_home,pp_profile):
         if plugin_cfg.strip() != '' and  plugin_cfg[0] == "+":
@@ -865,15 +923,55 @@ class Validator(AdaptableDialog):
                 self.display('f','plugin configuration file not found: '+ plugin_cfg)
 
 # *******************   
-# Check browser commands
-# ***********************             
+# BROWSER COMMANDS
+# *******************            
              
-    def check_browser_commands(self,command_text):
+    def check_browser_commands(self,command_text,b_type):
         lines = command_text.split('\n')
         for line in lines:
             if line.strip() == "":
                 continue
-            self.check_browser_command(line)
+            if b_type=='web':
+                self.check_browser_command(line)
+            else:
+                self.check_chrome_command(line)
+
+    def check_chrome_command(self,line):
+        fields = line.split()
+        
+        if len(fields) not in (1,2):
+            self.display('f','incorrect number of fields in browser command: '+ line)
+            return
+            
+        command = fields[0]
+    
+        
+        if command not in ('load','refresh','wait','loop'):
+            self.display('f','unknown command in browser commands: '+ line)
+            return
+           
+        if command in ('refresh',) and len(fields) != 1:
+            self.display('f','incorrect number of fields for '+ command + ' in: '+ line)
+            return
+            
+        if command =='loop' and len(fields)==1:
+            return
+            
+        if command == 'load':
+            if len(fields) != 2:
+                self.display('f','incorrect number of fields for '+ command + ' in: '+ line)
+                return
+
+        if command in ('wait','loop'):
+            if len(fields) != 2:
+                self.display('f','incorrect number of fields for '+ command + ' in: '+ line)
+                return          
+            arg = fields[1]
+            if not arg.isdigit():
+                self.display('f','Argument for "wait" or "loop" is not 0 or positive number in: '+ line)
+                return
+
+
 
 
     def check_browser_command(self,line):
@@ -886,6 +984,8 @@ class Validator(AdaptableDialog):
             return
             
         command = fields[0]
+    
+        
         if command not in ('load','refresh','wait','exit','loop'):
             self.display('f','unknown command in browser commands: '+ line)
             return
@@ -910,7 +1010,7 @@ class Validator(AdaptableDialog):
       
              
 # *******************   
-# Check controls
+# CONTROLS
 # *******************
 
     def check_controls(self,name,controls_text):
@@ -933,8 +1033,8 @@ class Validator(AdaptableDialog):
             self.display('f',"unknown Command in Control: " + line)
 
 
-# *******************   
-# Check hyperlinkshow links
+# ***********************   
+# HYPERLINKSHOW CONTROLS
 # ***********************
 
     def check_hyperlinks(self,name,links_text,v_track_labels):
@@ -980,9 +1080,9 @@ class Validator(AdaptableDialog):
             self.display('f',"unknown Command in Control: " + line)
 
 
-# *******************   
-# Check radiobuttonshow  links
-# ***********************
+# ************************   
+# RADIOBUTTONSHOW CONTROLS
+# ************************
 
     def check_radiobutton_links(self,name,links_text,v_track_labels):
         lines = links_text.split('\n')
@@ -1017,7 +1117,7 @@ class Validator(AdaptableDialog):
 
 
 # ***********************************
-# checking show controls
+# SHOW CONTROL
 # ************************************ 
 
     def check_show_control(self,text,v_show_labels):
@@ -1069,6 +1169,9 @@ class Validator(AdaptableDialog):
                     return
 
 
+# ***********************************
+# OSC
+# ************************************ 
 
     def check_osc(self,line,dest,fields,v_show_labels):
         if fields[0] not in ('exitpipresents','shutdownnow','reboot','open','close','openexclusive','closeall','monitor','event','send','server-info','loopback','animate'):
@@ -1089,8 +1192,10 @@ class Validator(AdaptableDialog):
                     return
 
 
+# ***********************************
+# COUNTERS
+# ************************************ 
  
-
     def check_counters(self,line,fields):
         if len(fields) < 2:
             self.display('f','Show Control too few fields in counter command - ' + ' ' +line)
@@ -1130,7 +1235,7 @@ class Validator(AdaptableDialog):
                  
             
 # ***********************************
-# checking animation
+# ANIMATION
 # ************************************ 
 
     def check_animate_fields(self,field,line):
@@ -1169,36 +1274,31 @@ class Validator(AdaptableDialog):
 
 
 # *************************************
-# GPIO CONFIG - NOT USED
+#  CHROME ZOOM
 # ************************************
-             
-    def read_gpio_cfg(self,pp_dir,pp_home):
-        tryfile=pp_home+os.sep+"gpio.cfg"
-        if os.path.exists(tryfile):
-            filename=tryfile
-        else:
-            self.display('t', "gpio.cfg not found in pp_home")
-            tryfile=pp_dir+os.sep+'pp_resources'+os.sep+"gpio.cfg"
-            if os.path.exists(tryfile):
-                filename=tryfile
-            else:
-                self.display('w', "gpio.cfg not found in pipresents/pp_resources - GPIO checking turned off")
-                return False
-        self.config = configparser.ConfigParser(inline_comment_prefixes = (';',))
-        self.config.read(filename)
-        return True
 
-        
-    def get(self,section,item):
-        if self.config.has_option(section,item) is False:
-            return False
-        else:
-            return self.config.get(section,item)
+    def check_chrome_zoom(self,track_type,field,line):
+        if track_type=='show' and line.strip()=='':
+            self.display('f','show must have Chrome Zoom: ' + field + ", " + line)
+            return
+            
+        if track_type=='track' and line.strip()=='':
+            return
+            
+        try:
+            val=float(line)
+        except:
+            self.display('f','zoom must be a decimal number: ' + field + ", " + line)
+            return
+        if val< 0:
+            self.display('f','zoom must be a positive number: ' + field + ", " + line)
+            return
+        return 
 
 
 
 # *************************************
-# WEB WINDOW
+# WEB WINDOWS
 # ************************************           
                  
     def check_web_window(self,track_type,field,line):
@@ -1228,6 +1328,39 @@ class Validator(AdaptableDialog):
             if status=='error':
                 self.display('f','Web Window: '+ message)
                 return
+
+
+
+    def check_chrome_window(self,track_type,field,line):
+        
+        if track_type == 'show' and line.strip()=='':
+            self.display('f','Show must specify Chrome Window: ' + field + ", " + line)
+            return
+            
+        if track_type == 'track' and line.strip()=='':
+            return
+            
+        # showcanvas|display +  [x+y+w*h]
+        words=line.split()
+        if len(words) not in (1,2):
+            self.display('f','Bad Chrome Web Window form: ' + field + ", " + line)
+            return
+            
+        if words[0] not in ('display','showcanvas','kiosk','fullscreen'):
+            self.display('f','No or invalid Chrome Web Window mode: ' + field + ", " + line)
+            return
+
+        if len(words)==1:
+            return
+            
+        if len(words)>1 and words[0] in ('kiosk','fullscreen'):
+           self.display('f','kiosk or fullscreen do not have dimensions: ' + field + ", " + line)
+            
+            
+        # display or showcanvas with  dimensions
+        self.check_window_dimensions(words[1],field,line)
+        return
+
 
 
                 
@@ -1360,5 +1493,147 @@ class Validator(AdaptableDialog):
                         
 
 
+    def check_vlc_video_window(self,track_type,field,line):
+        
+        words=line.split()
+        if track_type == 'show' and len(words) == 0:
+            self.display('f','show must have video window: ' + field + ", " + line)
+            return
+            
+        if len(words) == 0:
+            return
+            
+        if len(words) not in (1,2):
+            self.display('f','bad vlc video window form: ' + field + ", " + line)
+            return
+            
+        if words[0] not in ('display','showcanvas'):
+            self.display('f','Bad VLC Window option: ' + field + ", " + line)
+            return
 
+        
+        if len(words)==2:
+            self.check_window_dimensions(words[1],field,line)
+        return
+            
+            
+# *************************************
+#  WINDOW DIMENSIONS
+# ************************************
 
+    def check_window_dimensions(self,dim_text,field,line):
+        # parse x+y+width*height or width*height
+        if '+' in dim_text:
+            # x+y+width*height
+            fields=dim_text.split('+')
+            if len(fields) != 3:
+                self.display('f','bad dimension,should be <x>+<y>+<w>*<h>: ' + field + ", " + line)
+                return
+                
+            if 'x' in fields[0] or '*' in fields[0]:
+                self.display('f','bad dimensions, should be <x>+<y>+<w>*<h>: ' + field + ", " + line)
+                return
+
+            if not fields[0].isdigit():
+                self.display('f','x value is not a positive decimal: ' + field + ", " + line)
+                return
+            
+            if not fields[1].isdigit():
+                self.display('f','y value is not a positive decimal: ' + field + ", " + line)
+                return
+            
+            if '*' not in fields[2]:
+                self.display('f','bad dimensions, should be <w>*<h>: ' + field + ", " + line)
+                return
+                
+            
+            dimensions=fields[2].split('*')
+            if len(dimensions)!=2:
+                self.display('f','bad window dimensions: ' + field + ", " + line)
+                return
+                
+            if not dimensions[0].isdigit():
+                self.display('f','width is not a positive decimal : ' + field + ", " + line)
+                return
+                                
+            if not dimensions[1].isdigit():
+                self.display('f','height is not a positive decimal : ' + field + ", " + line)
+                return
+            return
+
+        else:
+            # width*height
+            dimensions=dim_text.split('*')
+            if len(dimensions)!=2:
+                self.display('f','bad window dimensions: ' + field + ", " + line)
+                return
+                 
+            if not dimensions[0].isdigit():
+                self.display('f','width is not a positive decimal : ' + field + ", " + line)
+                return
+                
+            if not dimensions[1].isdigit():
+                self.display('f','height is not a positive decimal : ' + field + ", " + line)
+                return
+
+            return
+            
+# *************************************
+#  DURATION
+# ************************************
+
+    def check_float_duration(self,track_type,field,line):
+        if track_type=='show' and line.strip()=='':
+            self.display('f','show must have duration: ' + field + ", " + line)
+            return
+            
+        if track_type=='track' and line.strip()=='':
+            return
+        if line =='0':
+            return
+        try:
+            val=float(line)*10
+        except:
+            self.display('f','duration must be a decimal number: ' + field + ", " + line)
+            return
+        if val< 0:
+            self.display('f','duration must be a positive number: ' + field + ", " + line)
+            return
+        if val<1:
+            self.display('f','duration must be >= 0.1 or be 0: ' + field + ", " + line)
+            return
+        return  
+        
+        
+# *************************************
+#  HOUR MINUTE SECOND
+# ************************************
+
+    def check_hh_mm_ss(self,name,item):          
+        fields=item.split(':')
+        if len(fields) == 0:
+            return
+        if len(fields)>3:
+            self.display('f','Too many fields in '+ name + ': '  + item)
+            return
+        if len(fields) == 1:
+            seconds=fields[0]
+            minutes='0'
+            hours='0'
+        if len(fields) == 2:
+            seconds=fields[1]
+            minutes=fields[0]
+            hours='0'
+        if len(fields) == 3:
+            seconds=fields[2]
+            minutes=fields[1]
+            hours=fields[0]
+        if not seconds.isdigit() or not  minutes.isdigit() or  not hours.isdigit():
+            self.display('f','Fields of  '+ name + ' are not positive integers: ' + item)
+            return        
+        if int(minutes)>59 or int(seconds)>59:
+            if len(fields)!=1:
+                self.display('f','Fields of  '+ name + ' are out of range: ' + item)
+            else:
+                self.display('w','Seconds or Minutes is greater then 59 in '+ name + ': ' + item)          
+            return    

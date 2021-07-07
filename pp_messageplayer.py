@@ -4,6 +4,7 @@ from pp_player import Player
 from tk_html_widgets import HTMLText
 import os
 
+
 class MessagePlayer(Player):
 
     """ Displays a message on a canvas for a period of time. Message display can be  interrupted
@@ -52,9 +53,9 @@ class MessagePlayer(Player):
         
         # get duration from profile
         if self.track_params['duration'] != "":
-            self.duration= int(self.track_params['duration'])
+            self.duration_text= self.track_params['duration']
         else:
-            self.duration= int(self.show_params['duration'])       
+            self.duration_text= self.show_params['duration']       
         
         self.html_message_text_obj = None
         self.track_obj=None
@@ -72,6 +73,14 @@ class MessagePlayer(Player):
 
         # do common bits of  load
         Player.pre_load(self)   
+        
+        # parse the duration
+        status,message,self.duration=Player.parse_duration(self.duration_text)
+        if status  == 'error':
+            self.mon.err(self, message)
+            self.play_state='load-failed'
+            self.loaded_callback('error',message)
+            return
 
         # load the plugin, this may modify self.track and enable the plugin drawing to canvas
         if self.track_params['plugin'] != '':
@@ -119,7 +128,7 @@ class MessagePlayer(Player):
         self.mon.trace(self,'')
         # init state and signals  
         self.tick = 100 # tick time for image display (milliseconds)
-        self.dwell = 10*self.duration
+        self.dwell = self.duration
         self.dwell_counter=0
         self.quit_signal=False
 
@@ -168,7 +177,8 @@ class MessagePlayer(Player):
                 self.finished_callback('pause_at_end','user quit or duration exceeded')
                 # use finish so that the show will call close
         else:
-            self.dwell_counter=self.dwell_counter+1
+            if self.dwell !=0:
+                self.dwell_counter=self.dwell_counter+1
 
             if self.dwell != 0 and self.dwell_counter ==  self.dwell:
                 if self.finished_callback is not None:
@@ -253,6 +263,5 @@ class MessagePlayer(Player):
             self.html_message_text_obj.delete_parser()
         self.canvas.delete(self.track_obj)
 
-            
- 
+
     

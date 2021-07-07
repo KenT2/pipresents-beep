@@ -56,7 +56,7 @@ class pp_kbddriver(object):
         return pp_kbddriver.driver_active
 
     def handle_output_event(self,name,param_type,param_values,req_time):
-        return 'normal','no output methods'
+        return 'normal',pp_kbddriver.title+' has no output methods'
 
 
     # sets up tkinter keyboard events such that any key press

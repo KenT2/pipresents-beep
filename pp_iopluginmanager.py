@@ -116,6 +116,7 @@ class IOPluginManager(object):
                     return 'error',message
                 else:
                     self.mon.log(self,message)
+        self.mon.log (self,'All installed I/O plugins scanned')
         return 'normal','output scan complete'
 
     def _load_plugin_file(self, name, driver_dir):

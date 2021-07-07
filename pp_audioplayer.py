@@ -53,14 +53,9 @@ class AudioPlayer(Player):
         self.mon.trace(self,'')
         # get duration limit (secs ) from profile
         if self.show_params['type'] in ('liveshow','artliveshow'):
-            duration_text=''
+            self.duration_text=''
         else:
-            duration_text= self.track_params['duration']
-        if duration_text != '':
-            self.duration_limit= 20 * int(duration_text)
-        else:
-            self.duration_limit=-1
-        # print self.duration_limit                   
+            self.duration_text= self.track_params['duration']                   
         # get audio device from profile.
         if  self.track_params['mplayer-audio'] != "":
             self.mplayer_audio= self.track_params['mplayer-audio']
@@ -158,6 +153,20 @@ class AudioPlayer(Player):
             if self.loaded_callback is not  None:
                 self.loaded_callback('error',message)
                 return
+
+        if self.duration_text != '':
+            status,message,duration100=Player.parse_duration(self.duration_text)
+            if status =='error':
+                self.mon.err(self,message)
+                self.play_state='load-failed'
+                if self.loaded_callback is not  None:
+                    self.loaded_callback('error','track file not found: ' + track)
+                    return
+            self.duration_limit= 2* duration100
+        else:
+            self.duration_limit=-1
+        #print (self.duration_limit)
+
 
         if track !='' and self.duration_limit!=0 and not os.path.exists(track):
             self.mon.err(self,"Track file not found: "+ track)

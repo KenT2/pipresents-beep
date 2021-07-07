@@ -53,11 +53,12 @@ class PiPresents(object):
             return 1000*int(vitems[0])+100*int(vitems[1])+int(vitems[2])
 
 
+
     def __init__(self):
         # gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_INSTANCES|gc.DEBUG_OBJECTS|gc.DEBUG_SAVEALL)
         gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_SAVEALL)
-        self.pipresents_issue="1.4.5"
-        self.pipresents_minorissue = '1.4.5f'
+        self.pipresents_issue="1.4.6"
+        self.pipresents_minorissue = '1.4.6a'
 
         StopWatch.global_enable=False
         
@@ -335,7 +336,8 @@ class PiPresents(object):
         self.reboot_required=False
         self.terminate_required=False
         self.exitpipresents_required=False
-        
+        self.restartpipresents_required=False
+                
         #initialise the Audio manager
         self.audiomanager=AudioManager()
         status,message=self.audiomanager.init(self.pp_dir)
@@ -468,6 +470,16 @@ class PiPresents(object):
             self.end(reason,message)
         self.handle_output_event(name,param_type,param_values,0)
 
+    def show_control_handle_animate(self,line):
+        self.mon.log(self,"animate show control command received: "+ line)
+        line = '0 ' + line
+        reason,message,delay,name,param_type,param_values=self.animate.parse_animate_fields(line)
+        # print (reason,message,delay,name,param_type,param_values)
+        if reason == 'error':
+            self.mon.err(self,message)
+            self.end(reason,message)
+        self.handle_output_event(name,param_type,param_values,0)
+
     # output events are animate commands       
     def handle_output_event(self,symbol,param_type,param_values,req_time):
             reason,message=self.ioplugin_manager.handle_output_event(symbol,param_type,param_values,req_time)
@@ -501,6 +513,15 @@ class PiPresents(object):
                 self.root.after(1,self.e_all_shows_ended_callback)
                 return
             reason,message= self.show_manager.exit_all_shows()
+            
+        elif symbol == 'pp-restartpipresents':
+            self.restartpipresents_required=True
+            if self.show_manager.all_shows_exited() is True:
+                # need root.after to grt out of st thread
+                self.root.after(1,self.e_all_shows_ended_callback)
+                return
+            reason,message= self.show_manager.exit_all_shows()
+            
         else:
             # pass the input event to all registered shows
             for show in self.show_manager.shows:
@@ -576,6 +597,10 @@ class PiPresents(object):
                 self.end('error',message)
                 return
             return
+            
+        if fields[0] =='animate':
+            self.show_control_handle_animate(' '.join(fields[1:]))
+            return
 
                 
         # show commands
@@ -584,6 +609,7 @@ class PiPresents(object):
             show_ref=fields[1]
         else:
             show_ref=''
+            
         if show_command in ('open','close','closeall','openexclusive'):
             self.mon.sched(self, TimeOfDay.now,command_text + ' received from show:'+show)
             if self.shutdown_required is False and self.terminate_required is False:
@@ -620,6 +646,8 @@ class PiPresents(object):
             
         if reason=='error':
             self.mon.err(self,message)
+            self.end('error',message)
+            return
         return
 
 
@@ -721,7 +749,7 @@ class PiPresents(object):
             if status != 'normal':
                 continue
             canvas_obj.config(bg=self.starter_show['background-colour'])
-        if reason in ('killed','error') or self.shutdown_required is True or self.exitpipresents_required is True or self.reboot_required is True:
+        if reason in ('killed','error') or self.shutdown_required is True or self.exitpipresents_required is True or self.reboot_required is True or self.restartpipresents_required is True:
             self.end(reason,message)
 
     def end(self,reason,message):
@@ -729,6 +757,7 @@ class PiPresents(object):
         if self.root is not None:
             self.root.destroy()
         self.tidy_up()
+        
         if reason == 'killed':
             if self.email_enabled is True and self.mailer.email_on_terminate is True:
                 subject= '[Pi Presents] ' + self.unit + ': PP Exited with reason: Terminated'
@@ -742,6 +771,7 @@ class PiPresents(object):
             #print('Uncollectable Garbage',gc.collect())
             # objgraph.show_backrefs(objgraph.by_type('Canvas'),filename='backrefs.png')
             sys.exit(101)
+            
                           
         elif reason == 'error':
             if self.email_enabled is True and self.mailer.email_on_error is True:
@@ -762,6 +792,10 @@ class PiPresents(object):
             
             # close logging files 
             self.mon.finish()
+            if self.restartpipresents_required is True:
+                #print ('restart')
+                return
+                
             if self.reboot_required is True:
                 # print 'REBOOT'
                 call (['sudo','reboot'])
@@ -920,8 +954,8 @@ if __name__ == '__main__':
         exit()
 
     pp = PiPresents()
-
-
-
+    print ('Pi Presents is restarting')
+    del(pp)
+    os.execv(__file__, sys.argv)
 
 

@@ -44,10 +44,10 @@ class BrowserPlayer(Player):
     
         # get duration limit (secs ) from profile
         if self.track_params['duration'] != '':
-            self.duration= int(self.track_params['duration'])
+            self.duration_text= self.track_params['duration']
         else:
-            self.duration= int(self.show_params['duration'])
-        self.duration_limit=20*self.duration
+            self.duration_text= self.show_params['duration']
+
 
         # process web window                  
         if self.track_params['web-window'] != '':
@@ -88,6 +88,14 @@ class BrowserPlayer(Player):
                 self.loaded_callback('error',message)
                 return
 
+        status,message,duration100=Player.parse_duration(self.duration_text)
+        if status =='error':
+            self.mon.err(self,message)
+            self.play_state='load-failed'
+            if self.loaded_callback is not  None:
+                self.loaded_callback('error',message)
+                return
+        self.duration=2*duration100
 
         # compute web_window size
         if has_window is False:
@@ -323,14 +331,14 @@ class BrowserPlayer(Player):
     def start_show_state_machine_show(self):
         self.play_state='showing'
         self.show_state='showing'
-        self.duration_count=self.duration_limit
+        self.duration_count=self.duration
         self.tick_timer=self.canvas.after(50, self.show_state_machine)
 
 
     def start_show_state_machine_close(self):
         self.play_state='showing'
         self.quit_signal=True
-        self.duration_limit = 0
+        self.duration = 0
         self.tick_timer=self.canvas.after(50, self.show_state_machine)
 
 
@@ -345,7 +353,7 @@ class BrowserPlayer(Player):
             # self.mon.log(self,"      Show state machine: " + self.show_state)
             
             # service any queued stop signals and test duration count
-            if self.quit_signal is True or (self.duration_limit != 0 and self.duration_count == 0):
+            if self.quit_signal is True or (self.duration != 0 and self.duration_count == 0):
                 self.mon.log(self,"      Service stop required signal or timeout")
                 if self.quit_signal  is True:
                     self.quit_signal=False

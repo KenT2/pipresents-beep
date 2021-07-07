@@ -1,3 +1,14 @@
+CHANGES FOR 1.4.6a 7/7/2021
+============================
+enhanced - added input event to restart Pi Presents, pp-restartpipresents
+enhanced - animate show control command allowing animation at start and end of shows (and tracks but better to use animation tab)
+enhanced - Duration now has resolution of 0.1 secs and minimum value of 0.1
+enhanced - added validation of vlc and chrome tracks to the editor
+fixed - task bar setting used correctly for vlc audio 
+fixed - volume wavering at start of a VLC video (suits-short.mkv), but not fixed for artshow
+fixed - crash when validating artliveshow or artmediashow, raises profile version to 1.4.6a
+
+
 CHANGES FOR 1.4.5f 25/6/2021
 ============================
 enhanced - pigpio I/O plugin. Based on pigpio by Joan. More responsve especially when many VLV tracks are playing

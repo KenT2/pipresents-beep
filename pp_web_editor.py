@@ -37,7 +37,7 @@ class PPWebEditor(App):
         # ***************************************
         # INIT
         # ***************************************
-        self.editor_issue="1.4.5"
+        self.editor_issue="1.4.6"
         self.force_update= False
 
         # get directory holding the code

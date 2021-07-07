@@ -1,5 +1,5 @@
 class PPdefinitions(object):
-    DEFINITIONS_VERSION_STRING='1.4.5'
+    DEFINITIONS_VERSION_STRING='1.4.6'
     IMAGE_FILES=('Image files', '.gif','.jpg','.jpeg','.bmp','.png','.tif')
     VIDEO_FILES= ('Video Files','.asf','.avi','.mpg','.mp4','.mpeg','.m2v','.m1v','.vob','.divx','.xvid','.mov','.m4v','.m2p','.mkv','.m2ts','.ts','.mts','.wmv','.webm')
     AUDIO_FILES=('Audio files','.mp3','.wav','.ogg','.ogm','.wma','.asf','.mp2')
@@ -30,6 +30,8 @@ class PPdefinitions(object):
                 'vlc-layer','vlc-audio','vlc-volume','vlc-window','vlc-aspect-mode','vlc-freeze-at-start','vlc-freeze-at-end','vlc-image-duration','vlc-other-options','sep',
 
                  'track-text-font','track-text-colour','track-text-x','track-text-y','track-text-justify','sep',
+                'chrome-window','chrome-zoom','chrome-freeze-at-end','chrome-other-options',
+                
             'tab-omx','sep',    
                 'omx-audio','omx-volume','omx-window','omx-other-options','freeze-at-start','freeze-at-end','sep',
             
@@ -59,6 +61,8 @@ class PPdefinitions(object):
                 'vlc-layer','vlc-audio','vlc-volume','vlc-window','vlc-aspect-mode','vlc-freeze-at-start','vlc-freeze-at-end','vlc-image-duration','vlc-other-options','sep',
 
                  'track-text-font','track-text-colour','track-text-x','track-text-y','track-text-justify','sep',
+                'chrome-window','chrome-zoom','chrome-freeze-at-end','chrome-other-options',
+                
             'tab-omx','sep',    
                 'omx-audio','omx-volume','omx-window','omx-other-options','freeze-at-start','freeze-at-end','sep',
 
@@ -261,10 +265,10 @@ class PPdefinitions(object):
                             'omx-audio': 'hdmi','omx-volume':'0','omx-window':'warp 300 300 655 500','omx-other-options': '','freeze-at-start':'no','freeze-at-end':'yes',
                              'vlc-layer':'1','vlc-audio': 'hdmi','vlc-volume':'100','vlc-window':'showcanvas 200+200+400*300','vlc-other-options':'','vlc-aspect-mode':'stretch','vlc-image-duration':'5',
                              'vlc-freeze-at-start':'no','vlc-freeze-at-end':'yes',
-
+                            'chrome-window':'showcanvas 200+200+600*400','chrome-zoom':'1.0','chrome-freeze-at-end':'yes','chrome-other-options':'',
                             'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                             'live-tracks-dir1':'','live-tracks-dir2':'',
-                               'controls':'pp-down down\npp-stop stop\npp-pause pause\n',
+                            'controls':'pp-down down\npp-stop stop\npp-pause pause\n',
                                'show-control-begin':'','show-control-end':'','show-control-events':'','disable-show-control-events':'no',
                                'sched-everyday':'','sched-weekday':'','sched-monthday':'','sched-specialday':'','enable-catchup':'yes'},
 
@@ -277,6 +281,7 @@ class PPdefinitions(object):
                             'omx-audio': 'hdmi','omx-volume':'0','omx-window':'warp 300 300 655 500','omx-other-options': '','freeze-at-start':'no','freeze-at-end':'yes',
                              'vlc-layer':'1','vlc-audio': 'hdmi','vlc-volume':'100','vlc-window':'showcanvas 200+200+400*300','vlc-other-options':'','vlc-aspect-mode':'stretch','vlc-image-duration':'5',
                              'vlc-freeze-at-start':'no','vlc-freeze-at-end':'yes',
+                            'chrome-window':'showcanvas 200+200+600*400','chrome-zoom':'1.0','chrome-freeze-at-end':'yes','chrome-other-options':'',
 
                                 'track-text-colour':'white','track-text-x':'0','track-text-y':'40','track-text-justify':'left','track-text-font': 'Helvetica 20 bold',
                             'controls':'pp-down down\npp-stop stop\npp-pause pause\n',

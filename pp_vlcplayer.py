@@ -164,7 +164,13 @@ class VLCPlayer(Player):
                 self.play_state='load-failed'
                 if self.loaded_callback is not  None:
                     self.loaded_callback('error','audio device not connected')
-                    return 
+                    return
+        else:
+            self.mon.err(self,'audio systems other than pulseaudio are not supported\n hint: audio.cfg error' )
+            self.play_state='load-failed'
+            if self.loaded_callback is not  None:
+                self.loaded_callback('error','audio device not connected')
+                return
 
 
         # do common bits of  load
@@ -362,7 +368,11 @@ class VLCPlayer(Player):
                 return            
             elif resp=='load-ok':
                 self.play_state = 'loaded'
-                #self.set_volume(self.volume)
+                if self.vlc_sink!='':
+                    self.set_device(self.vlc_sink)
+                else:
+                    self.set_device('')   
+                self.set_volume(self.volume)
                 self.mon.log(self,"      Entering state : " + self.play_state + ' from show Id: '+ str(self.show_id))
                 if self.loaded_callback is not  None:
                     self.loaded_callback('normal','loaded')
@@ -401,9 +411,7 @@ class VLCPlayer(Player):
             self.must_quit_signal=False
             # show the track and content
             self.vlcdriver.sendline('show')
-            self.mon.log (self,'>showing track from show Id: '+ str(self.show_id))
-            if self.vlc_sink!='':
-                self.set_device(self.vlc_sink)
+            self.mon.log (self,'>showing track from show Id: '+ str(self.show_id))  
             self.set_volume(self.volume)
             # and start polling for state changes
             # print 'start show state machine show'
@@ -473,7 +481,7 @@ class VLCPlayer(Player):
 
 
     def start_state_machine_close(self):
-        self.mon.log(self,">close received from show Id: "+ str(self.show_id))
+        # self.mon.log(self,">close received from show Id: "+ str(self.show_id))
         # cancel the pause timer
         if self.pause_timer != None:
             self.canvas.after_cancel(self.pause_timer)
@@ -625,12 +633,20 @@ class VLCPlayer(Player):
         # volume will be set during show by set_volume()
         # --------------------------------------
         if self.vlc_max_volume_text != "":
+            if not self.vlc_max_volume_text.isdigit():
+                return 'error','VLC Max Volume must be a positive integer: '+self.vlc_max_volume_text
             self.max_volume= int(self.vlc_max_volume_text)
+            if self.max_volume>100:
+                return 'error','VLC Max Volume must be <= 100: '+ self.vlc_max_volume_text                
         else:
             self.max_volume=100
             
         if self.vlc_volume_text != "":
+            if not self.vlc_volume_text.isdigit():
+                return 'error','VLC Volume must be a positive integer: '+self.vlc_volume_text
             self.volume= int(self.vlc_volume_text)
+            if self.volume>100:
+                return 'error','VLC Volume must be <= 100: '+self.vlc_max_volume_text  
         else:
             self.volume=100
             
@@ -640,13 +656,8 @@ class VLCPlayer(Player):
         # instance options
         # ----------------
         
-        #audio device
-        if self.vlc_audio =='' or self.vlc_audio=='default':
-            # default from task bar
-            audio_opt= '--aout=pulse '
-        else:
-            # how do you select a pulseaudio sink in vlc????
-            audio_opt=''
+        #audio system - pulseaudio
+        audio_opt= '--aout=pulse '
         
         # other options
         if self.vlc_other_options!='':
@@ -805,7 +816,7 @@ class VLCPlayer(Player):
 
 
     def parse_vlc_video_window(self,line):
-        words=line.split(' ')
+        words=line.split()
         if len(words) not in (1,2):
             return 'error','bad vlc video window form '+line,''
             

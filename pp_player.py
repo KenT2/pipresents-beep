@@ -1,4 +1,5 @@
 import os
+import math
 from tkinter import NW,FLAT,RIDGE
 from PIL import Image
 from PIL import ImageTk
@@ -537,3 +538,21 @@ class Player(object):
         return value # False if not found
 
 
+    def parse_duration(s):
+        if s =='0':
+            #print ('OK: infinite',0)
+            return 'normal','',0
+        try:
+            val=float(s)*10
+        except:
+            #print ('error: not a float')
+            return 'error','duration must be a decimal number: '+s,-1
+        if val< 0:
+            #print ('error: negative')
+            return 'error','duration must be a positive number: '+s,-1
+        if val<1:
+            #print('error:must be >= 0.1')
+            return 'error','duration must be >= 0.1 or be 0: '+s,-1
+        result=math.floor(val)
+        #print ('OK:',result)
+        return 'normal','',result  

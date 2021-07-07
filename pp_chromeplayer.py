@@ -50,18 +50,17 @@ class ChromePlayer(Player):
         
         # get duration limit (secs ) from profile
         if self.track_params['duration'] != '':
-            self.duration= int(self.track_params['duration'])
+            self.duration_text=self.track_params['duration']
         else:
-            self.duration= int(self.show_params['duration'])
-        self.duration_limit=20*self.duration
+            self.duration_text= self.show_params['duration']
 
-        # process web window                  
+        # process chrome window                  
         if self.track_params['chrome-window'] != '':
             self.chrome_window_text= self.track_params['chrome-window']
         else:
             self.chrome_window_text= self.show_params['chrome-window']
 
-        # process web window                  
+        # process chrome things                  
         if self.track_params['chrome-freeze-at-end'] != '':
             self.freeze_at_end= self.track_params['chrome-freeze-at-end']
         else:
@@ -93,6 +92,14 @@ class ChromePlayer(Player):
         self.loaded_callback=loaded_callback   # callback when loaded
         self.mon.trace(self,'')
 
+        status,message,duration100=Player.parse_duration(self.duration_text)
+        if status =='error':
+            self.mon.err(self,message)
+            self.play_state='load-failed'
+            if self.loaded_callback is not  None:
+                self.loaded_callback('error',message)
+                return
+        self.duration=2*duration100
 
         # Is display valid and connected
         status,message,self.display_id=self.dm.id_of_display(self.show_canvas_display_name)
@@ -209,7 +216,7 @@ class ChromePlayer(Player):
         # do common bits
         Player.pre_show(self)
         #self.driver.get(self.current_url)
-        self.duration_count=self.duration_limit
+        self.duration_count=self.duration
         self.tick_timer=self.canvas.after(10, self.show_state_machine)
 
         
@@ -220,7 +227,7 @@ class ChromePlayer(Player):
             # self.mon.log(self,"      Show state machine: " + self.show_state)
             
             # service any queued stop signals and test duration count
-            if self.quit_signal is True or (self.duration_limit != 0 and self.duration_count == 0):
+            if self.quit_signal is True or (self.duration != 0 and self.duration_count == 0):
                 self.mon.log(self,"      Service stop required signal or timeout")
                 if self.command_timer != None:
                     self.canvas.after_cancel(self.command_timer)
@@ -506,6 +513,7 @@ class ChromePlayer(Player):
 
         self.add_option('--force-device-scale-factor='+self.chrome_zoom_text)
 
+
         status,message= self.process_chrome_window(self.chrome_window_text)
         if status  == 'error':
             return 'error',message
@@ -534,17 +542,17 @@ class ChromePlayer(Player):
 
     def process_chrome_window(self,line):
         #parse chrome window
-        # kiosk,fullscreen,app,showcanvas,display
+        # kiosk,fullscreen,showcanvas,display
         # obxprop | grep "^_OB_APP"  and click the window
 
         self.app_mode=False
         
         # showcanvas|display +  [x+y+w*h]
-        words=line.split(' ')
+        words=line.split()
         if len(words) not in (1,2):
             return 'error','bad Chrome Web Window form '+line
             
-        if words[0] not in ('display','showcanvas','kiosk','fullscreen','app'):
+        if words[0] not in ('display','showcanvas','kiosk','fullscreen'):
             return 'error','No or invalid Chrome Web Window mode: '+line
 
 

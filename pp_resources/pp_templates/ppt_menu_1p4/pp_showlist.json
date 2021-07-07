@@ -1,5 +1,5 @@
 {
- "issue": "1.4.5",
+ "issue": "1.4.6",
  "shows": [
   {
    "audio-speaker": "stereo",
@@ -66,7 +66,7 @@
    "transition": "cut",
    "type": "menu",
    "vlc-aspect-mode": "stretch",
-   "vlc-audio": "hdmi",
+   "vlc-audio": "default",
    "vlc-freeze-at-end": "yes",
    "vlc-freeze-at-start": "no",
    "vlc-image-duration": "5",
