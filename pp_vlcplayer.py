@@ -366,7 +366,11 @@ class VLCPlayer(Player):
                 #if self.loaded_callback is not  None:
                     #self.loaded_callback('normal','unloaded')
                 return            
-            elif resp=='load-ok':
+            elif resp in ('load-ok','stop-frozen'):
+                # stop received while in freeze-at-start - quit showing as soon as it starts
+                if resp=='stop-frozen':
+                    self.quit_signal= True
+                    self.mon.log(self,'stop received while in freeze-at-start')
                 self.play_state = 'loaded'
                 if self.vlc_sink!='':
                     self.set_device(self.vlc_sink)
