@@ -1,4 +1,4 @@
-PI PRESENTS  - Version 1.4.4
+PI PRESENTS  - Version 1.4.6
 ============================
 
 This repository contains the latest and greatest version Pi Presents. Use if you are happy with bleeding edge software that is under development.
@@ -61,6 +61,9 @@ Requirements
 	* must have Python 3 installed (which Raspbian does)
 	* should use a clean install of Raspberry Pi OS, particularly if you intend to use GPIO
 
+NOTE: PI PRESENTS DOES NOT WORK WITH BULLSEYE WHICH IS THE VERSION OF THE OS THAT IS ON THE RASPBERRY PI WEBSITE AND INSTALLED BY THE IMAGER. BUSTER CAN BE OBTAINED FROM HERE:
+
+https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2021-05-28/
 
 Set the GPU Memory size to 256MB
 ---------------------------------
