@@ -274,6 +274,8 @@ class HyperlinkShow(Show):
     def track_timeout_callback(self):
         self.mon.trace(self, 'goto ' + self.timeout_track_ref)
         self.next_track_op='goto'
+        # print ('KRT track timeout callback')
+        self.next_track_signal=True
         self.next_track_arg=self.timeout_track_ref
         self.what_next_after_showing()
 
@@ -363,7 +365,6 @@ class HyperlinkShow(Show):
                 self.show_timeout_timer=None
             if self.show_timeout != 0:
                 self.show_timeout_timer=self.canvas.after(self.show_timeout*1000 ,self.show_timeout_stop)
-
         
        # start timeout for the track if required   ???? differnet to radiobuttonshow
         if self.continue_timeout is False:
@@ -371,6 +372,7 @@ class HyperlinkShow(Show):
                 self.canvas.after_cancel(self.track_timeout_timer)
                 self.track_timeout_timer=None
             if self.current_track_ref != self.first_track_ref and self.track_timeout != 0:
+                # print ('KRT set track timeout timer')
                 self.track_timeout_timer=self.canvas.after(self.track_timeout*1000,self.track_timeout_callback)
 
 
@@ -481,6 +483,7 @@ class HyperlinkShow(Show):
             self.user_stop_signal=False
             self.ending_reason='user-stop'
             Show.base_close_or_unload(self)
+            
 
         # user has selected another track
         elif self.next_track_signal is True:
@@ -578,6 +581,7 @@ class HyperlinkShow(Show):
                 
         else:
             # track ends naturally look to see if there is a pp-onend link
+            # print ('KRT track ends naturally')
             found,link_op,link_arg=self.path.find_link('pp-onend',self.links)
             if found is True:
                 if link_op=='exit':

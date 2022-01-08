@@ -72,7 +72,7 @@ class pp_pn532driver(object):
             # add entry to working list of tag_codes  (list of lists [0] of sublist is key code)      
             pp_pn532driver.tag_codes.append(copy.deepcopy(entry))
 
-        # print pp_pn532driver.tag_codes
+        # print ('tag codes from .cfg',pp_pn532driver.tag_codes)
 
         #Start the PN532 tag reader
 
@@ -111,16 +111,16 @@ class pp_pn532driver(object):
         self.debounced_tag_code=''    # empty string is no tag
         self.last_debounced_tag_code=''    # empty string is no tag
         self.last_event_entry=None
-        # self.start_time=time.time()
+        self.start_time=time.time()
         # print 'start poll'
         self.button_tick_timer=self.widget.after(0,self.poll)
 
 
     def poll(self):
         """One iteration of a loop that polls for tags"""
-        # print 'poll',"%.2f" % (time.time()-self.start_time)
+        #print ('poll',"%.2f" % (time.time()-self.start_time))
         status,message,tag_code=self.read_tag()
-        # print 'tag read',"%.2f" % (time.time()-self.start_time)
+        # print ('tag read at ',"%.2f" % (time.time()-self.start_time))
         # get event table entry corresonding to tag code
         if tag_code != '':
             event_entry=self.find_event_entry(tag_code)
@@ -144,16 +144,21 @@ class pp_pn532driver(object):
         if self.count == self.threshold:
             self.debounced_tag_code = tag_code
 
-        # print 'code: ',self.debounced_tag_code
+        # PRINT CODE IF ITS NOT BLANK
+        if self.debounced_tag_code !='':
+            pass
+            # print ('code: ',self.debounced_tag_code,'debounce count:  ',self.count)
             
         # generate events on change of tag code
         if self.debounced_tag_code != self.last_debounced_tag_code:
             if self.last_debounced_tag_code !='':
+                # print ('SEND INPUT EVENT TAG REMOVED')
                 #remove tag event
                 self.button_callback(self.last_event_entry[pp_pn532driver.REMOVED_NAME],pp_pn532driver.title)
             if self.debounced_tag_code != '':
                 # detect tag event
-                self.button_callback(event_entry[pp_pn532driver.DETECTED_NAME],pp_pn532driver.title)
+                # print ('SEND INPUT EVENT TAG PRESENT')
+                self.button_callback(event_entry[pp_pn532driver.DETECTED_NAME],pp_pn532driver.title+ ' tag UID: '+ self.debounced_tag_code)
             self.last_debounced_tag_code = self.debounced_tag_code
             self.last_event_entry=event_entry 
         self.button_tick_timer=self.widget.after(5,self.poll)
@@ -173,6 +178,7 @@ class pp_pn532driver(object):
             uid_length=nt.nti.nai.szUidLen
             uid = bytearray([nt.nti.nai.abtUid[i] for i in range(uid_length)])
             uid_hex=binascii.hexlify(uid).decode('UTF-8')
+            # print ('uid hex:  ',uid_hex,'  uid length: ',uid_length)
             return 'normal','',uid_hex
         else:
             print('tag reader error: reader returns zero result')
@@ -182,7 +188,7 @@ class pp_pn532driver(object):
         for entry in pp_pn532driver.tag_codes:
             # print (entry[pp_pn532driver.TAG_CODE],tag_code)
             if entry[pp_pn532driver.TAG_CODE]==tag_code:
-                # print entry
+                # print (entry)
                 return entry
         return None
     

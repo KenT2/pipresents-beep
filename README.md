@@ -55,15 +55,16 @@ The full manual in English is here https://github.com/KenT2/pipresents-beep/blob
 Requirements
 -------------
 
-	* must use the latest version of Raspbian Buster with Desktop (not the Lite version)
+	* must use the latest version of Raspberry Pi OS (legacy) with Desktop (not the Lite version)
 	* must be run from the PIXEL desktop.
 	* must be installed and run from user Pi
-	* must have Python 3 installed (which Raspbian does)
+	* must have Python 3 installed (which Rasperry Pi OS does)
 	* should use a clean install of Raspberry Pi OS, particularly if you intend to use GPIO
 
-NOTE: PI PRESENTS DOES NOT WORK WITH BULLSEYE WHICH IS THE VERSION OF THE OS THAT IS ON THE RASPBERRY PI WEBSITE AND INSTALLED BY THE IMAGER. BUSTER CAN BE OBTAINED FROM HERE:
+NOTE: PI PRESENTS DOES NOT WORK WITH BULLSEYE WHICH IS THE LATEST VERSION OF THE OS. INSTEAD USE THE LEGACY VERSION BASED ON BUSTER THAT CAN BE OBTAINED USING THE IMAGER OR CAN BE DOWNLOADED FROM HERE:
 
-https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2021-05-28/
+https://www.raspberrypi.com/software/operating-systems/#raspberry-pi-os-legacy
+
 
 Set the GPU Memory size to 256MB
 ---------------------------------
@@ -82,11 +83,21 @@ Install required packages
          sudo apt install python3-pil.imagetk
          sudo apt install unclutter
          sudo apt install mplayer
-         sudo apt install python3-pexpect
-         
-         sudo pip3 install selenium
-         sudo apt install chromium-chromedriver
+         sudo apt install python3-pexpect (may be already installed)
+	 
          sudo pip3 install python-vlc
+		 sudo pip3 install selenium
+	 
+Now you have two choices of chromium browser. You will need the hardware accelerated browser to play videos in the browser and possibly for complex web sites, otherwise continue with the updated software accelerated browser.
+
+a. If you wish to retain the currently installed software accelerated browser which will be updated. Installing this driver will retain the out of the box installed browser (chromium)
+
+	 sudo apt install chromium-driver
+
+b. If you wish to switch to the hardware accelerated browser which will not receive updates then install this driver. Doing so will delete the software accelerated browser and install the hardware accelerated browser (chromium-browser)
+ 
+	sudo apt install chromium-chromedriver
+
 
 Install optional packages
 ------------------------------
@@ -147,6 +158,7 @@ Install Python 3 version of some packages:
       sudo apt-get install python3-pexpect
       sudo pip3 install evdev
       sudo pip3 install python-vlc
+      
       
 The Python 2 versions of these packages can be left installed
 

@@ -1,3 +1,7 @@
+Version 1.4.6c  8/1/2022
+========================
+In addition to the fix in pp_hyperlinkshow.py you will need an updated version of the pp_hyperlinkshow_1p4 example
+
 Version 1.4.6a  7/7/2021
 ========================
 It will be necessary to update the profiles to version 1.4.6. The update will happen automatically if you edit the profile. I recommend making a backup of all profile directories before editing them.
