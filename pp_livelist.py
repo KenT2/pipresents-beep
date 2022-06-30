@@ -101,7 +101,7 @@ class LiveList(object):
         return self._num_tracks        
     
     def next(self,sequence):
-        if sequence=='ordered':
+        if sequence in('ordered','reverse'):
             if self._selected_track_index==self._num_tracks-1:
                 self._selected_track_index=0
             else:
@@ -145,7 +145,7 @@ class LiveList(object):
 
 
     def previous(self,sequence):
-        if sequence=='ordered':
+        if sequence in ('ordered','reverse'):
             if self._selected_track_index == 0:
                 self._selected_track_index=self._num_tracks-1
             else:
@@ -254,7 +254,7 @@ class LiveList(object):
         return True
 
 
-    def create_new_livelist(self):
+    def create_new_livelist(self,sequence):
         # fetch new livelist if available
         self.llf.fetch_livelist()
         self.new_livelist=[]
@@ -280,7 +280,11 @@ class LiveList(object):
                     if (ext_file.lower() in PPdefinitions.IMAGE_FILES+PPdefinitions.VIDEO_FILES+PPdefinitions.AUDIO_FILES+PPdefinitions.WEB_FILES) or (ext_file.lower()=='.cfg'):
                         self.livelist_add_track(track_file)
                         
-        self.new_livelist= sorted(self.new_livelist, key= lambda track: os.path.basename(track['location']).lower())
+        if sequence in('ordered','shuffle'):
+            self.new_livelist= sorted(self.new_livelist, key= lambda track: os.path.basename(track['location']).lower(),reverse=False)
+        else:    
+            self.new_livelist= sorted(self.new_livelist, key= lambda track: os.path.basename(track['location']).lower(),reverse=True)
+
         # self.print_livelist()
 
 

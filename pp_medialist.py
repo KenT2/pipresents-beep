@@ -175,7 +175,7 @@ class MediaList(object):
         if self.anon_length()==0:
             return False
         # select first anonymous track in the list
-        if self.sequence == 'ordered':
+        if self.sequence in ('ordered','reverse'):
             index=0
             while index<self._num_tracks:
                 if self._tracks[index] ['track-ref'] =="":
@@ -197,7 +197,7 @@ class MediaList(object):
     def finish(self):
         if self.anon_length()==0:
             return False
-        if self.sequence == 'ordered':
+        if self.sequence in ('ordered','reverse'):
             # select last anymous track in the list
             index=self._num_tracks-1
             while index>=0:
@@ -238,7 +238,7 @@ class MediaList(object):
     def next(self,sequence):
         if self.anon_length()==0:
             return False
-        if sequence=='ordered':
+        if sequence in ('ordered','reverse'):
             if self._selected_track_index== self._num_tracks-1:
                 index=0
             else:
@@ -266,7 +266,7 @@ class MediaList(object):
     def previous(self,sequence):
         if self.anon_length()==0:
             return False
-        if sequence=='ordered':
+        if sequence in ('ordered','reverse'):
             if self._selected_track_index == 0:
                 index=self._num_tracks-1
             else:
@@ -344,7 +344,7 @@ class MediaList(object):
     def use_new_livelist(self):
         pass
 
-    def create_new_livelist(self):
+    def create_new_livelist(self,sequence=None):
         pass
 
     def new_length(self):

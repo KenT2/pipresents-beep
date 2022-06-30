@@ -306,18 +306,22 @@ class pp_serialdriver(object):
         return 'normal',pp_serialdriver.title + 'message sent'
 
     def send_string(self,text):
-        # convert string to a byte array
-        bytes=bytearray()
-        for char in text:
-            intfield=ord(char)
-            if intfield>255:
-                return 'error',pp_serialdriver.title + ' illegal character: ' + char + ' ' + ord(char)
-            else:
-                bytes.append(intfield)
+        out_bytes=bytearray()
+
+        # handle escape charaters
+        out_text = bytes(text, "utf-8").decode("unicode_escape")
         
+        # convert to bytes
+        out_bytes=out_text.encode()
+        
+        #print(out_text)
+        #print (out_bytes)
+        #for char in out_bytes:
+            #print (char)
+            
         if pp_serialdriver.ser.is_open is False:        
             return 'error',pp_serialdriver.title + ' serial port not open: ' + name
-        bytes_sent = pp_serialdriver.ser.write(bytes)
+        bytes_sent = pp_serialdriver.ser.write(out_bytes)
         self.result += pp_serialdriver.title + ': sent ' + str(bytes_sent) + ' characters to ' + pp_serialdriver.ser.name
 
         # print pp_serialdriver.title + ': sent ' + str(bytes_sent) + ' characters to ' + pp_serialdriver.ser.name

@@ -496,7 +496,7 @@ class PPdefinitions(object):
                     'sched-monthday':{'shape':'text','text':'Month day','must':'no','read-only':'no'},
                     'sched-specialday':{'shape':'text','text':'Special day','must':'no','read-only':'no'},
                     'sequence':{'shape':'option-menu','text':'Sequence','must':'no','read-only':'no',
-                                        'values':['ordered','shuffle']},
+                                        'values':['ordered','shuffle','reverse']},
                     'show-canvas':{'shape':'entry','text':'Show Canvas','must':'no','read-only':'no'},
                     'show-control-begin':{'shape':'text','text':'Show Control at Beginning','must':'no','read-only':'no'},
                     'show-control-end':{'shape':'text','text':'Show Control at End','must':'no','read-only':'no'},

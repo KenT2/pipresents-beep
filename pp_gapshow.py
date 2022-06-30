@@ -504,7 +504,7 @@ class GapShow(Show):
                 self.poll_for_interval_timer=self.canvas.after(1000,self.what_next_after_showing)
 
         else:
-            self.medialist.create_new_livelist()
+            self.medialist.create_new_livelist(self.show_params['sequence'])
             escapetrack_required=self.escapetrack_required
             self.escapetrack_required=False
             # print escapetrack_required,self.medialist.new_length()
@@ -641,9 +641,9 @@ class GapShow(Show):
                         self.kickback_for_next_track=False
                         if self.medialist.at_end() is True:
                             # medialist_at_end can give false positive for shuffle
-                            if  self.show_params['sequence'] == "ordered" and self.show_params['repeat'] == 'repeat':
+                            if  self.show_params['sequence'] in ("ordered",'reverse') and self.show_params['repeat'] == 'repeat':
                                 self.wait_for_trigger()
-                            elif  self.show_params['sequence'] == "ordered" and self.show_params['repeat'] == 'single-run':
+                            elif  self.show_params['sequence'] in ("ordered",'reverse') and self.show_params['repeat'] == 'single-run':
                                 if self.level != 0:
                                     self.kickback_for_next_track=False
                                     self.subshow_kickback_signal=False
@@ -674,10 +674,10 @@ class GapShow(Show):
                     # medialist_at_start can give false positive for shuffle
                     if self.medialist.at_start() is True:
                         # print 'AT START'
-                        if  self.show_params['sequence'] == "ordered" and self.show_params['repeat'] == 'repeat':
+                        if  self.show_params['sequence'] in ( "ordered",'reverse') and self.show_params['repeat'] == 'repeat':
                             self.kickback_for_next_track=True
                             self.wait_for_trigger()
-                        elif  self.show_params['sequence'] == "ordered" and self.show_params['repeat'] == 'single-run':
+                        elif  self.show_params['sequence'] in ("ordered",'reverse') and self.show_params['repeat'] == 'single-run':
                             if self.level != 0:
                                 self.kickback_for_next_track=True
                                 self.subshow_kickback_signal=True
@@ -706,7 +706,7 @@ class GapShow(Show):
                     # print 'MEDIALIST AT END'
 
                     # interval>0 and list finished so wait for the interval timer
-                    if self.show_params['sequence'] == "ordered"  and self.interval > 0 and self.interval_timer_signal==False:
+                    if self.show_params['sequence'] in ("ordered",'reverse')  and self.interval > 0 and self.interval_timer_signal==False:
                         self.waiting_for_interval=True
                         # print 'WAITING FOR INTERVAL'
                         Show.base_shuffle(self)
@@ -724,7 +724,7 @@ class GapShow(Show):
                         self.start_load_show_loop(self.medialist.selected_track())
                         
                     # nothing special to do at end of list, just repeat or exit
-                    elif self.show_params['sequence'] == "ordered":
+                    elif self.show_params['sequence'] in ("ordered",'reverse'):
                         if self.show_params['repeat'] == 'repeat':
                             # print 'repeating at end of list'
                             self.wait_for_trigger()

@@ -14,6 +14,7 @@ class ScreenDriver(object):
     def __init__(self):
         self.mon=Monitor()
         self.dm=DisplayManager()
+    
 
 
     # read screen.cfg    
@@ -52,10 +53,25 @@ class ScreenDriver(object):
     # canvas is the PiPresents canvas
     
     def make_click_areas(self,callback):
+        # called once at start
+        #click_area_ids = dict()   #disctionary of ids access by click area name
+        # contains - canvas_ids   list of canvases for the click area one for each display. used to index the other lists
+        #            poly_ids     list of polygon objects with nones. one for each display
+        #            image_ids    as above
+        #            text_ids     as above
+
+        #print (self.click_areas())
         self.callback=callback
         reason=''
         ScreenDriver.image_obj=[]
+        ScreenDriver.click_area_names=[]
+        ScreenDriver.canvas_ids=[]
+        ScreenDriver.poly_ids=[]
+        ScreenDriver.image_ids=[]
+        ScreenDriver.text_ids=[]
         for area in self.click_areas():
+
+            #print ('\nNAME',self.get(area,'name'))
             if not self.is_in_config(area,'displays'):
                 reason='error'
                 message='missing displays field in screen.cfg'
@@ -68,29 +84,33 @@ class ScreenDriver(object):
 
             # calculate centre of polygon
             vertices = len(points)//2
-            # print area, 'vertices',vertices
+            #print (area, 'vertices',vertices)
             sum_x=0
             sum_y=0
             for i in range(0,vertices):
-                # print i
+                #print (i)
                 sum_x=sum_x+int(points[2*i])
-                # print int(points[2*i])
+                #print (int(points[2*i]))
                 sum_y=sum_y+int(points[2*i+1])
-                # print int(points[2*i+1])
+                #print (int(points[2*i+1]))
             polygon_centre_x=sum_x/vertices
             polygon_centre_y=sum_y/vertices
-
+            
             for display_name in DisplayManager.display_map:
                 if display_name in displays_list:
                     status,message,display_id,canvas=self.dm.id_of_canvas(display_name)
                     if status!='normal':
                         continue
-                    canvas.create_polygon(points,
+                    ScreenDriver.click_area_names.append(area)
+                    ScreenDriver.canvas_ids.append(canvas)
+                    #print (display_id,canvas)
+                    polygon_id=canvas.create_polygon(points,
                                                fill=self.get (area,'fill-colour'),
                                                outline=self.get (area,'outline-colour'),
                                                tags=("pp-click-area",self.get(area,'name')),
                                                state='hidden')
-
+                    #print ('polygon',polygon_id,area,self.get(area,'name'),display_id,canvas)
+                    ScreenDriver.poly_ids.append(polygon_id)
                     # image for the button
                     if not self.is_in_config(area,'image'):
                         reason='error'
@@ -123,22 +143,33 @@ class ScreenDriver(object):
                                                     state='hidden')
                             del self.pil_image
                             ScreenDriver.image_obj.append(photo_image_id)
+                            ScreenDriver.image_ids.append(image_id)
                             # print (ScreenDriver.image_obj)
-        
+                    else:
+                        image_id=None
+                        ScreenDriver.image_ids.append(None)
+                    #print ('image',image_id)
                     # write the label at the centroid
                     if self.get(area,'text') != '':
-                        canvas.create_text(polygon_centre_x,polygon_centre_y,
+                        text_id=canvas.create_text(polygon_centre_x,polygon_centre_y,
                                                 text=self.get(area,'text'),
                                                 fill=self.get(area,'text-colour'),
                                                 font=self.get(area,'text-font'),
                                                 tags=('pp-click-area',self.get(area,'name')),
                                                 state='hidden')
-                        
+                        ScreenDriver.text_ids.append(text_id)
+                        #print ('text',text_id)
+                    else:
+                        ScreenDriver.text_ids.append(None)
                     canvas.bind('<Button-1>',self.click_pressed)
-                                     
         if reason == 'error':
             return 'error',message
         else:
+            # print('\nnames',ScreenDriver.click_area_names)
+            # print('\ncanvas',ScreenDriver.canvas_ids)
+            # print('\npoly',ScreenDriver.poly_ids)
+            # print('\nimage',ScreenDriver.image_ids)
+            # print('\ntext',ScreenDriver.text_ids)
             return 'normal','made click areas'
 
                                         
@@ -160,8 +191,10 @@ class ScreenDriver(object):
 
     def is_click_area(self,test_area,canvas):
         click_areas=canvas.find_withtag('pp-click-area')
-        for area in click_areas:        
+        #print ('click areas - ids',click_areas)
+        for area in click_areas:
             if test_area in canvas.gettags(area):
+                # print('test area link',test_area,'is in click areas for canvas',canvas)
                 return True
         return False
                                                       
@@ -170,20 +203,39 @@ class ScreenDriver(object):
     def enable_click_areas(self,links,canvas):
         for link in links:
             if self.is_click_area(link[0],canvas) and link[1] != 'null':
-                # print 'enabling link ',link[0]
-                canvas.itemconfig(link[0],state='normal')
-
+                status,poly_id,image_id,text_id=self.ids_of_click_area(link[0],canvas)
+                # print ('enabling click area ',link[0],status,poly_id,image_id,text_id)
+                canvas.itemconfig(poly_id,state='normal')
+                if image_id != None:
+                    canvas.itemconfig(image_id,state='normal')
+                if text_id != None:
+                    canvas.itemconfig(text_id,state='normal')
 
     def hide_click_areas(self,links,canvas):
         # hide  click areas
         for link in links:
             if self.is_click_area(link[0],canvas) and link[1] != 'null':
-                # print 'disabling link ',link[0]
-                canvas.itemconfig(link[0],state='hidden')
+                status,poly_id,image_id,text_id=self.ids_of_click_area(link[0],canvas)
+                # print ('disabling click area ',link[0],status,poly_id,image_id,text_id)
+                canvas.itemconfig(poly_id,state='hidden')
+                if image_id != None:
+                    canvas.itemconfig(image_id,state='hidden')
+                if text_id != None:
+                    canvas.itemconfig(text_id,state='hidden')
+
 
         # this does not seem to change the colour of the polygon
         # ScreenDriver.canvas.itemconfig('pp-click-area',state='hidden')
         canvas.update_idletasks( )
+
+    def ids_of_click_area(self,area_name,canvas):
+        #print (ScreenDriver.click_area_names)
+        for index,name in enumerate(ScreenDriver.click_area_names):
+            if area_name==name and ScreenDriver.canvas_ids[index]==canvas:
+                # print (index,name,canvas)
+                return True,ScreenDriver.poly_ids[index],ScreenDriver.image_ids[index],ScreenDriver.text_ids[index]
+        print ('!!!! ERROR, click area lookup failed',area_name,canvas)
+        return false,None,None,None
         
 
     def parse_points(self,points_text,area):

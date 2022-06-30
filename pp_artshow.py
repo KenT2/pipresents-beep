@@ -165,7 +165,7 @@ class ArtShow(Show):
     # load the first track of the show
     def load_first_track(self):
         self.mon.trace(self,'')
-        self.medialist.create_new_livelist()
+        self.medialist.create_new_livelist(self.show_params['sequence'])
         self.medialist.use_new_livelist()
         if self.medialist.start() is False:
             # print 'FIRST EMPTY'
@@ -260,11 +260,11 @@ class ArtShow(Show):
             # test for ordered since medialist at end gives false positives for shuffle
             
             # repeat so go back to start
-            if self.show_params['sequence'] == "ordered" and self.show_params['repeat'] == 'repeat':
+            if self.show_params['sequence'] in ("ordered",'reverse') and self.show_params['repeat'] == 'repeat':
                 self.show_next_track()
 
             # single run so end
-            elif self.show_params['sequence'] == "ordered" and self.show_params['repeat'] == 'single-run':
+            elif self.show_params['sequence'] in ("ordered",'reverse') and self.show_params['repeat'] == 'single-run':
                 self.ending_reason='end-of-medialist'
                 self.close_current_and_next()
 
@@ -329,7 +329,7 @@ class ArtShow(Show):
 
         # has content of list been changed (replaced if it has, used for content of livelist)
         # print 'WHAT to load NEXT'
-        self.medialist.create_new_livelist()
+        self.medialist.create_new_livelist(self.show_params['sequence'])
 
         # print result, self.medialist.new_length(),self.medialist.anon_length()
         if self.medialist.livelist_changed() is True:
