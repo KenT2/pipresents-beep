@@ -235,7 +235,7 @@ class ScreenDriver(object):
                 # print (index,name,canvas)
                 return True,ScreenDriver.poly_ids[index],ScreenDriver.image_ids[index],ScreenDriver.text_ids[index]
         print ('!!!! ERROR, click area lookup failed',area_name,canvas)
-        return false,None,None,None
+        return False,None,None,None
         
 
     def parse_points(self,points_text,area):

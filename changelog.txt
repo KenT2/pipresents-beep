@@ -1,3 +1,14 @@
+CHANGES FOR 1.4.6e 15/8/2022
+============================
+Bugs fixed when developing pipresents-kms, some due to later version of python used
+fixed  - crash on nounclutter when pp_displaymanager.py is run.
+fixed  - bug in remi/remigui line 41
+fixed  - syntax warning in remi/remigui
+fixed  - keyboard not working in bullseye after resize of a window. In kbdriver.py and kbdriver_plus.py bind to top level window not canvas
+fixed - crash when menus have no bullet specified. Uses default bullet in this situation
+fixed - syntax error in pp_web_editor.py (is '')
+
+
 CHANGES FOR 1.4.6d 29/6/2022
 ============================
 enhanced - live tracks can now be sorted in reverse order by name using 'reverse'

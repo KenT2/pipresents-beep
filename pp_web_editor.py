@@ -609,7 +609,7 @@ class PPWebEditor(App):
 
     def copy_profile(self,widget,to_file=''):
         if self.pp_profile_dir != '':
-            if to_file is '':
+            if to_file == '':
                 d = InputDialog("Copy Profile","To new Profile",width=400,height=200,callback=self.copy_profile_confirm)
                 d.show(self)
             else:

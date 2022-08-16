@@ -1314,8 +1314,7 @@ class Display(object):
         self.mon=Mon()
     
     def init(self):
-        self.options={'fullscreen':True}
-        
+        self.options={'fullscreen':True,'nounclutter':False}
         # set up the displays and create a canvas for each display
         self.dm=DisplayManager()
         self.pp_dir='/home/pi/pipresents'

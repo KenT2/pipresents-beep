@@ -6,7 +6,7 @@ It is aimed at primarily at  musems, exhibitions and galleries
 but has many other applications including digital signage
 
 Version 1.4 [pipresents-beep]
-Copyright 2012/2013/2014/2015/2016/2017/2018/2019/2020/2021, Ken Thompson
+Copyright 2012/2013/2014/2015/2016/2017/2018/2019/2020/2021/2022, Ken Thompson
 See github for licence conditions
 See readme.md and manual.pdf for instructions.
 """
@@ -58,7 +58,7 @@ class PiPresents(object):
         # gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_INSTANCES|gc.DEBUG_OBJECTS|gc.DEBUG_SAVEALL)
         gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_SAVEALL)
         self.pipresents_issue="1.4.6"
-        self.pipresents_minorissue = '1.4.6d'
+        self.pipresents_minorissue = '1.4.6e'
 
         StopWatch.global_enable=False
         
