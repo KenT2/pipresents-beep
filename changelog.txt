@@ -1,3 +1,9 @@
+CHANGES FOR 1.4.6f 25/2/2023
+============================
+fixed - fixed 'ERROR, click area lookup failed' because PP was using the section
+ name not the name= name in screen.cfg
+
+
 CHANGES FOR 1.4.6e 15/8/2022
 ============================
 Bugs fixed when developing pipresents-kms, some due to later version of python used

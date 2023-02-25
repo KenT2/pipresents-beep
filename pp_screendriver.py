@@ -101,7 +101,8 @@ class ScreenDriver(object):
                     status,message,display_id,canvas=self.dm.id_of_canvas(display_name)
                     if status!='normal':
                         continue
-                    ScreenDriver.click_area_names.append(area)
+                    # ScreenDriver.click_area_names.append(area)
+                    ScreenDriver.click_area_names.append(self.get(area,'name'))
                     ScreenDriver.canvas_ids.append(canvas)
                     #print (display_id,canvas)
                     polygon_id=canvas.create_polygon(points,
