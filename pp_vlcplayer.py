@@ -19,7 +19,7 @@ class VLCPlayer(Player):
     """
     
     debug = False
-    debug = True
+    #debug = True
     
     def __init__(self,
                  show_id,
@@ -352,6 +352,7 @@ class VLCPlayer(Player):
             self.root.after(100,self.load_state_machine)
         else:
             resp=self.get_state()
+            # print ('Response',resp)
             # pp_vlcdriver changes state from load-loading when track is frozen at start.
             if resp == 'load-fail':
                 self.play_state = 'load-failed'
@@ -366,11 +367,7 @@ class VLCPlayer(Player):
                 #if self.loaded_callback is not  None:
                     #self.loaded_callback('normal','unloaded')
                 return            
-            elif resp in ('load-ok','stop-frozen'):
-                # stop received while in freeze-at-start - quit showing as soon as it starts
-                if resp=='stop-frozen':
-                    self.quit_signal= True
-                    self.mon.log(self,'stop received while in freeze-at-start')
+            elif resp in ('load-ok','load-frozen'):
                 self.play_state = 'loaded'
                 if self.vlc_sink!='':
                     self.set_device(self.vlc_sink)
@@ -411,8 +408,6 @@ class VLCPlayer(Player):
         if self.play_state == 'loaded':
             # print '\nstart show state machine ' + self.play_state
             self.play_state='showing'
-            self.freeze_signal=False     # signal that user has pressed stop
-            self.must_quit_signal=False
             # show the track and content
             self.vlcdriver.sendline('show')
             self.mon.log (self,'>showing track from show Id: '+ str(self.show_id))  

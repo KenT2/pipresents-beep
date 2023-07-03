@@ -1,3 +1,7 @@
+CHANGES FOR 1.4.6g 3/7/2023
+============================
+fixed - PP hangs if Stop command is received during freeze-at-start
+
 CHANGES FOR 1.4.6f 25/2/2023
 ============================
 fixed - fixed 'ERROR, click area lookup failed' because PP was using the section
