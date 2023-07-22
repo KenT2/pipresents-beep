@@ -39,6 +39,7 @@ from pp_network import Mailer, Network
 from pp_iopluginmanager import IOPluginManager
 from pp_countermanager import CounterManager
 from pp_beepplayer import BeepPlayer
+from pp_vibeplayer import VibePlayer
 from pp_audiomanager import AudioManager
 from pp_vlcdriver import Logger
 
@@ -58,7 +59,7 @@ class PiPresents(object):
         # gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_INSTANCES|gc.DEBUG_OBJECTS|gc.DEBUG_SAVEALL)
         gc.set_debug(gc.DEBUG_UNCOLLECTABLE|gc.DEBUG_SAVEALL)
         self.pipresents_issue="1.4.6"
-        self.pipresents_minorissue = '1.4.6g'
+        self.pipresents_minorissue = '1.4.6h'
 
         StopWatch.global_enable=False
         
@@ -105,7 +106,7 @@ class PiPresents(object):
                             
                             'HyperlinkShow','RadioButtonShow','ArtLiveShow','ArtMediaShow','MediaShow','LiveShow','MenuShow',
                             'GapShow','Show','ArtShow',
-                            'AudioPlayer','BrowserPlayer','ImagePlayer','MenuPlayer','MessagePlayer','VideoPlayer','Player','VLCPlayer','ChromePlayer',
+                            'VibePlayer','AudioPlayer','BrowserPlayer','ImagePlayer','MenuPlayer','MessagePlayer','VideoPlayer','Player','VLCPlayer','ChromePlayer',
                             'MediaList','LiveList','ShowList',
                             'PathManager','ControlsManager','ShowManager','TrackPluginManager','IOPluginManager',
                             'MplayerDriver','OMXDriver','UZBLDriver',
@@ -348,7 +349,10 @@ class PiPresents(object):
         # initialise the Beeps Player
         self.bp=BeepPlayer()
         self.bp.init(self.pp_home,self.pp_profile)
-
+        
+        #init vibe player
+        self.vp=VibePlayer()
+             
         # initialise the I/O plugins by importing their drivers
         self.ioplugin_manager=IOPluginManager()
         reason,message=self.ioplugin_manager.init(self.pp_dir,self.pp_profile,self.root,self.handle_input_event,self.pp_home)
@@ -566,6 +570,14 @@ class PiPresents(object):
 
         if fields[0]=='beep':
             status,message=self.bp.play_show_beep(command_text)
+            if status == 'error':
+                self.mon.err(self,message)
+                self.end('error',message)
+                return
+            return
+            
+        if fields[0]=='vibe':
+            status,message=self.vp.play_show_vibe(command_text)
             if status == 'error':
                 self.mon.err(self,message)
                 self.end('error',message)
