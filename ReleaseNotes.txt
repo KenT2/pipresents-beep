@@ -1,3 +1,11 @@
+Version 1.4.6h 22/7/2023
+========================
+Install an additional library, the DRV2605 library using:
+        python3 -m pip install DRV2605
+	
+There is an addittional example - pp_DRV2605_1p4
+	
+      
 Version 1.4.6c  8/1/2022
 ========================
 In addition to the fix in pp_hyperlinkshow.py you will need an updated version of the pp_hyperlinkshow_1p4 example

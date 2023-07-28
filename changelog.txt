@@ -1,6 +1,6 @@
 CHANGES FOR 1.4.6h 22/7/2023
 ============================
-enhanced - Added driver for DRV2605 Haptic Controller
+enhanced - Added driver for DRV2605 Haptic Controller (see Release Notes)
 
 CHANGES FOR 1.4.6g 3/7/2023
 ============================
