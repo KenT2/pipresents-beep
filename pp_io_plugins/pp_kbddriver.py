@@ -69,14 +69,18 @@ class pp_kbddriver(object):
                 continue
             # bind all the normal keys that return a printing character such that x produces pp-key-x
             if self.bind_printing =='yes':
-                canvas.bind("<Key>", lambda event : self._normal_key(callback,event))
+                #CANVAS KRT
+                top=canvas.winfo_toplevel()
+                top.bind("<Key>", lambda event : self._normal_key(callback,event))
+                
                 
             for option in self.config.items('keys'):
                 condition=option[0]
                 symbolic_name=option[1]
-                # print condition,symbolic_name
-                # print condition,symbolic_name
-                canvas.bind(condition, lambda event, name=symbolic_name: self._specific_key(callback,name))
+                # CANVAS
+                top=canvas.winfo_toplevel()
+                # print (condition,symbolic_name,canvas,top)
+                top.bind(condition, lambda event, name=symbolic_name: self._specific_key(callback,name))
 
 
     def _specific_key(self,callback,name):

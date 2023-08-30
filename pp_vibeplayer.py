@@ -3,6 +3,7 @@ import copy
 from pp_utils import Monitor
 import time
 from DRV2605_lib import DRV2605, PlayWaveform, WaitMillis
+from subprocess import call, check_output
 
 class VibePlayer(object):
 
@@ -11,8 +12,9 @@ class VibePlayer(object):
 
     def __init__(self):
         self.mon=Monitor()
+        #print ('vibeplayerr-_init')
         self.drv2605 = DRV2605()
-
+            
     # run once when PP starts
     def init(self,device,library):
         self.device=device
@@ -75,7 +77,7 @@ class VibePlayer(object):
     def play_show_vibe(self,command_text):
 
         fields = command_text.split()
-        print ('show VIBW',fields)
+        #print ('show VIBW',fields)
         if len(fields) !=2:
             return 'error',"incorrect number of fields in vibe command" + line
         sequence_vals = fields[1].split(',')

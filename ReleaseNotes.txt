@@ -1,5 +1,10 @@
+Version 1.4.6i 30/8/2023
+========================
+the --vibes command line option is now required to enable the vibes show control command
+
 Version 1.4.6h 22/7/2023
 ========================
+
 Install an additional library, the DRV2605 library using:
         python3 -m pip install DRV2605
 	

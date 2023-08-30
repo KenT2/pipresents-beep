@@ -5,7 +5,7 @@ import os
 import configparser
 import time
 from pp_vibeplayer import VibePlayer
-
+from subprocess import call, check_output
 
 class pp_DRV2605driver(object):
 
@@ -30,8 +30,18 @@ class pp_DRV2605driver(object):
 
     # executed by main program and by each object using the driver
     def __init__(self):
-        self.vp=VibePlayer()
-        pass
+        # test I2C is enabled
+        com=['sudo' ,'raspi-config' ,'nonint' ,'get_i2c']
+        result= check_output(com,universal_newlines=True)
+        #print ('I2C-driver',result)
+        if int(result) == 1:
+            #print ('driver-error')
+            print("ERROR: DRV2506 I/O plugin,I2C interface must be enabled for Vibes")
+            exit(102)
+        else:
+            #print('dr2506 driver _init vibeplayer')
+            self.vp=VibePlayer()
+
 
      # executed once from main program   
     def init(self,filename,filepath,widget,pp_dir,pp_home,pp_profile,event_callback=None):

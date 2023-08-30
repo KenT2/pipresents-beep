@@ -84,11 +84,9 @@ Install required packages
          sudo apt install unclutter
          sudo apt install mplayer
          sudo apt install python3-pexpect (may be already installed)
-	 
          sudo pip3 install python-vlc
-	 sudo pip3 install selenium
-	 
-	 python3 -m pip install DRV2605
+         sudo pip3 install selenium
+         python3 -m pip install DRV2605
 	 
 Now you have two choices of chromium browser. You will need the hardware accelerated browser to play videos in the browser and possibly for complex web sites, otherwise continue with the updated software accelerated browser.
 

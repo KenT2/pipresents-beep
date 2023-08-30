@@ -20,6 +20,7 @@ def command_options():
     parser.add_argument( '-n','--nonetwork', nargs='?', default=wait_no_w, const=wait_w,help='Enable wait for network [and time in secs]')
     parser.add_argument( '--loadcounters', action='store_true',help='Load counters form Start Show')
     parser.add_argument( '--nounclutter', action='store_true', help='Disable Unclutter')
+    parser.add_argument( '--vibes', action='store_true', help='Enable Vibes')
     
     args=parser.parse_args()
     return  vars(args)

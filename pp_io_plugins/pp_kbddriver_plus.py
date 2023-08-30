@@ -90,12 +90,14 @@ class pp_kbddriver_plus(object):
             if status !='normal':
                 continue
             # bind all the normal keys that return a printing character such that x produces pp-key-x (but fileterd in _key_received)
-            canvas.bind("<Key>", lambda event,match='<Key>',name='': self._key_received(event,match,name))
+            top=canvas.winfo_toplevel()
+            top.bind("<Key>", lambda event,match='<Key>',name='': self._key_received(event,match,name))
             # print 'bind printing'
     
             # Bind <Return> so that eol detection works, <Return> cannot be used to trigger an input event
             # if you wnt that use keys.cfg
-            canvas.bind("<Return>", lambda event,match='<Return>',name='': self._key_received(event,match,name))
+            top=canvas.winfo_toplevel()
+            top.bind("<Return>", lambda event,match='<Return>',name='': self._key_received(event,match,name))
             # print 'bind Return to make eol work'
                 
             # go through entries and bind all specific-character matches to _key_received
@@ -103,7 +105,8 @@ class pp_kbddriver_plus(object):
                 if entry[pp_kbddriver_plus.MODE] == 'specific-character':
                     match = entry[pp_kbddriver_plus.MATCH]
                     name = entry[pp_kbddriver_plus.NAME]
-                    canvas.bind(match, lambda event, match=match,name=name: self._key_received(event,match,name))
+                    top=canvas.winfo_toplevel()
+                    top.bind(match, lambda event, match=match,name=name: self._key_received(event,match,name))
                     # print 'bind specific-char', match,name
 
 
