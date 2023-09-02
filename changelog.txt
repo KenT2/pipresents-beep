@@ -1,9 +1,9 @@
-CHANGES FOR 1.4.6i 30/8/2023
+CHANGES FOR 1.4.6i 30/8/2023 and 2/9/2023
 ============================
 fixed  - keyboard not working in bullseye after resize of a window. In kbdriver.py and kbdriver_plus.py bind to top level window not canvas. Now transfer fix to beep
 fixed - crash if I2C interface is not enabled even though vibes not required 
         new command line --vibes option now required to enable vibes (see manual)
-fixed - audio gain too high and not adjustable
+
              
 CHANGES FOR 1.4.6h 22/7/2023
 ============================
