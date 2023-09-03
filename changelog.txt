@@ -1,3 +1,7 @@
+CHANGES FOR 1.4.6j 30/8/2023
+============================
+fixed - chrome web track failed to open the browser
+
 CHANGES FOR 1.4.6i 30/8/2023 and 2/9/2023
 ============================
 fixed  - keyboard not working in bullseye after resize of a window. In kbdriver.py and kbdriver_plus.py bind to top level window not canvas. Now transfer fix to beep

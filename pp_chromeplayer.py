@@ -5,6 +5,7 @@ import os
 import copy
 from selenium import webdriver
 from selenium.common.exceptions import *
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options 
 from pp_player import Player
 from pp_displaymanager import DisplayManager
@@ -299,13 +300,15 @@ class ChromePlayer(Player):
 # ***********************
 
     def driver_open(self):
+        path = '/bin/chromedriver'
+        service = Service(executable_path=path) # Here
         tries=4
         while tries>0:
             try:
-                self.driver = webdriver.Chrome(options=self.chrome_options)
+                self.driver = webdriver.Chrome(service=service,options=self.chrome_options)
                 return
             except Exception as e:
-                #print ("Failed to open Chromium", e, e.__class__,tries)
+                print ("Failed to open Chromium\n", e, e.__class__,'\n')
                 tries-=1
 
 
@@ -331,6 +334,7 @@ class ChromePlayer(Player):
             
     def driver_get(self,url):
         self.mon.log(self,'get: '+url)
+        #print(self.driver)
         try:
             self.driver.get(url)
         except WebDriverException as e:

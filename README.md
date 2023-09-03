@@ -55,7 +55,7 @@ The full manual in English is here https://github.com/KenT2/pipresents-beep/blob
 Requirements
 -------------
 
-	* must use the latest version of Raspberry Pi OS (legacy) with Desktop (not the Lite version)
+	* must use the latest version of Raspberry Pi OS (legacy) (buster) with Desktop (not the Lite version)
 	* must be run from the PIXEL desktop.
 	* must be installed and run from user Pi
 	* must have Python 3 installed (which Rasperry Pi OS does)
@@ -66,17 +66,12 @@ NOTE: PI PRESENTS DOES NOT WORK WITH BULLSEYE WHICH IS THE LATEST VERSION OF THE
 https://www.raspberrypi.com/software/operating-systems/#raspberry-pi-os-legacy
 
 
-Set the GPU Memory size to 256MB
----------------------------------
-Using the Raspbian menu preferences>raspberry pi configuration>performance, increase the GPU Memory to 256. On a Pi Zero this may not be possible due to the small amount of RAM.
-
-
 Ensure Raspbian is up to date.
 -------------------------------
-Pi Presents MUST have the latest version of omxplayer and of Raspbian, get this by
+Pi Presents MUST have the latest version of  of Raspberry Pi OS, get this by
 
          sudo apt update
-         sudo apt upgrade
+         sudo apt full-upgrade
 
 Install required packages 
 -----------------------------
@@ -88,13 +83,13 @@ Install required packages
          sudo pip3 install selenium
          python3 -m pip install DRV2605
  
-Now you have two choices of chromium browser. You will need the hardware accelerated browser to play videos in the browser and possibly for complex web sites, otherwise continue with the updated software accelerated browser.
+Buster now comes with Firefox installed but Pi Presents requires the chromium browser which has been deleted from the distribution because it is no longer having security updates. You have two choices of chromium browser. You will need the hardware accelerated browser to play videos in the browser and possibly for complex web sites, otherwise use the software accelerated browser which was updated more recently.
 
-a. If you wish to retain the currently installed software accelerated browser which will be updated. Installing this driver will retain the out of the box installed browser (chromium)
+a. If you wish to use the software accelerated browser:
 
 	 sudo apt install chromium-driver
 
-b. If you wish to switch to the hardware accelerated browser which will not receive updates then install this driver. Doing so will delete the software accelerated browser and install the hardware accelerated browser (chromium-browser)
+b. If you wish to use the hardware accelerated browser:
  
 	sudo apt install chromium-chromedriver
 
@@ -158,7 +153,18 @@ Install Python 3 version of some packages:
       sudo apt-get install python3-pexpect
       sudo pip3 install evdev
       sudo pip3 install python-vlc
-      
+      python3 -m pip install DRV2605
+ 
+Buster now comes with Firefox installed but Pi Presents requires the chromium browser which has been deleted from the distribution because it is no longer having security updates. You have two choices of chromium browser. You will need the hardware accelerated browser to play videos in the browser and possibly for complex web sites, otherwise use the software accelerated browser which was updated more recently.
+
+a. If you wish to use the software accelerated browser:
+
+	 sudo apt install chromium-driver
+
+b. If you wish to use the hardware accelerated browser:
+ 
+	sudo apt install chromium-chromedriver
+
       
 The Python 2 versions of these packages can be left installed
 
