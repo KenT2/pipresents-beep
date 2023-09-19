@@ -90,6 +90,7 @@ class ChromePlayer(Player):
     # LOAD - loads the browser and show stuff
     def load(self,track,loaded_callback,enable_menu):  
         # instantiate arguments
+        self.track=track
         self.loaded_callback=loaded_callback   # callback when loaded
         self.mon.trace(self,'')
 
@@ -114,21 +115,33 @@ class ChromePlayer(Player):
 
 
         # does media exist    
-        if not ':' in track:
-            if not os.path.exists(track):
-                self.mon.err(self, 'cannot find file; '+track )
+        if not ':' in self.track:
+            if not os.path.exists(self.track):
+                self.mon.err(self, 'cannot find file; '+self.track )
                 self.play_state='load-failed'
                 if self.loaded_callback is not  None:
-                    self.loaded_callback('error','cannot find file; '+track )
+                    self.loaded_callback('error','cannot find file; '+self.track )
+                    return
+                    
+
+        # do common bits of  load
+        Player.pre_load(self)
+        
+        # load the plugin, this may modify self.track and enable the plugin drawing to canvas
+        if self.track_params['plugin'] != '':
+            status,message=self.load_plugin()
+            if status == 'error':
+                self.mon.err(self,message)
+                self.play_state='load-failed'
+                if self.loaded_callback is not  None:
+                    self.loaded_callback('error',message)
                     return
                     
         # add file:// to files.
-        if ':' in track:
-            self.current_url=track
+        if ':' in self.track:
+            self.current_url=self.track
         else:
-            self.current_url='file://'+track
-        # do common bits of  load
-        Player.pre_load(self)
+            self.current_url='file://'+self.track
         
         # prepare chromium options
         status,message=self.process_chrome_options()
@@ -150,15 +163,8 @@ class ChromePlayer(Player):
                 return
 
 
-        # load the plugin, this may modify self.track and enable the plugin drawing to canvas
-        if self.track_params['plugin'] != '':
-            status,message=self.load_plugin()
-            if status == 'error':
-                self.mon.err(self,message)
-                self.play_state='load-failed'
-                if self.loaded_callback is not  None:
-                    self.loaded_callback('error',message)
-                    return
+
+
 
         # start loading the browser
         self.play_state='loading'
@@ -310,7 +316,7 @@ class ChromePlayer(Player):
             except Exception as e:
                 print ("Failed to open Chromium\n", e, e.__class__,'\n')
                 tries-=1
-
+        
 
     def driver_close(self):
         try:
@@ -334,7 +340,6 @@ class ChromePlayer(Player):
             
     def driver_get(self,url):
         self.mon.log(self,'get: '+url)
-        #print(self.driver)
         try:
             self.driver.get(url)
         except WebDriverException as e:

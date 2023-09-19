@@ -1,3 +1,7 @@
+CHANGES FOR 1.4.6k 19/9/2023
+============================
+fixed - track plugins now work for chrome web tracks
+
 CHANGES FOR 1.4.6j 30/8/2023
 ============================
 fixed - chrome web track failed to open the browser
