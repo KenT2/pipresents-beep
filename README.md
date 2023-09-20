@@ -1,7 +1,7 @@
 PI PRESENTS  - Version 1.4.6
 ============================
 
-This repository contains the latest and greatest version Pi Presents. Use if you are happy with bleeding edge software that is under development.
+This repository contains a version of PiPresents in which omxplayer was replaced by VLC. Unfortunately VLC does not integrate well with Pi Presents when used under RPi OS Bullseye which uses DRM/KMS. Please use Pi Presents KMS which works on Bullseye.It has all the features of Beep.
 
 Diese Readme-Datei hat Peter Vasen ins Deutsche übersetzt. Klicken Sie hier 
 http://www.web-echo.de/4.html
